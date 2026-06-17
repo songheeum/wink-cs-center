@@ -113,13 +113,20 @@ body{font-family:'Pretendard Variable',-apple-system,BlinkMacSystemFont,'Apple S
 
   <div class="summary" id="summary"></div>
 
-  <div class="controls">
-    <div class="search">
-      <input id="q" type="text" placeholder="증상·점검종류·자마드 검색" autocomplete="off">
-    </div>
-    <button class="mine" id="mine">내 점검건</button>
+       <div class="controls">
+  <div class="search">
+    <input id="q" type="text" placeholder="증상·점검종류·자마드 검색" autocomplete="off">
   </div>
 
+  <button class="mine" id="mine">내 점검건</button>
+
+  <div id="memberPicker" class="picker" style="display:none">
+    <button onclick="filterOwner('도아')">도아</button>
+    <button onclick="filterOwner('우교')">우교</button>
+    <button onclick="filterOwner('대성')">대성</button>
+    <button onclick="filterOwner('')">전체보기</button>
+  </div>
+</div>
   <div id="list"></div>
 </div>
 
@@ -194,10 +201,18 @@ if(s.indexOf('부재')>=0)
 
 /* ---------- 상태 ---------- */
 var ALL=[],filterStatus='all',mineOnly=false,query='';
+var selectedOwner='';
 
+function filterOwner(name){
+  selectedOwner=name;
+
+  document.getElementById('memberPicker').style.display='none';
+
+  render();
+}
 function render(){
   var list=ALL.filter(function(o){
-    if(mineOnly && o.who!==MY_NAME) return false;
+    if(selectedOwner && (o.who || '').trim() !== selectedOwner) return false;
     if(filterStatus!=='all' && statusKind(o.status).k!==filterStatus) return false;
     if(query){
       var hay=((o.sym||'')+(o.type||'')+(o.url||'')).toLowerCase();
@@ -272,10 +287,20 @@ ALL.sort(function(a,b){
 }
 
 document.getElementById('refresh').onclick=load;
+
 document.getElementById('mine').onclick=function(){
-  mineOnly=!mineOnly; this.classList.toggle('on',mineOnly); render();
+  var p=document.getElementById('memberPicker');
+
+  p.style.display =
+    p.style.display==='none'
+      ? 'block'
+      : 'none';
 };
-document.getElementById('q').addEventListener('input',function(){ query=this.value; render(); });
+
+document.getElementById('q').addEventListener('input',function(){
+  query=this.value;
+  render();
+});
 
 load();
 </script>
