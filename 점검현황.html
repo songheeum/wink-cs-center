@@ -65,6 +65,26 @@ body{font-family:'Pretendard Variable',-apple-system,BlinkMacSystemFont,'Apple S
 .b-book{background:#eaf2ff;color:var(--blue);}
 .b-prog{background:#fff3e0;color:#c06f00;}
 .b-cancel{background:#f0f0f2;color:var(--gray);}
+.b-issue{
+  background:#dbeafe;
+  color:#2563eb;
+}
+
+.b-urgent{
+  background:#fee2e2;
+  color:#dc2626;
+  font-weight:700;
+}
+
+.b-absent{
+  background:#f3f4f6;
+  color:#6b7280;
+}
+
+.b-etc{
+  background:#eef2ff;
+  color:#4338ca;
+}
 .date{margin-left:auto;font-size:12px;color:var(--ink-3);}
 .row .sym{font-size:15px;font-weight:600;letter-spacing:-.2px;margin-bottom:6px;}
 .row .meta{display:flex;gap:12px;flex-wrap:wrap;font-size:12.5px;color:var(--ink-2);}
@@ -152,12 +172,24 @@ function buildItems(rows){
 
 /* ---------- 상태 분류 ---------- */
 function statusKind(s){
-  s=s||'';
-  if(s.indexOf('취소')>=0) return {k:'cancel',label:'취소',cls:'b-cancel'};
-  if(s.indexOf('완료')>=0) return {k:'done',label:'완료',cls:'b-done'};
-  if(s.indexOf('예약')>=0) return {k:'book',label:'예약',cls:'b-book'};
-  if(s) return {k:'prog',label:'처리중',cls:'b-prog'};
-  return {k:'prog',label:'미정',cls:'b-prog'};
+  s = (s || '').trim();
+
+  if(s.indexOf('취소') >= 0) return {k:'cancel', label:s, cls:'b-cancel'};
+  if(s.indexOf('완료') >= 0) return {k:'done', label:s, cls:'b-done'};
+  if(s.indexOf('예약') >= 0) return {k:'book', label:s, cls:'b-book'};
+if(s.indexOf('이슈')>=0)
+  return {k:'etc',label:s,cls:'b-issue'};
+
+if(s.indexOf('당일')>=0)
+  return {k:'etc',label:s,cls:'b-urgent'};
+
+if(s.indexOf('부재')>=0)
+  return {k:'etc',label:s,cls:'b-absent'};
+  // 처리중이라는 말이 실제로 적혀 있을 때만 처리중으로 계산
+  if(s.indexOf('처리중') >= 0) return {k:'prog', label:s, cls:'b-prog'};
+
+  // 나머지 상태는 처리중으로 세지 않음
+  return {k:'etc', label:s || '미정', cls:'b-etc'};
 }
 
 /* ---------- 상태 ---------- */
@@ -200,7 +232,7 @@ function render(){
 }
 
 function renderSummary(){
-  var cnt={all:ALL.length,book:0,prog:0,done:0,cancel:0};
+  var cnt={all:ALL.length,book:0,prog:0,done:0,cancel:0,etc:0};
   ALL.forEach(function(o){ cnt[statusKind(o.status).k]++; });
   var defs=[['all','전체'],['book','예약'],['prog','처리중'],['done','완료'],['cancel','취소']];
   document.getElementById('summary').innerHTML=defs.map(function(d){
