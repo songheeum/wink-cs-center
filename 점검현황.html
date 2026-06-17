@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>점검현황</title>
+
+<!-- ===================================================================
+     ▼▼▼ 여기에 구글시트 "웹에 게시(CSV)" 주소를 붙여넣으세요 ▼▼▼
+     예) https://docs.google.com/spreadsheets/d/e/2PACX-xxxx/pub?gid=0&single=true&output=csv
+=================================================================== -->
+<script>
+  var SHEET_CSV_URL = "";   // ← 여기에 CSV URL 붙여넣기
+  var MY_NAME = "도아";       // ← "내 점검건" 기준 (처리자 이름)
+</script>
+
+<style>
+@font-face{font-family:'Pretendard Variable';font-style:normal;font-weight:45 920;font-display:swap;
+  src:url('pretendard.woff2') format('woff2');}
+
+:root{
+  --blue:#0066cc; --ink:#1d1d1f; --ink-2:#6e6e73; --ink-3:#98a2b3;
+  --border:#e6e6ea; --bg:#f5f5f7; --card:#ffffff;
+  --g:#34c759; --o:#ff9500; --r:#ff3b30; --gray:#8e8e93;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Pretendard Variable',-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;
+  background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased;padding:18px;}
+.wrap{max-width:780px;margin:0 auto;}
+
+.top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.top h1{font-size:21px;font-weight:700;letter-spacing:-.3px;}
+.top .right{display:flex;align-items:center;gap:10px;}
+.updated{font-size:12px;color:var(--ink-3);}
+.refresh{border:1px solid var(--border);background:var(--card);color:var(--blue);font-family:inherit;
+  font-size:13px;font-weight:600;padding:7px 13px;border-radius:10px;cursor:pointer;}
+.refresh:active{background:#eef4fc;}
+
+/* 상태 요약 칩 */
+.summary{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;}
+.chip{flex:1;min-width:84px;background:var(--card);border:1px solid var(--border);border-radius:13px;
+  padding:11px 8px;text-align:center;cursor:pointer;transition:.12s;}
+.chip:hover{border-color:#cfd2d8;}
+.chip.on{border-color:var(--blue);background:#f0f6ff;}
+.chip .n{font-size:22px;font-weight:700;letter-spacing:-.5px;line-height:1;}
+.chip .l{font-size:11.5px;color:var(--ink-2);margin-top:5px;}
+
+/* 컨트롤 */
+.controls{display:flex;gap:8px;margin-bottom:14px;}
+.search{flex:1;position:relative;}
+.search input{width:100%;height:44px;border:1px solid var(--border);border-radius:12px;background:var(--card);
+  padding:0 14px;font-family:inherit;font-size:14px;outline:none;}
+.search input:focus{border-color:var(--blue);}
+.mine{flex:0 0 auto;height:44px;border:1px solid var(--border);background:var(--card);border-radius:12px;
+  padding:0 14px;font-family:inherit;font-size:13.5px;font-weight:600;color:var(--ink-2);cursor:pointer;white-space:nowrap;}
+.mine.on{border-color:var(--blue);background:#f0f6ff;color:var(--blue);}
+
+/* 리스트 */
+#list{display:flex;flex-direction:column;gap:9px;}
+.row{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:13px 15px;}
+.row .head{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:7px;}
+.badge{font-size:11.5px;font-weight:600;padding:3px 9px;border-radius:7px;}
+.b-type{background:#eef1f5;color:var(--ink-2);}
+.b-done{background:#e7f9ec;color:#1a8a3a;}
+.b-book{background:#eaf2ff;color:var(--blue);}
+.b-prog{background:#fff3e0;color:#c06f00;}
+.b-cancel{background:#f0f0f2;color:var(--gray);}
+.date{margin-left:auto;font-size:12px;color:var(--ink-3);}
+.row .sym{font-size:15px;font-weight:600;letter-spacing:-.2px;margin-bottom:6px;}
+.row .meta{display:flex;gap:12px;flex-wrap:wrap;font-size:12.5px;color:var(--ink-2);}
+.row .meta b{font-weight:600;color:var(--ink);}
+.row .link{font-size:12.5px;}
+.row .link a{color:var(--blue);text-decoration:none;}
+.row .link a:hover{text-decoration:underline;}
+.row .extra{margin-top:6px;font-size:12.5px;color:#c06f00;}
+
+.msg{text-align:center;color:var(--ink-3);font-size:14px;line-height:1.7;padding:48px 16px;}
+.msg b{color:var(--ink-2);}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <h1>점검현황</h1>
+    <div class="right">
+      <span class="updated" id="updated"></span>
+      <button class="refresh" id="refresh">새로고침</button>
+    </div>
+  </div>
+
+  <div class="summary" id="summary"></div>
+
+  <div class="controls">
+    <div class="search">
+      <input id="q" type="text" placeholder="증상·점검종류·자마드 검색" autocomplete="off">
+    </div>
+    <button class="mine" id="mine">내 점검건</button>
+  </div>
+
+  <div id="list"></div>
+</div>
+
+<script>
+/* ---------- CSV 파서 (따옴표·쉼표·줄바꿈 처리) ---------- */
+function parseCSV(text){
+  var rows=[],row=[],cur="",q=false;
+  for(var i=0;i<text.length;i++){
+    var c=text[i];
+    if(q){
+      if(c==='"'){ if(text[i+1]==='"'){cur+='"';i++;} else q=false; }
+      else cur+=c;
+    }else{
+      if(c==='"') q=true;
+      else if(c===','){ row.push(cur);cur=""; }
+      else if(c==='\n'){ row.push(cur);rows.push(row);row=[];cur=""; }
+      else if(c==='\r'){}
+      else cur+=c;
+    }
+  }
+  if(cur!==""||row.length){ row.push(cur);rows.push(row); }
+  return rows;
+}
+
+/* ---------- 헤더 자동 탐지 + 컬럼명 매핑 ---------- */
+var COLS={접수일:'date',점검종류:'type',자마드주소:'url',증상:'sym',처리자:'who',
+  소요시간:'dur',상태:'status',특이사항:'extra'};
+function norm(s){return (s||'').replace(/\s|\(.*?\)/g,'').trim();}
+
+function buildItems(rows){
+  var hi=-1;
+  for(var i=0;i<rows.length;i++){
+    if(rows[i].some(function(c){return norm(c)==='접수일';})){hi=i;break;}
+  }
+  if(hi<0) return [];
+  var header=rows[hi].map(norm);
+  var map={};
+  header.forEach(function(h,idx){ if(COLS[h]) map[COLS[h]]=idx; });
+  var out=[];
+  for(var r=hi+1;r<rows.length;r++){
+    var line=rows[r];
+    if(!line||!(line[map.date]||'').trim()) continue;
+    var o={};
+    for(var k in map) o[k]=(line[map[k]]||'').trim();
+    out.push(o);
+  }
+  return out;
+}
+
+/* ---------- 상태 분류 ---------- */
+function statusKind(s){
+  s=s||'';
+  if(s.indexOf('취소')>=0) return {k:'cancel',label:'취소',cls:'b-cancel'};
+  if(s.indexOf('완료')>=0) return {k:'done',label:'완료',cls:'b-done'};
+  if(s.indexOf('예약')>=0) return {k:'book',label:'예약',cls:'b-book'};
+  if(s) return {k:'prog',label:'처리중',cls:'b-prog'};
+  return {k:'prog',label:'미정',cls:'b-prog'};
+}
+
+/* ---------- 상태 ---------- */
+var ALL=[],filterStatus='all',mineOnly=false,query='';
+
+function render(){
+  var list=ALL.filter(function(o){
+    if(mineOnly && o.who!==MY_NAME) return false;
+    if(filterStatus!=='all' && statusKind(o.status).k!==filterStatus) return false;
+    if(query){
+      var hay=((o.sym||'')+(o.type||'')+(o.url||'')).toLowerCase();
+      if(hay.indexOf(query.toLowerCase())<0) return false;
+    }
+    return true;
+  });
+
+  var el=document.getElementById('list');
+  if(!list.length){ el.innerHTML='<div class="msg">표시할 점검건이 없어요.</div>'; return; }
+
+  el.innerHTML=list.map(function(o){
+    var st=statusKind(o.status);
+    var link=o.url && /^https?:/.test(o.url)
+      ? '<div class="link"><a href="'+o.url+'" target="_blank" rel="noopener">자마드 열기 ↗</a></div>' : '';
+    var meta=[];
+    if(o.who) meta.push('처리자 <b>'+o.who+'</b>');
+    if(o.dur) meta.push('소요 <b>'+o.dur+'</b>');
+    var extra=o.extra ? '<div class="extra">⚑ '+o.extra+'</div>' : '';
+    return '<div class="row">'
+      +'<div class="head">'
+        +(o.type?'<span class="badge b-type">'+o.type+'</span>':'')
+        +'<span class="badge '+st.cls+'">'+st.label+'</span>'
+        +'<span class="date">'+(o.date||'')+'</span>'
+      +'</div>'
+      +'<div class="sym">'+(o.sym||'(증상 없음)')+'</div>'
+      +(meta.length?'<div class="meta">'+meta.join('')+'</div>':'')
+      +link+extra
+    +'</div>';
+  }).join('');
+}
+
+function renderSummary(){
+  var cnt={all:ALL.length,book:0,prog:0,done:0,cancel:0};
+  ALL.forEach(function(o){ cnt[statusKind(o.status).k]++; });
+  var defs=[['all','전체'],['book','예약'],['prog','처리중'],['done','완료'],['cancel','취소']];
+  document.getElementById('summary').innerHTML=defs.map(function(d){
+    return '<div class="chip'+(filterStatus===d[0]?' on':'')+'" data-k="'+d[0]+'">'
+      +'<div class="n">'+(cnt[d[0]]||0)+'</div><div class="l">'+d[1]+'</div></div>';
+  }).join('');
+  document.querySelectorAll('.chip').forEach(function(c){
+    c.onclick=function(){ filterStatus=this.getAttribute('data-k'); renderSummary(); render(); };
+  });
+}
+
+/* ---------- 데이터 로드 ---------- */
+function load(){
+  var el=document.getElementById('list');
+  if(!SHEET_CSV_URL){
+    el.innerHTML='<div class="msg">아직 시트 주소가 없어요.<br>HTML 상단 <b>SHEET_CSV_URL</b> 에 게시 CSV 주소를 붙여넣어 주세요.</div>';
+    document.getElementById('summary').innerHTML='';
+    return;
+  }
+  el.innerHTML='<div class="msg">불러오는 중…</div>';
+  fetch(SHEET_CSV_URL+(SHEET_CSV_URL.indexOf('?')<0?'?':'&')+'t='+Date.now())
+    .then(function(r){ if(!r.ok) throw 0; return r.text(); })
+    .then(function(t){
+      ALL=buildItems(parseCSV(t));
+      renderSummary(); render();
+      var d=new Date();
+      document.getElementById('updated').textContent='업데이트 '
+        +('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2);
+    })
+    .catch(function(){
+      el.innerHTML='<div class="msg">데이터를 불러오지 못했어요.<br>'
+        +'시트가 <b>웹에 게시(CSV)</b> 되어 있는지, 주소가 맞는지 확인해 주세요.</div>';
+    });
+}
+
+document.getElementById('refresh').onclick=load;
+document.getElementById('mine').onclick=function(){
+  mineOnly=!mineOnly; this.classList.toggle('on',mineOnly); render();
+};
+document.getElementById('q').addEventListener('input',function(){ query=this.value; render(); });
+
+load();
+</script>
+</body>
+</html>
