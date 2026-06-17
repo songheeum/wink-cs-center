@@ -349,6 +349,7 @@
       <div class="cat" data-cat="레노버"><div class="emoji" data-edit="icon">🐱</div><div class="name" data-edit="name">레노버</div><div class="desc" data-edit="desc">캐츠잉글리시</div></div>
       <div class="cat" data-cat="학부모앱"><div class="emoji" data-edit="icon">👪</div><div class="name" data-edit="name">학부모앱</div><div class="desc" data-edit="desc">보호자용</div></div>
       <div class="cat" data-cat="AI도움말"><div class="emoji" data-edit="icon">🤖</div><div class="name" data-edit="name">AI도움말</div><div class="desc" data-edit="desc">키워드 챗봇</div></div>
+      <div class="cat" data-cat="점검현황"><div class="emoji">📊</div><div class="name">점검현황</div><div class="desc">실시간 조회</div></div>
     </div>
 
     <div class="tip" id="tipBox">💡 <span><b>전체 검색</b> — 검색창에 키워드를 입력하면 모든 메뉴에서 통합 검색됩니다.</span></div>
@@ -590,9 +591,16 @@
     }
     return list;
   }
-  function renderCategory(name){
-    currentCat=name; activeChip='전체';
-    if(name==='AI도움말'){ faqView.style.display='none'; stubEl.style.display='none'; chatPanel.style.display='block';
+function renderCategory(name){
+  currentCat=name;
+  activeChip='전체';
+
+  if(name==='점검현황'){
+      window.open('점검현황.html','_blank');
+      return;
+  }
+
+  if(name==='AI도움말'){ faqView.style.display='none'; stubEl.style.display='none'; chatPanel.style.display='block';
       tipBox.innerHTML='💡 <span><b>AI 도움말</b> — 매뉴얼 안에서 키워드로 답을 찾아드려요. 궁금한 걸 입력해 보세요.</span>'; initChat(); return; }
     chatPanel.style.display='none';
     var has=(name==='전체')||FAQ.some(function(f){return f.cat===name;});
