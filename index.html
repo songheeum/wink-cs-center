@@ -23,31 +23,39 @@
 
   /* ===== 게이트 ===== */
   #gate{position:fixed;inset:0;z-index:100;padding:24px;display:flex;align-items:center;justify-content:center;
-    background:linear-gradient(180deg,#fffafc 0%,#fcf1f6 100%);transition:opacity .5s ease;}
+    background:linear-gradient(160deg,#FCE9F1 0%,#F8DEEA 58%,#F4D3E3 100%);transition:opacity .5s ease;}
+  #gate::before{content:"";position:absolute;width:340px;height:340px;border-radius:50%;top:-120px;right:-90px;
+    background:radial-gradient(circle,rgba(231,110,166,.22),transparent 70%);pointer-events:none;}
+  #gate::after{content:"";position:absolute;width:300px;height:300px;border-radius:50%;bottom:-110px;left:-80px;
+    background:radial-gradient(circle,rgba(244,171,203,.28),transparent 70%);pointer-events:none;}
   #gate.hide{opacity:0;pointer-events:none;}
-  .gate-card{width:100%;max-width:380px;background:var(--surface);border-radius:24px;
-    box-shadow:0 14px 44px rgba(231,110,166,.16);padding:48px 36px 40px;text-align:center;
+  .gate-card{position:relative;width:100%;max-width:360px;
+    background:rgba(255,255,255,.62);
+    -webkit-backdrop-filter:blur(20px) saturate(160%);backdrop-filter:blur(20px) saturate(160%);
+    border:1px solid rgba(255,255,255,.85);border-radius:26px;
+    box-shadow:0 18px 50px rgba(159,58,105,.16);padding:40px 30px 32px;text-align:center;
     animation:rise .6s cubic-bezier(.16,1,.3,1);}
   @keyframes rise{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:none;}}
-  .lock-icon{width:64px;height:64px;margin:0 auto 22px;border-radius:18px;
+  .lock-icon{width:56px;height:56px;margin:0 auto 18px;border-radius:16px;
     background:linear-gradient(135deg,var(--blue-light),var(--blue));
-    display:flex;align-items:center;justify-content:center;box-shadow:0 8px 20px rgba(231,110,166,.4);}
-  .lock-icon svg{width:30px;height:30px;fill:#fff;}
-  .gate-title{font-size:22px;font-weight:700;letter-spacing:-.02em;}
-  .gate-sub{font-size:14px;color:var(--ink-3);margin-top:6px;}
-  .gate-action{margin-top:30px;}
+    display:flex;align-items:center;justify-content:center;box-shadow:0 10px 22px rgba(231,110,166,.38);}
+  .lock-icon svg{width:27px;height:27px;fill:#fff;}
+  .gate-brand{font-size:12px;font-weight:700;letter-spacing:.14em;color:var(--blue-dark);}
+  .gate-title{font-size:21px;font-weight:700;letter-spacing:-.02em;margin-top:2px;}
+  .gate-sub{font-size:13px;color:var(--ink-3);margin-top:7px;}
+  .gate-action{margin-top:26px;}
   .btn{width:100%;border:none;cursor:pointer;font-family:inherit;font-size:16px;font-weight:600;
-    background:var(--blue);color:#fff;padding:15px;border-radius:14px;transition:background .15s,transform .1s;}
+    background:var(--blue);color:#fff;padding:15px;border-radius:14px;transition:background .15s,transform .1s;
+    box-shadow:0 8px 20px rgba(231,110,166,.3);}
   .btn:hover{background:var(--blue-dark);}
   .btn:active{transform:scale(.985);}
-  #pwWrap{display:none;}
-  #pwWrap.show{display:block;animation:rise .35s ease;}
-  .pw-field{display:flex;gap:10px;margin-bottom:12px;}
-  #pwInput{flex:1;min-width:0;font-family:inherit;font-size:18px;text-align:center;letter-spacing:.3em;
-    padding:14px;border:1.5px solid var(--border);border-radius:14px;outline:none;transition:border-color .15s;}
-  #pwInput:focus{border-color:var(--blue);}
-  #pwConfirm{flex:0 0 auto;width:64px;font-size:15px;padding:14px 0;}
-  .err{color:#d93025;font-size:13px;height:18px;opacity:0;transition:opacity .15s;}
+  .pw-field{margin-bottom:10px;}
+  #pwInput{width:100%;font-family:inherit;font-size:17px;text-align:center;letter-spacing:.3em;
+    padding:15px;border:1.5px solid rgba(231,110,166,.35);border-radius:14px;outline:none;
+    background:rgba(255,255,255,.9);transition:border-color .15s,box-shadow .15s;}
+  #pwInput::placeholder{letter-spacing:.04em;color:var(--ink-3);}
+  #pwInput:focus{border-color:var(--blue);box-shadow:0 0 0 4px rgba(231,110,166,.12);}
+  .err{color:#d93025;font-size:13px;height:18px;opacity:0;transition:opacity .15s;margin-bottom:4px;}
   .err.show{opacity:1;}
   .shake{animation:shake .4s;}
   @keyframes shake{0%,100%{transform:translateX(0);}20%,60%{transform:translateX(-7px);}40%,80%{transform:translateX(7px);}}
@@ -268,17 +276,15 @@
     <div class="lock-icon">
       <svg viewBox="0 0 24 24"><path d="M12 1a5 5 0 0 0-5 5v3H6a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-9a2 2 0 0 0-2-2h-1V6a5 5 0 0 0-5-5zm0 2a3 3 0 0 1 3 3v3H9V6a3 3 0 0 1 3-3zm0 11a2 2 0 0 1 1 3.73V19a1 1 0 0 1-2 0v-1.27A2 2 0 0 1 12 14z"/></svg>
     </div>
-    <div class="gate-title">단비공감팀 통합 메뉴얼</div>
+    <div class="gate-brand">DANBI 공감</div>
+    <div class="gate-title">통합 메뉴얼</div>
     <div class="gate-sub">팀 내부 전용 페이지입니다</div>
     <div class="gate-action">
-      <button class="btn" id="enterBtn">입장하기</button>
-      <div id="pwWrap">
-        <div class="pw-field">
-          <input id="pwInput" type="password" inputmode="numeric" maxlength="12" placeholder="비밀번호" autocomplete="off">
-          <button class="btn" id="pwConfirm">확인</button>
-        </div>
-        <div class="err" id="errMsg">비밀번호가 올바르지 않습니다</div>
+      <div class="pw-field">
+        <input id="pwInput" type="password" inputmode="numeric" maxlength="12" placeholder="비밀번호 입력" autocomplete="off">
       </div>
+      <div class="err" id="errMsg">비밀번호가 올바르지 않습니다</div>
+      <button class="btn" id="pwConfirm">입장하기</button>
     </div>
   </div>
 </div>
@@ -381,8 +387,8 @@
 (function(){
   var PASSWORD = "1234";  /* 입장 비밀번호 */
 
-  var gate=document.getElementById('gate'),enterBtn=document.getElementById('enterBtn'),
-      pwWrap=document.getElementById('pwWrap'),pwInput=document.getElementById('pwInput'),
+  var gate=document.getElementById('gate'),
+      pwInput=document.getElementById('pwInput'),
       pwConfirm=document.getElementById('pwConfirm'),errMsg=document.getElementById('errMsg'),
       gateCard=document.getElementById('gateCard'),app=document.getElementById('app');
 
@@ -413,8 +419,7 @@
     });
   }
 
-  try{ if(sessionStorage.getItem('danbi_in')==='1') unlock(true); }catch(e){}
-  enterBtn.addEventListener('click',function(){enterBtn.style.display='none';pwWrap.classList.add('show');pwInput.focus();});
+  try{ if(sessionStorage.getItem('danbi_in')==='1'){ unlock(true); } else { setTimeout(function(){pwInput.focus();},650); } }catch(e){ setTimeout(function(){pwInput.focus();},650); }
   function check(){
     if(pwInput.value===PASSWORD){ try{sessionStorage.setItem('danbi_in','1');}catch(e){} unlock(false); }
     else{ errMsg.classList.add('show');gateCard.classList.add('shake');pwInput.value='';
