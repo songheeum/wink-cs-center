@@ -72,8 +72,6 @@ body{font-family:'Pretendard Variable',-apple-system,BlinkMacSystemFont,'Apple S
 .row .link{font-size:12.5px;}
 .row .link a{color:var(--blue);text-decoration:none;}
 .row .link a:hover{text-decoration:underline;}
-.row .extra{margin-top:6px;font-size:12.5px;color:#c06f00;}
-
 .msg{text-align:center;color:var(--ink-3);font-size:14px;line-height:1.7;padding:48px 16px;}
 .msg b{color:var(--ink-2);}
 </style>
@@ -123,7 +121,8 @@ function parseCSV(text){
 
 /* ---------- 헤더 자동 탐지 + 컬럼명 매핑 ---------- */
 var COLS={접수일:'date',점검종류:'type',자마드주소:'url',증상:'sym',처리자:'who',
-  소요시간:'dur',상태:'status',특이사항:'extra'};
+  소요시간:'dur',상태:'status'
+       };
 function norm(s){return (s||'').replace(/\s|\(.*?\)/g,'').trim();}
 
 function buildItems(rows){
@@ -180,7 +179,6 @@ function render(){
     var meta=[];
     if(o.who) meta.push('처리자 <b>'+o.who+'</b>');
     if(o.dur) meta.push('소요 <b>'+o.dur+'</b>');
-    var extra=o.extra ? '<div class="extra">⚑ '+o.extra+'</div>' : '';
     return '<div class="row">'
       +'<div class="head">'
         +(o.type?'<span class="badge b-type">'+o.type+'</span>':'')
@@ -189,7 +187,7 @@ function render(){
       +'</div>'
       +'<div class="sym">'+(o.sym||'(증상 없음)')+'</div>'
       +(meta.length?'<div class="meta">'+meta.join('')+'</div>':'')
-      +link+extra
+      +link
     +'</div>';
   }).join('');
 }
