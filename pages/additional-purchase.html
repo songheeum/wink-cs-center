@@ -1,1 +1,127 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>추가구매 계산기</title>
 
+<style>
+body{
+  font-family: Pretendard, sans-serif;
+  background:#fff7fa;
+  padding:30px;
+}
+
+.container{
+  max-width:900px;
+  margin:auto;
+}
+
+.card{
+  background:white;
+  border-radius:20px;
+  padding:20px;
+  margin-bottom:20px;
+  box-shadow:0 4px 12px rgba(0,0,0,.08);
+}
+
+h1{
+  margin-top:0;
+}
+
+.product{
+  display:flex;
+  justify-content:space-between;
+  margin-bottom:10px;
+}
+
+input[type="number"]{
+  width:70px;
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+  <h1>🛒 추가구매 계산기</h1>
+
+  <div class="card">
+
+    <h3>상품구분</h3>
+
+    <label>
+      <input type="radio" name="brand" checked>
+      윙크
+    </label>
+
+    <label>
+      <input type="radio" name="brand">
+      캐츠홈
+    </label>
+
+    <label>
+      <input type="radio" name="brand">
+      캐츠잉글리시
+    </label>
+
+  </div>
+
+  <div class="card">
+
+    <h3>상품선택</h3>
+
+    <div class="product">
+      <label>
+        <input type="checkbox">
+        충전기
+      </label>
+
+      <input type="number" value="1">
+    </div>
+
+    <div class="product">
+      <label>
+        <input type="checkbox">
+        키스킨
+      </label>
+
+      <input type="number" value="1">
+    </div>
+
+    <div class="product">
+      <label>
+        <input type="checkbox">
+        한글교재
+      </label>
+
+      <input type="number" value="1">
+    </div>
+
+  </div>
+
+  <div class="card">
+
+    <label>
+      <input type="checkbox">
+      배송비 포함
+    </label>
+
+  </div>
+
+  <div class="card">
+
+    <h3>결과</h3>
+
+    상품금액 : 0원<br>
+    배송비 : 0원<br>
+    총금액 : 0원
+
+  </div>
+
+</div>
+
+</body>
+</html>
