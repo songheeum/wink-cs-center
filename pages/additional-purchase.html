@@ -50,16 +50,11 @@ input[type="number"]{
 
   <div class="card">
 
-    <h3>상품구분</h3>
+    <h3>상품 구분</h3>
 
     <label>
       <input type="radio" name="brand" checked>
       윙크
-    </label>
-
-    <label>
-      <input type="radio" name="brand">
-      캐츠홈
     </label>
 
     <label>
@@ -71,12 +66,12 @@ input[type="number"]{
 
   <div class="card">
 
-    <h3>상품선택</h3>
+    <h3>상품 선택</h3>
 
     <div class="product">
       <label>
         <input type="checkbox">
-        충전기
+        윙크 전용 충전기 (WD/WC)
       </label>
 
       <input type="number" value="1">
@@ -85,7 +80,7 @@ input[type="number"]{
     <div class="product">
       <label>
         <input type="checkbox">
-        키스킨
+        스쿨 공용 키보드 스킨
       </label>
 
       <input type="number" value="1">
@@ -94,7 +89,7 @@ input[type="number"]{
     <div class="product">
       <label>
         <input type="checkbox">
-        한글교재
+        한글 교재
       </label>
 
       <input type="number" value="1">
@@ -115,13 +110,80 @@ input[type="number"]{
 
     <h3>결과</h3>
 
-    상품금액 : 0원<br>
-    배송비 : 0원<br>
-    총금액 : 0원
+상품금액 :
+<span id="productPrice">0원</span>
+
+<br><br>
+
+배송비 :
+<span id="shippingPrice">0원</span>
+
+<br><br>
+
+총금액 :
+<b id="totalPrice">0원</b>
 
   </div>
 
 </div>
+<script>
 
+function calculate(){
+
+  let total = 0;
+
+  const products = [
+    {
+      checkbox: document.querySelectorAll('input[type="checkbox"]')[0],
+      qty: document.querySelectorAll('input[type="number"]')[0],
+      price: 10000
+    },
+    {
+      checkbox: document.querySelectorAll('input[type="checkbox"]')[1],
+      qty: document.querySelectorAll('input[type="number"]')[1],
+      price: 3000
+    },
+    {
+      checkbox: document.querySelectorAll('input[type="checkbox"]')[2],
+      qty: document.querySelectorAll('input[type="number"]')[2],
+      price: 12000
+    }
+  ];
+
+  products.forEach(item=>{
+    if(item.checkbox.checked){
+      total += item.price * Number(item.qty.value);
+    }
+  });
+
+  const shippingCheckbox =
+    document.querySelectorAll('input[type="checkbox"]')[3];
+
+  const shipping =
+    shippingCheckbox.checked ? 2000 : 0;
+
+  document.getElementById('productPrice').innerText =
+    total.toLocaleString() + '원';
+
+  document.getElementById('shippingPrice').innerText =
+    shipping.toLocaleString() + '원';
+
+  document.getElementById('totalPrice').innerText =
+    (total+shipping).toLocaleString() + '원';
+
+}
+
+document
+.querySelectorAll('input')
+.forEach(el=>{
+
+  el.addEventListener('change',calculate);
+  el.addEventListener('input',calculate);
+
+});
+
+calculate();
+
+</script>
 </body>
 </html>
