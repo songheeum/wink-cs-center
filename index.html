@@ -350,6 +350,7 @@
       <div class="cat" data-cat="학부모앱"><div class="emoji" data-edit="icon">👪</div><div class="name" data-edit="name">학부모앱</div><div class="desc" data-edit="desc">보호자용</div></div>
       <div class="cat" data-cat="AI도움말"><div class="emoji" data-edit="icon">🤖</div><div class="name" data-edit="name">AI도움말</div><div class="desc" data-edit="desc">키워드 챗봇</div></div>
       <div class="cat" data-cat="점검현황"><div class="emoji">💻</div><div class="name">레노버·업무폰 점검</div><div class="desc">레노버 · 교사PC · 업무폰</div></div>
+      <div class="cat" data-cat="단비폰"><div class="emoji">📱</div><div class="name">단비폰 점검 가이드</div><div class="desc">원격지원 · 2차 점검</div></div>
     </div>
 
     <div class="tip" id="tipBox">💡 <span><b>전체 검색</b> — 검색창에 키워드를 입력하면 모든 메뉴에서 통합 검색됩니다.</span></div>
@@ -597,6 +598,11 @@ function renderCategory(name){
 
   if(name==='점검현황'){
       window.open('점검현황.html','_blank');
+      return;
+  }
+
+  if(name==='단비폰'){
+      window.open('danbiphone.html','_blank');
       return;
   }
 
