@@ -184,7 +184,8 @@ function renderCatSelect(){
   var sel=document.getElementById('catSelect');
   sel.innerHTML='<option value="all">전체 카테고리</option>'+cats.map(function(c){return '<option value="'+esc(c)+'" '+(filterCat===c?'selected':'')+'>'+esc(c)+'</option>';}).join('');
   sel.value=filterCat;
-})).sort();var sel=document.getElementById('catSelect');sel.innerHTML='<option value="all">전체 카테고리</option>'+cats.map(function(c){return '<option value="'+esc(c)+'" '+(filterCat===c?'selected':'')+'>'+esc(c)+'</option>';}).join('');sel.value=filterCat;}
+}
+
 function initFilters(){renderMonthShortcuts();renderCatSelect();if(ALL[0])setCalendarFromDate(ALL[0].date);renderCalendar();updatePeriodLabel();}
 function filterOwner(name,btn){selectedOwner=name;document.querySelectorAll('#memberPicker button').forEach(function(b){b.classList.remove('active');});if(btn)btn.classList.add('active');render();}
 function filteredList(){var list=ALL.filter(function(o){var d=dateKey(o.date);if(selectedOwner&&(o.who||'').trim()!==selectedOwner)return false;if(filterStatus!=='all'&&statusKind(o.status).k!==filterStatus)return false;if(filterStart&&d<filterStart)return false;if(filterEnd&&d>filterEnd)return false;if(filterCat!=='all'&&(o.cat||'').trim()!==filterCat)return false;if(query){var hay=((o.sym||'')+(o.type||'')+(o.cat||'')+(o.url||'')+(o.who||'')+(o.status||'')).toLowerCase();if(hay.indexOf(query.toLowerCase())<0)return false;}return true;});list.sort(function(a,b){var da=new Date(dateKey(a.date)||'1900-01-01');var db=new Date(dateKey(b.date)||'1900-01-01');return sortDir==='desc'?db-da:da-db;});return list;}
