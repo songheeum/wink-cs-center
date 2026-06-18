@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>📱 단비폰 업무 가이드</title>
+<style>
+@font-face{font-family:'Pretendard Variable';font-style:normal;font-weight:45 920;font-display:swap;
+  src:url('pretendard.woff2') format('woff2');}
+:root{
+  --blue:#0066cc;--blue2:#eaf2ff;--ink:#1d1d1f;--sub:#6e6e73;--muted:#98a2b3;
+  --bg:#f5f5f7;--card:#fff;--border:#e6e6ea;--green:#34c759;--orange:#ff9500;--red:#ff3b30;
+  --purple:#6d28d9;--teal:#0f766e;--shadow:0 2px 10px rgba(0,0,0,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Pretendard Variable','Pretendard',-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:var(--bg);color:var(--ink);padding:18px;line-height:1.55;-webkit-font-smoothing:antialiased}
+button,input,textarea,select{font-family:'Pretendard Variable','Pretendard',-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Malgun Gothic',sans-serif}
+.wrap{max-width:1040px;margin:0 auto}
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px}
+h1{font-size:25px;letter-spacing:-.6px}.sub{font-size:13px;color:var(--sub);margin-top:3px}.home{border:1px solid var(--border);background:var(--card);color:var(--blue);border-radius:12px;padding:9px 13px;text-decoration:none;font-size:13px;font-weight:800;white-space:nowrap}
+.notice{background:#fff8e6;border:1px solid #ffe3a3;border-radius:16px;padding:14px 16px;margin-bottom:14px;color:#7a4b00;font-size:14px}
+.search{margin-bottom:14px}.search input{width:100%;height:46px;border:1px solid var(--border);background:var(--card);border-radius:14px;padding:0 15px;font-family:inherit;font-size:14px;outline:none}.search input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(0,102,204,.12)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px;margin-bottom:16px}.quick{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:15px;text-decoration:none;color:var(--ink);box-shadow:var(--shadow);transition:.15s}.quick:hover{transform:translateY(-2px);border-color:#cfd2d8}.quick b{display:block;font-size:15px;margin-bottom:4px}.quick span{font-size:12.5px;color:var(--sub)}
+.section{background:var(--card);border:1px solid var(--border);border-radius:18px;margin-bottom:12px;overflow:hidden;box-shadow:var(--shadow)}.section summary{cursor:pointer;list-style:none;padding:16px 18px;font-size:17px;font-weight:900;display:flex;align-items:center;justify-content:space-between}.section summary::-webkit-details-marker{display:none}.section summary:after{content:'⌄';color:var(--muted);font-size:18px}.section[open] summary:after{content:'⌃'}
+.content{padding:0 18px 18px;border-top:1px solid var(--border)}h2{font-size:15px;margin:16px 0 8px}.small{font-size:12.5px;color:var(--sub)}
+.step{counter-reset:num}.step li{list-style:none;position:relative;padding:12px 12px 12px 46px;background:#f8fafc;border:1px solid #edf0f5;border-radius:12px;margin:8px 0}.step li:before{counter-increment:num;content:counter(num);position:absolute;left:12px;top:12px;width:24px;height:24px;border-radius:50%;background:var(--blue);color:#fff;font-size:12px;font-weight:900;display:flex;align-items:center;justify-content:center}.step b{display:block;margin-bottom:2px}
+.appgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px}.appcard{border:1px solid var(--border);background:#f8fbff;border-radius:16px;padding:14px;text-align:left;cursor:pointer;transition:.14s;min-height:96px;font-family:inherit;color:var(--ink);display:flex;gap:12px;align-items:flex-start}.appcard:hover{transform:translateY(-2px);border-color:var(--blue);box-shadow:0 6px 18px rgba(0,102,204,.12)}.appcard .ico{font-size:24px;line-height:1}.appcard strong{display:block;font-size:15px;margin-bottom:4px}.appcard span{display:block;font-size:12.5px;color:var(--sub)}.appcard em{display:inline-block;margin-top:8px;font-style:normal;font-size:11.5px;color:var(--blue);font-weight:900}.appcard.copied{border-color:var(--green);background:#f0fff4}.appcard.copied em{color:#15803d}.appnote{margin-top:10px;color:var(--sub);font-size:12.5px}
+.remote-summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin-top:14px}.remote-card{background:#f8fafc;border:1px solid #edf0f5;border-radius:16px;padding:14px}.remote-card .num{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--teal);color:#fff;font-size:13px;font-weight:900;margin-bottom:10px}.remote-card strong{display:block;font-size:15px;margin-bottom:5px}.remote-card p{font-size:13px;color:var(--sub)}
+.rlist{list-style:none;margin-top:8px;display:grid;gap:6px}.rlist li{position:relative;padding-left:16px;font-size:13px;color:var(--sub)}.rlist li:before{content:'';position:absolute;left:2px;top:7px;width:5px;height:5px;border-radius:50%;background:var(--teal)}
+.guide-btn{display:inline-flex;align-items:center;gap:7px;margin-top:16px;background:var(--blue);color:#fff;border-radius:14px;padding:12px 18px;text-decoration:none;font-weight:800;font-size:14px;transition:.14s}.guide-btn:hover{background:#0056ad;transform:translateY(-1px);box-shadow:0 8px 20px rgba(0,102,204,.22)}
+.timeline{margin-top:14px;display:grid;gap:8px}.timeitem{display:grid;grid-template-columns:78px 1fr;gap:10px;align-items:start;background:#fff;border:1px solid var(--border);border-radius:14px;padding:11px 12px}.timeitem .label{font-size:12px;font-weight:900;color:var(--teal);background:#e6fffb;border-radius:999px;padding:5px 8px;text-align:center}.timeitem b{display:block;font-size:14px;margin-bottom:2px}.timeitem span{font-size:13px;color:var(--sub)}
+.card{background:#f8fafc;border:1px solid #edf0f5;border-radius:14px;padding:13px;margin:9px 0}.card strong{display:block;margin-bottom:5px}.tag{display:inline-block;font-size:11.5px;font-weight:900;padding:3px 8px;border-radius:999px;margin-right:5px}.t-blue{background:#eaf2ff;color:#0066cc}.t-green{background:#e7f9ec;color:#1a8a3a}.t-orange{background:#fff3e0;color:#c06f00}.t-red{background:#fee2e2;color:#dc2626}.t-purple{background:#ede9fe;color:#6d28d9}
+.tool-card{display:flex;gap:14px;align-items:center;border:1px solid var(--border);background:linear-gradient(135deg,#f8fbff,#fff);border-radius:18px;padding:17px;text-decoration:none;color:var(--ink);transition:.14s}.tool-card:hover{transform:translateY(-2px);border-color:var(--blue);box-shadow:0 8px 22px rgba(0,102,204,.13)}.tool-card .icon{width:46px;height:46px;border-radius:16px;background:var(--blue2);display:flex;align-items:center;justify-content:center;font-size:24px;flex:0 0 auto}.tool-card h3{font-size:17px;margin-bottom:3px}.tool-card p{font-size:13px;color:var(--sub)}.tool-card .go{margin-left:auto;color:var(--blue);font-weight:900;font-size:20px}
+.hidden{display:none!important}.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#111827;color:#fff;padding:11px 15px;border-radius:999px;font-size:13px;font-weight:900;display:none;z-index:1000;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+@media(max-width:640px){body{padding:12px}.top{align-items:flex-start}h1{font-size:21px}.grid,.appgrid,.remote-summary{grid-template-columns:1fr}.section summary{font-size:16px}.timeitem{grid-template-columns:1fr}.tool-card{align-items:flex-start}.tool-card .go{display:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div>
+      <h1>📱 단비폰 업무 가이드</h1>
+      <div class="sub">교사업무폰 · PC점검 · 원격지원 대체자용 매뉴얼</div>
+    </div>
+    <a class="home" href="index.html">← 메인으로</a>
+  </div>
+
+  <div class="notice">💡 이 페이지는 대체자가 바로 처리할 수 있게 만든 실무용 도구함입니다. 앱 링크는 카드 클릭 시 URL이 복사됩니다.</div>
+
+  <div class="search"><input id="q" type="text" placeholder="원격, 파일관리자, 동기화, 토큰, 권한, 2차 점검 등 검색" autocomplete="off"></div>
+
+  <div class="grid">
+    <a class="quick" href="#flow"><b>🚀 빠른 처리 순서</b><span>대체자용 1분 흐름</span></a>
+    <a class="quick" href="#apps"><b>📲 필수 어플 설치</b><span>앱 이름 클릭 → 링크 복사</span></a>
+    <a class="quick" href="#remote"><b>🖥 원격 연결 가이드</b><span>3단계 요약 가이드</span></a>
+    <a class="quick" href="#issues"><b>⚠️ 자주 나는 문제</b><span>동기화 · 토큰 · 권한</span></a>
+    <a class="quick" href="#request"><b>🛠 2차 점검 요청서 만들기</b><span>체크 후 자동 복사</span></a>
+  </div>
+
+  <details class="section" id="flow" open>
+    <summary>🚀 빠른 처리 순서</summary>
+    <div class="content">
+      <ol class="step">
+        <li><b>자마드 티켓 제목 작성</b>예: [단비폰] CS 명칭 / 교사명 / 증상 대략 작성</li>
+        <li><b>선생님 부재 시 대응</b>담당 팀장에게 선생님과 라인방 만들어 달라고 요청 또는 업무폰 번호로 직접 연락 시도</li>
+        <li><b>필수 어플 설치 안내</b>RemoteCall + RSAssistant 설치 안내. 파일 확인이 필요하면 파일관리자+도 안내</li>
+        <li><b>원격 연결 안내</b>RSAssistant 권한 허용 후 모바일 지원에서 6자리 숫자 입력 안내</li>
+        <li><b>점검 및 기록</b>증상에 따라 시작/종료시간 기록 → 조치 내용 자마드 티켓 댓글로 기록</li>
+        <li><b>2차 점검 필요 시</b>아래 “2차 점검 요청서 만들기”에서 체크 후 개발 전달 양식 복사</li>
+      </ol>
+    </div>
+  </details>
+
+  <details class="section" id="apps" open>
+    <summary>📲 필수 어플 설치</summary>
+    <div class="content">
+      <h2>앱 이름 카드를 누르면 URL이 복사됩니다.</h2>
+      <div class="appgrid">
+        <button class="appcard" data-url="https://update.danbiedu.co.kr/apps/DANBIEDU/DanbiPhone.apk" onclick="copyAppUrl(this)">
+          <div class="ico">📱</div><div><strong>단비폰 최신 APK</strong><span>단비폰 앱 재설치/업데이트용</span><em>클릭하면 링크 복사</em></div>
+        </button>
+        <button class="appcard" data-url="https://wink.co.kr/winkphone/winkphone-hotfix_os_s_v1.4.4.apk" onclick="copyAppUrl(this)">
+          <div class="ico">📲</div><div><strong>윙크폰 최신 APK</strong><span>윙크폰 앱 재설치/업데이트용</span><em>클릭하면 링크 복사</em></div>
+        </button>
+        <button class="appcard" data-url="https://play.google.com/store/apps/details?id=com.rsupport.rs.activity.rsupport&pcampaignid=web_share" onclick="copyAppUrl(this)">
+          <div class="ico">🖥</div><div><strong>RemoteCall</strong><span>원격 연결용 기본 앱</span><em>클릭하면 링크 복사</em></div>
+        </button>
+        <button class="appcard" data-url="https://play.google.com/store/apps/details?id=com.rsupport.android.plugin.assistant&pcampaignid=web_share" onclick="copyAppUrl(this)">
+          <div class="ico">🔌</div><div><strong>RSAssistant</strong><span>업무폰 원격 제어 권한용 플러그인</span><em>클릭하면 링크 복사</em></div>
+        </button>
+        <button class="appcard" data-url="https://play.google.com/store/search?q=%ED%8C%8C%EC%9D%BC%EA%B4%80%EB%A6%AC%EC%9E%90%2B&c=apps" onclick="copyAppUrl(this)">
+          <div class="ico">📂</div><div><strong>파일관리자+</strong><span>APK 설치 및 통화/녹음 파일 확인용</span><em>클릭하면 링크 복사</em></div>
+        </button>
+      </div>
+      <p class="appnote">※ URL을 화면에 길게 노출하지 않고, 카드 클릭으로 복사되게 구성했습니다.</p>
+    </div>
+  </details>
+
+  <details class="section" id="remote" open>
+    <summary>🖥 원격 연결 가이드</summary>
+    <div class="content">
+      <div class="remote-summary">
+        <div class="remote-card">
+          <div class="num">1</div><strong>필수 앱 설치</strong>
+          <ul class="rlist"><li>RemoteCall</li><li>RSAssistant</li></ul>
+        </div>
+        <div class="remote-card">
+          <div class="num">2</div><strong>접근성 권한 허용</strong>
+          <ul class="rlist"><li>RSAssistant 실행</li><li>접근성 권한 허용</li><li>제어 허용</li></ul>
+        </div>
+        <div class="remote-card">
+          <div class="num">3</div><strong>원격 연결</strong>
+          <ul class="rlist"><li>모바일 지원 실행</li><li>6자리 인증번호 입력</li><li>원격지원 요청</li></ul>
+        </div>
+      </div>
+      <a class="guide-btn" href="https://drive.google.com/file/d/1esw4xL1Ksy3ksRTWnJaODPs3OGysyrb1/view?usp=sharing" target="_blank" rel="noopener">📖 상세 가이드 보기 ↗</a>
+    </div>
+  </details>
+
+  <details class="section" id="issues">
+    <summary>⚠️ 자주 발생하는 문제</summary>
+    <div class="content">
+      <div class="card"><span class="tag t-orange">동기화</span><strong>윙크폰 수동 동기화</strong>내장 메모리 &gt; Recoding &gt; Call 폴더에서 파일 확인 후 고객센터에 안 올라오면 main 폴더의 Call로 이동 후 재동기화 진행</div>
+      <div class="card"><span class="tag t-red">토큰</span><strong>토큰값 안 생김 / -로 나옴</strong>앱 재설치, 설치 허용 권한, 와이파이 문제 여부 확인</div>
+      <div class="card"><span class="tag t-blue">버전</span><strong>단비폰 최신 버전 확인</strong>필요 시 단비폰 최신 APK 링크 복사 후 재설치 안내</div>
+      <div class="card"><span class="tag t-purple">권한</span><strong>원격 연결이 안 될 때</strong>RSAssistant 접근성 권한, 모바일 지원 전화/알림 권한, 출처를 알 수 없는 앱 설치 허용 여부 확인</div>
+    </div>
+  </details>
+
+  <details class="section" id="request" open>
+    <summary>🛠 2차 점검 요청서 만들기</summary>
+    <div class="content">
+      <a href="danbiphone_checklist_generator.html" class="tool-card">
+        <div class="icon">🛠</div>
+        <div>
+          <h3>2차 점검 요청서 만들기</h3>
+          <p>체크만 하면 개발 전달 양식이 자동 완성됩니다.</p>
+        </div>
+        <div class="go">›</div>
+      </a>
+      <p class="appnote">※ 이 페이지 하단에 긴 양식은 노출하지 않고, 별도 만들기 페이지에서 체크 후 복사하도록 정리했습니다.</p>
+    </div>
+  </details>
+</div>
+
+<div class="toast" id="toast">복사 완료</div>
+
+<script>
+function showToast(msg){
+  var t=document.getElementById('toast');
+  t.textContent=msg;
+  t.style.display='block';
+  setTimeout(function(){t.style.display='none';},1400);
+}
+function copyText(text){
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    return navigator.clipboard.writeText(text);
+  }
+  var ta=document.createElement('textarea');
+  ta.value=text;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();
+  return Promise.resolve();
+}
+function copyAppUrl(btn){
+  var url=btn.getAttribute('data-url');
+  var title=btn.querySelector('strong').textContent;
+  copyText(url).then(function(){
+    document.querySelectorAll('.appcard').forEach(function(c){c.classList.remove('copied'); var e=c.querySelector('em'); if(e) e.textContent='클릭하면 링크 복사';});
+    btn.classList.add('copied');
+    btn.querySelector('em').textContent='복사 완료';
+    showToast('링크가 복사되었습니다');
+    setTimeout(function(){btn.classList.remove('copied'); btn.querySelector('em').textContent='클릭하면 링크 복사';},1200);
+  });
+}
+document.getElementById('q').addEventListener('input',function(){
+  var q=this.value.trim().toLowerCase();
+  document.querySelectorAll('.section').forEach(function(sec){
+    var hit=sec.innerText.toLowerCase().indexOf(q)>=0;
+    sec.classList.toggle('hidden',q && !hit);
+    if(q && hit) sec.open=true;
+  });
+});
+</script>
+</body>
+</html>
