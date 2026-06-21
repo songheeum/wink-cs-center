@@ -2942,6 +2942,81 @@ body{
   }
 }
 
+
+/* =====================================================================
+   GENERAL CONSULTING SKELETON
+   일반상담 CSV 연결 전/후 모두 사용할 공통 뼈대
+   ===================================================================== */
+
+.general-detail .customer-question{
+  background:linear-gradient(135deg,#FAF7FF 0%,#FFF8FB 100%);
+  border-color:rgba(154,112,191,.18);
+}
+
+.general-detail .customer-label{
+  color:#8F62B5;
+}
+
+.general-answer-box{
+  white-space:pre-wrap;
+  color:#2F3B4A;
+  font-size:15.5px;
+  font-weight:520;
+  line-height:1.82;
+  background:#fff;
+  border:1px solid rgba(241,226,233,.98);
+  border-radius:20px;
+  padding:18px 20px;
+  box-shadow:0 8px 20px rgba(159,58,105,.04);
+}
+
+.general-info-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+}
+
+.general-info-card{
+  background:#fff;
+  border:1px solid rgba(241,226,233,.98);
+  border-radius:18px;
+  padding:16px 17px;
+  box-shadow:0 8px 20px rgba(159,58,105,.035);
+}
+
+.general-info-card b{
+  display:block;
+  color:#202631;
+  font-size:13.5px;
+  font-weight:760;
+  margin-bottom:8px;
+}
+
+.general-info-card p{
+  margin:0;
+  white-space:pre-wrap;
+  color:#566274;
+  font-size:14px;
+  font-weight:430;
+  line-height:1.72;
+}
+
+.general-cat.active{
+  background:linear-gradient(135deg,#FBF7FF 0%,#FFF0F7 100%);
+  border-color:rgba(154,112,191,.34);
+}
+
+.guide-entry-card[data-guide="general"].active{
+  background:linear-gradient(135deg,#FBF7FF 0%,#FFF0F7 100%);
+  border-color:rgba(154,112,191,.34);
+}
+
+@media(max-width:760px){
+  .general-info-grid{
+    grid-template-columns:1fr;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -3269,7 +3344,8 @@ body{
       faqCount=document.getElementById('faqCount'),fdList=document.getElementById('fdList'),
       fdDetail=document.getElementById('fdDetail'),stubEl=document.getElementById('stub'),
       chatPanel=document.getElementById('chatPanel'),tipBox=document.getElementById('tipBox'),
-      currentCat='전체',activeChip='전체',curItems=[],curSel=0;
+      currentCat='전체',activeChip='전체',curItems=[],curSel=0,
+      currentGuide='tech',catGridEl=document.getElementById('catGrid'),techCatGridHTML='';
 
   function rowHTML(f,i,showSub){
     /* Dense Pro Support View: 좌측 목록에서 문서타입/소분류/사진유무를 빠르게 파악 */
@@ -3565,6 +3641,140 @@ function renderCategory(name){
     });
   });
 
+  /* ===== 일반상담 가이드 뼈대 ===== */
+  var GENERAL_FAQ=[];
+  var GENERAL_CATS=[
+    {cat:'체험학습',icon:'🧸',desc:'무료체험 · 신청 · 재체험'},
+    {cat:'유료학습',icon:'🎓',desc:'상품 · 비용 · 신청 · 변경'},
+    {cat:'해지/환불',icon:'↩️',desc:'해지 · 위약금 · 청약철회'},
+    {cat:'배송/회수',icon:'📦',desc:'배송 · 회수 · 반납 · 추가배송'},
+    {cat:'결제/청구',icon:'💳',desc:'결제수단 · 미납 · 현금영수증'},
+    {cat:'학습/교재',icon:'📚',desc:'교재 · 단계 · 화상수업 · 앱'},
+    {cat:'시스템/이관',icon:'🖥️',desc:'공감센터 · 통합관리자 · 해피톡'},
+    {cat:'응대원칙/Q&A',icon:'💬',desc:'응대기준 · 기본절차 · 상담 Q&A'}
+  ];
+  var GENERAL_PLACEHOLDER=[
+    {cat:'체험학습',sub:'무료체험',q:'무료체험 신청 및 진행 절차 안내',says:'무료체험은 어떻게 신청하고 언제부터 시작되나요?',reply:'무료체험은 신청 경로와 회원 상태를 확인한 뒤 체험 가능 여부, 배송 일정, 로그인 기준 체험 기간을 안내합니다.',criteria:'연령 기준 / 기존 체험 이력 / 신청 경로 / 배송 상태 확인',process:'1. 회원 및 학생 정보 확인\\n2. 체험 가능 연령 확인\\n3. 기존 체험 이력 확인\\n4. 신청 경로 및 배송 상태 안내\\n5. 담당 선생님 상담 필요 시 이관',caution:'체험 기간은 배송 기준이 아니라 학습기 로그인 기준으로 안내합니다.',tags:['무료체험','체험신청','재체험','권장연령']},
+    {cat:'유료학습',sub:'상품/비용',q:'유료학습 상품 종류 및 비용 안내',says:'정회원 상품은 어떤 종류가 있고 비용은 어떻게 되나요?',reply:'회원이 관심 있는 상품과 약정 기간을 확인한 뒤, 상품별 비용과 상담교사 안내 필요 여부를 구분해 안내합니다.',criteria:'상품 종류 / 약정 기간 / 단과·종합반 / 프로모션 적용 여부 확인',process:'1. 관심 상품 확인\\n2. 약정 기간 확인\\n3. 상품별 비용 기준 확인\\n4. 결제 또는 상담교사 연결 안내',caution:'할인·프로모션은 시점별로 달라질 수 있으므로 최종 금액은 회원별 조건 확인 후 안내합니다.',tags:['유료학습','정회원','상품','비용']},
+    {cat:'해지/환불',sub:'해지',q:'유료학습 해지 및 환불 가능 여부 안내',says:'해지하면 환불이나 위약금이 어떻게 되나요?',reply:'이용 상품, 약정, 결제일, 사용 기간, 반납 여부를 확인한 뒤 해지 접수 가능 여부와 담당부서 상담 필요 사항을 안내합니다.',criteria:'결제일 7일 전 여부 / 약정 유형 / 이용 개월 수 / 미납 여부 / 반납 대상 확인',process:'1. 회원 상태 확인\\n2. 상품 및 약정 확인\\n3. 결제일 기준 확인\\n4. 해지상담 이관 또는 접수 안내\\n5. 위약금·환불 상세는 담당부서 상담 연결',caution:'위약금은 회원별 조건에 따라 달라지므로 단정 안내하지 않고 담당 상담을 통해 확인하도록 안내합니다.',tags:['해지','환불','위약금','청약철회']},
+    {cat:'배송/회수',sub:'배송상태',q:'배송 상태 및 주소 변경 문의',says:'기기는 언제 도착하고 배송지를 바꿀 수 있나요?',reply:'배송 요청 상태와 송장 출력 여부를 확인한 뒤 배송 예정일, 주소 변경 가능 여부, 수취거부/재배송 필요 여부를 안내합니다.',criteria:'배송전 / 배송중 / 배송완료 / 운송장 출력 전후 확인',process:'1. 회원 배송 상태 확인\\n2. 송장 출력 여부 확인\\n3. 주소 변경 가능 여부 판단\\n4. 배송 또는 회수 절차 안내',caution:'운송장 출력 이후에는 시스템 주소 변경이 실제 배송에 반영되지 않을 수 있습니다.',tags:['배송','주소변경','송장','회수']},
+    {cat:'결제/청구',sub:'결제수단',q:'결제수단 변경 및 미납 문의',says:'카드를 바꾸거나 미납금을 결제하려면 어떻게 해야 하나요?',reply:'회원의 결제수단, 미납 회차, 결제 실패 이력을 확인한 뒤 카드 변경, 재결제, 가상계좌 또는 담당부서 이관 기준을 안내합니다.',criteria:'정기결제 카드 / 미납 회차 / 결제 실패 사유 / 가상계좌 여부 확인',process:'1. 결제내역 확인\\n2. 결제수단 확인\\n3. 미납 회차 및 실패 사유 확인\\n4. 재결제 또는 카드 변경 안내\\n5. 필요 시 담당부서 이관',caution:'결제 금액과 납부 방식은 회원별 청구 상태 확인 후 안내합니다.',tags:['결제','청구','미납','카드변경']},
+    {cat:'학습/교재',sub:'교재/수업',q:'정회원 교재 구성 및 화상수업 문의',says:'정회원 교재는 어떻게 오고 화상수업은 어떻게 진행되나요?',reply:'회원 상품과 학습 과목을 확인한 뒤 교재 구성, 정기배송 기준, 화상수업 운영 기준을 안내합니다.',criteria:'상품 종류 / 과목 / 정기배송 일정 / 화상수업 대상 여부 확인',process:'1. 회원 상품 확인\\n2. 과목 및 단계 확인\\n3. 교재 구성 안내\\n4. 화상수업 대상 여부 안내\\n5. 변경 요청 시 선생님 상담 이관',caution:'단계·회차 변경은 공감센터에서 직접 처리 권한이 없을 수 있어 담당교사 상담으로 연결합니다.',tags:['교재','화상수업','단계변경','학부모앱']},
+    {cat:'시스템/이관',sub:'업무시스템',q:'공감센터/통합관리자 확인 및 상담 이관 방법',says:'상담 이력이나 배송/결제 정보는 어디서 확인하나요?',reply:'공감센터와 통합관리자에서 확인 가능한 정보와 상담예약, 해피콜, 이관 버튼 사용 기준을 안내합니다.',criteria:'회원정보 / 상담이력 / 배송내역 / 결제내역 / 이슈내역 확인',process:'1. 회원 정보 2가지 이상 확인\\n2. 공감센터 상담이력 확인\\n3. 통합관리자 기본정보 확인\\n4. 필요 업무에 맞게 상담요청·예약·이관 처리',caution:'일정 예약 후 상담하기 버튼을 누르면 메모가 저장되지 않을 수 있어 사전 복사 후 진행합니다.',tags:['공감센터','통합관리자','해피톡','상담이관']},
+    {cat:'응대원칙/Q&A',sub:'응대기준',q:'고객 응대 원칙 및 상담 Q&A 확인',says:'강성 고객이나 예외 문의는 어떻게 응대해야 하나요?',reply:'고객 응대 원칙, 기본 상담 절차, 상담 Q&A를 기준으로 사과·확인·안내·이관 순서로 응대합니다.',criteria:'고객 불편 내용 / 귀책 여부 / 확인 가능한 이력 / 이관 필요 여부 판단',process:'1. 고객 불편에 먼저 공감\\n2. 회원 정보와 이력 확인\\n3. 가능한 조치 안내\\n4. 예외·강성·정책 문의는 팀장 또는 담당부서 이관',caution:'정책·금액·위약금 등 민감 사항은 단정 표현을 피하고 확인 후 안내합니다.',tags:['응대원칙','강성고객','상담QA','기본절차']}
+  ];
+
+  function generalCount(cat){
+    return GENERAL_FAQ.filter(function(f){return f.cat===cat;}).length;
+  }
+
+  function renderGeneralCards(){
+    if(!techCatGridHTML) techCatGridHTML=catGridEl.innerHTML;
+    catGridEl.innerHTML=GENERAL_CATS.map(function(c){
+      var cnt=generalCount(c.cat);
+      return '<div class="cat general-cat" data-gcat="'+esc(c.cat)+'">'
+        +'<div class="emoji">'+esc(c.icon)+'</div>'
+        +'<div class="name">'+esc(c.cat)+'</div>'
+        +'<div class="desc">'+esc(c.desc)+'</div>'
+        +'<span class="cat-count" style="'+(cnt?'':'display:none')+'">'+(cnt||'')+'</span>'
+      +'</div>';
+    }).join('');
+  }
+
+  function restoreTechCards(){
+    if(techCatGridHTML) catGridEl.innerHTML=techCatGridHTML;
+    updateCategoryCounts();
+  }
+
+  function generalItems(cat){
+    var data=GENERAL_FAQ.length?GENERAL_FAQ:GENERAL_PLACEHOLDER;
+    return cat==='전체' ? data : data.filter(function(f){return f.cat===cat;});
+  }
+
+  function generalRowHTML(f,i){
+    return '<button class="fd-row general-row" data-gi="'+i+'">'
+      +'<span class="row-meta"><span class="row-type ref">일반상담</span><span class="row-sub">'+esc(f.sub||'기타')+'</span></span>'
+      +'<span class="fq">'+esc(f.q)+'</span>'
+      +'<span class="row-foot"><span class="row-mini">응대멘트</span><span class="row-mini">처리기준</span></span>'
+    +'</button>';
+  }
+
+  function generalDetailHTML(f){
+    var tags=(f.tags||[]).map(function(t){return '<span class="ht">#'+esc(t)+'</span>';}).join('');
+    return '<div class="detail-shell general-detail">'
+      +'<div class="detail-top pro-detail-top"><div class="detail-title-wrap">'
+        +'<div class="dhead"><span class="dtag">'+esc(f.cat)+(f.sub?' · '+esc(f.sub):'')+'</span><span class="doc-pill ref">일반상담</span></div>'
+        +'<div class="dtitle">'+esc(f.q)+'</div>'
+      +'</div></div>'
+      +'<section class="customer-question"><div class="customer-label">💬 고객 문의</div><div class="customer-text">'+esc(f.says||f.q||'')+'</div></section>'
+      +'<section class="pro-section"><div class="pro-section-head"><span class="section-icon">🗣️</span><div><b>추천 응대 멘트</b><small>상담사가 바로 참고하거나 복사할 수 있는 안내 문구입니다.</small></div><button class="copy-btn section-copy copy-general-reply" title="응대 멘트 복사">복사</button></div><div class="general-answer-box">'+esc(f.reply||'일반상담 CSV 연결 후 응대 멘트가 표시됩니다.')+'</div></section>'
+      +'<section class="general-info-grid">'
+        +'<div class="general-info-card"><b>처리 기준</b><p>'+esc(f.criteria||'가능/불가/예외 기준을 입력합니다.')+'</p></div>'
+        +'<div class="general-info-card"><b>진행 절차</b><p>'+esc(f.process||'1. 회원 확인\\n2. 조건 확인\\n3. 안내 또는 접수')+'</p></div>'
+      +'</section>'
+      +'<section class="pro-section"><div class="pro-section-head"><span class="section-icon">⚠️</span><div><b>주의사항</b><small>민원 방지, 이관 기준, 예외 조건을 정리합니다.</small></div></div><div class="guide-panel note pro-panel">'+esc(f.caution||'상담 전 회원별 조건을 반드시 확인합니다.')+'</div></section>'
+      +(tags?'<div class="fhash pro-tags">'+tags+'</div>':'')
+    +'</div>';
+  }
+
+  function renderGeneralItems(cat){
+    var items=generalItems(cat);
+    curItems=items;
+    faqChips.innerHTML='';
+    faqCount.innerHTML=(GENERAL_FAQ.length?'총 <b>'+items.length+'</b>개':'CSV 연결 전 미리보기 · <b>'+items.length+'</b>개');
+    if(!items.length){
+      fdList.innerHTML='';
+      fdDetail.innerHTML='<div class="fd-empty">일반상담 CSV가 연결되면 자주 묻는 질문 리스트가 여기에 표시됩니다.</div>';
+      return;
+    }
+    var html='';
+    items.forEach(function(f,i){ html+=generalRowHTML(f,i); });
+    fdList.innerHTML=html;
+    fdDetail.innerHTML=generalDetailHTML(items[0]);
+    curSel=0;
+    var first=fdList.querySelector('.fd-row');
+    if(first) first.classList.add('active');
+  }
+
+  function renderGeneralGuide(cat){
+    currentGuide='general';
+    currentCat=cat||'전체';
+    activeChip='전체';
+    chatPanel.style.display='none';
+    stubEl.style.display='none';
+    faqView.style.display='block';
+    renderGeneralCards();
+    tipBox.innerHTML=GENERAL_FAQ.length
+      ? '💡 <span><b>일반상담 가이드</b> — 카테고리를 선택하거나 검색창으로 응대 멘트를 찾아보세요.</span>'
+      : '💡 <span><b>일반상담 가이드</b> — CSV 연결 전 뼈대 미리보기입니다. 추후 일반상담 구글시트 주소만 연결하면 됩니다.</span>';
+    renderGeneralItems(currentCat);
+  }
+
+  function runGeneralSearch(q){
+    var nq=norm(q);
+    var data=GENERAL_FAQ.length?GENERAL_FAQ:GENERAL_PLACEHOLDER;
+    var res=data.filter(function(f){
+      return norm(f.q).indexOf(nq)>=0||norm(f.says).indexOf(nq)>=0||norm(f.reply).indexOf(nq)>=0
+        ||norm(f.criteria).indexOf(nq)>=0||norm(f.process).indexOf(nq)>=0||norm(f.caution).indexOf(nq)>=0
+        ||(f.tags||[]).some(function(t){return norm(t).indexOf(nq)>=0;});
+    });
+    currentGuide='general';
+    faqChips.innerHTML='';
+    faqCount.innerHTML='일반상담 검색 “<b>'+esc(q)+'</b>” · '+res.length+'개';
+    curItems=res;
+    if(!res.length){
+      fdList.innerHTML='';
+      fdDetail.innerHTML='<div class="fd-empty">관련 일반상담 항목을 찾지 못했어요. 다른 키워드로 검색해 주세요.</div>';
+      return;
+    }
+    fdList.innerHTML=res.map(function(f,i){return generalRowHTML(f,i);}).join('');
+    fdDetail.innerHTML=generalDetailHTML(res[0]);
+    curSel=0;
+    var first=fdList.querySelector('.fd-row');
+    if(first) first.classList.add('active');
+    faqView.style.display='block'; stubEl.style.display='none'; chatPanel.style.display='none';
+  }
+
   /* ===== 상담 가이드 전환 카드 ===== */
   document.querySelectorAll('.guide-entry-card').forEach(function(card){
     card.addEventListener('click',function(){
@@ -3572,17 +3782,39 @@ function renderCategory(name){
       document.querySelectorAll('.guide-entry-card').forEach(function(x){x.classList.remove('active');});
       card.classList.add('active');
       if(guide==='tech'){
+        currentGuide='tech';
+        restoreTechCards();
         renderCategory('전체');
         document.querySelector('.cat-head').scrollIntoView({block:'start',behavior:'smooth'});
       }else{
-        faqView.style.display='none';
-        chatPanel.style.display='none';
-        stubEl.style.display='';
-        tipBox.innerHTML='💡 <span><b>일반상담 가이드</b> — 추후 이용/변경/해지/환불/정책 상담 자료를 연결할 수 있어요.</span>';
-        stubEl.innerHTML='<div class="ico">💬</div><div class="ttl"><b>일반상담 가이드</b> 준비 중</div><div class="sub">일반상담 DB가 추가되면 이 영역에서 별도 카테고리와 FAQ로 보여줄 수 있어요.</div>';
+        renderGeneralGuide('전체');
         document.querySelector('.cat-head').scrollIntoView({block:'start',behavior:'smooth'});
       }
     });
+  });
+
+  catGridEl.addEventListener('click',function(e){
+    var g=e.target.closest('.general-cat');
+    if(g){
+      renderGeneralGuide(g.getAttribute('data-gcat'));
+      catGridEl.querySelectorAll('.general-cat').forEach(function(x){x.classList.remove('active');});
+      g.classList.add('active');
+      return;
+    }
+    var c=e.target.closest('.cat[data-cat]');
+    if(c && currentGuide==='tech'){
+      selectCat(c);
+    }
+  });
+
+  fdList.addEventListener('click',function(e){
+    if(currentGuide!=='general') return;
+    var row=e.target.closest('.general-row'); if(!row) return;
+    var i=+row.getAttribute('data-gi');
+    curSel=i;
+    fdList.querySelectorAll('.fd-row').forEach(function(x){x.classList.remove('active');});
+    row.classList.add('active');
+    fdDetail.innerHTML=generalDetailHTML(curItems[i]);
   });
 
   /* ===== 상단 통합 검색 ===== */
@@ -3591,7 +3823,11 @@ function renderCategory(name){
     q=(q||'').trim();
     if(searchInput.value!==q) searchInput.value=q;
     if(searchInput2.value!==q) searchInput2.value=q;
-    if(q) runSearch(q); else renderCategory(currentCat);
+    if(currentGuide==='general'){
+      if(q) runGeneralSearch(q); else renderGeneralGuide(currentCat||'전체');
+    }else{
+      if(q) runSearch(q); else renderCategory(currentCat);
+    }
   }
   searchInput.addEventListener('input',function(){ applyQuery(this.value); });
   searchInput2.addEventListener('input',function(){ applyQuery(this.value); });
@@ -3742,7 +3978,8 @@ function renderCategory(name){
      ▸ 시트가 안 열리면 자동으로 technical-faq.json 으로 대체(안전장치).
      ▸ STEP 사진: 시트 'STEPn사진' 칸에 파일명만 적으면 IMG_BASE 폴더에서 찾음.
      ===================================================================== */
-  var SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSEYbFjQgL9dYX-t3brc34goP1rdrgRMr7PJzbg8-04fTH0vE5t74VpLnlKdjGDkJ6M2vQ6mEn_pbXK/pub?gid=1815248879&single=true&output=csv";          /* 예: https://docs.google.com/.../pub?gid=0&single=true&output=csv */
+  var SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSEYbFjQgL9dYX-t3brc34goP1rdrgRMr7PJzbg8-04fTH0vE5t74VpLnlKdjGDkJ6M2vQ6mEn_pbXK/pub?gid=1815248879&single=true&output=csv";          /* 기술상담 CSV */
+  var GENERAL_CSV_URL = "";  /* 일반상담 CSV 주소를 나중에 여기에 붙여넣으세요 */
   var IMG_BASE      = "assets/guides/";      /* 깃허브 사진 폴더 */
   var FALLBACK_JSON = "data/technical-faq.backup.json";
 
@@ -3820,6 +4057,41 @@ function renderCategory(name){
     }
     return out;
   }
+  function rowsToGeneralFAQ(rows){
+    if(!rows || rows.length<2) return [];
+    var head=rows[0].map(function(h){return (h||'').trim();});
+    function idx(){
+      for(var a=0;a<arguments.length;a++){
+        var n=arguments[a];
+        var i=head.findIndex(function(h){return norm(h)===norm(n);});
+        if(i>=0) return i;
+      }
+      return -1;
+    }
+    var iCat=idx('분류','cat'), iSub=idx('소분류','유형','sub'), iQ=idx('제목','문의','q'),
+        iSay=idx('요약','고객문의','고객 문의','고객말','says'),
+        iReply=idx('추천멘트','응대멘트','안내멘트','답변','reply'),
+        iCriteria=idx('처리기준','기준','criteria'),
+        iProcess=idx('진행절차','처리절차','절차','process'),
+        iCaution=idx('주의사항','비고','note','caution'),
+        iTags=idx('태그','키워드','tags');
+    return rows.slice(1).map(function(r){
+      function val(i){return i>=0?(r[i]||'').trim():'';}
+      var tags=val(iTags).replace(/#/g,'').split(/[,\s]+/).map(function(x){return x.trim();}).filter(Boolean);
+      return {
+        cat:val(iCat)||'기타',
+        sub:val(iSub)||'일반',
+        q:val(iQ)||val(iSay)||'제목 없음',
+        says:val(iSay),
+        reply:val(iReply),
+        criteria:val(iCriteria),
+        process:val(iProcess),
+        caution:val(iCaution),
+        tags:tags
+      };
+    }).filter(function(f){return f.q&&f.q!=='제목 없음';});
+  }
+
   function updateCategoryCounts(){
     var cards=document.querySelectorAll('.cat[data-cat]');
     cards.forEach(function(card){
@@ -3845,6 +4117,17 @@ function renderCategory(name){
       .then(function(r){ if(!r.ok) throw new Error(r.status); return r.json(); })
       .then(function(arr){ applyFAQ(arr); });
   }
+  function loadGeneralData(){
+    if(!GENERAL_CSV_URL) return;
+    fetch(GENERAL_CSV_URL+(GENERAL_CSV_URL.indexOf('?')<0?'?':'&')+'t='+Date.now())
+      .then(function(r){ if(!r.ok) throw new Error(r.status); return r.text(); })
+      .then(function(t){
+        GENERAL_FAQ.length=0;
+        Array.prototype.push.apply(GENERAL_FAQ, rowsToGeneralFAQ(parseCSV(t)));
+        if(currentGuide==='general') renderGeneralGuide(currentCat||'전체');
+      })
+      .catch(function(){ console.warn('일반상담 CSV를 불러오지 못했습니다.'); });
+  }
   function loadData(){
     if(SHEET_CSV_URL){
       fetch(SHEET_CSV_URL+(SHEET_CSV_URL.indexOf('?')<0?'?':'&')+'t='+Date.now())
@@ -3860,6 +4143,7 @@ function renderCategory(name){
         loadError('데이터를 불러오지 못했어요.<br>파일을 직접 열지 말고 공유받은 주소로 접속해 주세요.');
       });
     }
+    loadGeneralData();
   }
   loadData();
 
