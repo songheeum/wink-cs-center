@@ -1526,6 +1526,64 @@ body{
   font-weight:650 !important;
 }
 
+
+/* =====================================================================
+   CATEGORY CARD CLEAN PATCH
+   카테고리 카드 우측 그라데이션 그림자 제거 + 주요 카테고리명 가독성 확대
+   ===================================================================== */
+
+/* 우측에 남던 흐릿한 핑크 그라데이션 제거 */
+.cat::after{
+  display:none !important;
+  content:none !important;
+}
+
+/* 카드 자체도 더 깨끗한 SaaS 카드 톤으로 정리 */
+.cat{
+  background:#fff !important;
+  box-shadow:0 8px 20px rgba(159,58,105,.035) !important;
+}
+
+.cat:hover{
+  box-shadow:0 14px 28px rgba(159,58,105,.075) !important;
+}
+
+/* 카테고리명 크게 */
+.cat .name{
+  font-size:16px !important;
+  font-weight:780 !important;
+  line-height:1.35 !important;
+  letter-spacing:-.015em !important;
+  color:#202631 !important;
+}
+
+/* 하단 설명도 살짝 키워 균형 맞춤 */
+.cat .desc{
+  font-size:12.5px !important;
+  font-weight:540 !important;
+  line-height:1.45 !important;
+  color:#8793A5 !important;
+}
+
+/* 아이콘도 글자 크기에 맞춰 살짝 확대 */
+.cat .emoji{
+  width:36px !important;
+  height:36px !important;
+  font-size:19px !important;
+  margin-bottom:10px !important;
+}
+
+/* 숫자 뱃지는 덜 튀게 */
+.cat-count{
+  top:15px !important;
+  right:15px !important;
+  min-width:26px !important;
+  height:23px !important;
+  font-size:11px !important;
+  background:#fff !important;
+  box-shadow:0 4px 10px rgba(159,58,105,.045) !important;
+}
+
 </style>
 </head>
 <body>
