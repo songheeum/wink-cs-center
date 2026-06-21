@@ -2668,9 +2668,6 @@ body{
 .hero-stage{position:absolute;z-index:1;width:344px;height:178px;left:50%;top:50%;transform:translate(-50%,-34%);border-radius:34px;background:linear-gradient(180deg, rgba(255,255,255,.42) 0%, rgba(255,247,251,.26) 100%);border:1px solid rgba(255,255,255,.6);box-shadow:inset 0 1px 0 rgba(255,255,255,.85), 0 16px 36px rgba(159,58,105,.08);-webkit-backdrop-filter:blur(9px) saturate(140%);backdrop-filter:blur(9px) saturate(140%);}
 
 /* 실시간 연동 상태 칩 (엔터프라이즈 디테일) */
-.hero-live{position:absolute;z-index:9;left:6px;bottom:34px;display:inline-flex;align-items:center;gap:7px;padding:7px 12px;border-radius:999px;background:rgba(255,255,255,.86);border:1px solid rgba(255,255,255,.92);box-shadow:0 10px 24px rgba(159,58,105,.12),inset 0 1px 0 rgba(255,255,255,.95);-webkit-backdrop-filter:blur(14px) saturate(170%);backdrop-filter:blur(14px) saturate(170%);color:#5B6472;font-size:11.5px;font-weight:700;letter-spacing:-.01em;white-space:nowrap;}
-.live-dot{width:7px;height:7px;border-radius:50%;background:#22C55E;box-shadow:0 0 0 3px rgba(34,197,94,.18);animation:livePulse 2.4s ease-in-out infinite;}
-@keyframes livePulse{0%,100%{box-shadow:0 0 0 3px rgba(34,197,94,.18);}50%{box-shadow:0 0 0 5px rgba(34,197,94,.06);}}
 
 .mascot-v3,.hero-right-v3 .mascot-v3{position:relative;z-index:5;width:clamp(330px,30vw,420px);height:clamp(228px,22vw,300px);display:flex;align-items:center;justify-content:center;overflow:visible;background:transparent !important;border-radius:0;transform:translateY(2px);filter:drop-shadow(0 14px 22px rgba(159,58,105,.16));}
 .mascot-v3::before,.mascot-v3::after{display:none !important;}
@@ -2701,7 +2698,6 @@ body{
   .hero-stage{width:300px;height:182px;}
   .mascot-v3,.hero-right-v3 .mascot-v3{width:min(380px,80vw);height:min(272px,58vw);transform:translateY(2px);}
   .speech-1{left:8%;top:6px}.speech-2{right:6%;top:54px}.speech-3{right:9%;bottom:34px}
-  .hero-live{left:4%;bottom:30px;}
 }
 @media (max-width:640px){
   .hero.hero-v3{padding:26px 20px 22px;border-radius:22px;}
@@ -2711,7 +2707,6 @@ body{
   .hero-stage{width:248px;height:152px;}
   .mascot-v3,.hero-right-v3 .mascot-v3{width:min(290px,86vw);height:min(208px,62vw);}
   .floating-card.speech-bubble{display:none;}
-  .hero-live{bottom:22px;left:6%;}
   .pc-only{display:none;}
 }
 
