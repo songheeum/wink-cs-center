@@ -800,6 +800,589 @@ word-break:break-word;}
   }
 }
 
+
+/* =====================================================================
+   BEST 1 — Dense Pro Support View
+   큰 구글시트 DB / 참고형 대표사진 / 절차형 STEP별 사진 구조에 맞춘 SaaS형 업무 레이아웃
+   ===================================================================== */
+
+/* 중복 검색 배너 제거 */
+#featureCard{
+  display:none !important;
+}
+
+/* 안내바는 검색 배너가 아닌 가벼운 상태 안내로 축소 */
+.tip{
+  margin-top:18px !important;
+  padding:12px 16px !important;
+  border-radius:16px !important;
+  background:rgba(255,247,250,.78) !important;
+  border:1px solid rgba(231,110,166,.18) !important;
+  color:#9F3A69 !important;
+  box-shadow:none !important;
+}
+
+/* 카테고리: 빠른 진입 허브형 SaaS 카드 */
+.cat-head{
+  margin:26px 0 10px !important;
+}
+
+.cat-grid{
+  display:grid !important;
+  grid-template-columns:repeat(4,minmax(0,1fr)) !important;
+  gap:12px !important;
+}
+
+.cat{
+  position:relative !important;
+  min-height:86px !important;
+  padding:16px 18px !important;
+  border-radius:18px !important;
+  background:rgba(255,255,255,.88) !important;
+  border:1px solid rgba(241,226,233,.98) !important;
+  box-shadow:0 8px 22px rgba(159,58,105,.045) !important;
+  overflow:hidden !important;
+}
+
+.cat::before{
+  display:none !important;
+}
+
+.cat::after{
+  content:"";
+  position:absolute;
+  right:-26px;
+  bottom:-34px;
+  width:92px;
+  height:92px;
+  border-radius:999px;
+  background:radial-gradient(circle,rgba(231,110,166,.12),transparent 65%);
+  pointer-events:none;
+}
+
+.cat:hover{
+  transform:translateY(-3px) !important;
+  border-color:rgba(231,110,166,.48) !important;
+  box-shadow:0 16px 34px rgba(159,58,105,.10) !important;
+}
+
+.cat.active{
+  background:linear-gradient(135deg,#FFF7FB 0%,#FFEAF3 100%) !important;
+  border-color:rgba(231,110,166,.62) !important;
+}
+
+.cat .emoji{
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  width:34px !important;
+  height:34px !important;
+  border-radius:12px !important;
+  background:#FFF4F9 !important;
+  font-size:18px !important;
+  margin-bottom:9px !important;
+}
+
+.cat .name{
+  font-size:14px !important;
+  font-weight:920 !important;
+  letter-spacing:-.02em !important;
+  color:#202631 !important;
+}
+
+.cat .desc{
+  font-size:11.5px !important;
+  font-weight:680 !important;
+  color:#98A2B3 !important;
+  margin-top:2px !important;
+}
+
+.cat-count{
+  position:absolute;
+  top:16px;
+  right:16px;
+  min-width:28px;
+  height:24px;
+  align-items:center;
+  justify-content:center;
+  border-radius:999px;
+  background:#fff;
+  border:1px solid rgba(231,110,166,.18);
+  color:#B84A80;
+  font-size:11px;
+  font-weight:900;
+  box-shadow:0 6px 14px rgba(159,58,105,.06);
+}
+
+/* FAQ 워크스페이스: 좌측 탐색 + 우측 상세 문서 */
+#faqView{
+  margin-top:16px !important;
+  padding:18px !important;
+  border-radius:28px !important;
+  background:rgba(255,255,255,.58) !important;
+  border:1px solid rgba(241,226,233,.92) !important;
+  box-shadow:0 18px 48px rgba(159,58,105,.055) !important;
+}
+
+.faq-chips{
+  gap:8px !important;
+  margin-bottom:10px !important;
+}
+
+.fchip{
+  height:32px !important;
+  padding:0 14px !important;
+  border-radius:999px !important;
+  background:#fff !important;
+  font-size:12px !important;
+  font-weight:850 !important;
+}
+
+.fchip.on{
+  color:#fff !important;
+  background:linear-gradient(135deg,#E76EA6,#C93F83) !important;
+  border-color:transparent !important;
+  box-shadow:0 8px 18px rgba(231,110,166,.22) !important;
+}
+
+.faq-count{
+  margin:8px 0 14px !important;
+  font-size:12.5px !important;
+  font-weight:800 !important;
+  color:#8A6476 !important;
+}
+
+.fd{
+  grid-template-columns:minmax(280px,330px) minmax(0,1fr) !important;
+  gap:20px !important;
+  align-items:start !important;
+}
+
+.fd-list{
+  max-height:760px !important;
+  overflow-y:auto !important;
+  padding:4px 8px 4px 0 !important;
+  scrollbar-gutter:stable;
+}
+
+.fd-group{
+  display:flex !important;
+  align-items:center !important;
+  gap:8px !important;
+  padding:12px 4px 8px !important;
+  color:#9F3A69 !important;
+  font-size:12px !important;
+  font-weight:950 !important;
+  letter-spacing:-.01em !important;
+}
+
+.fd-gcount{
+  background:#F8DEEA !important;
+  color:#9F3A69 !important;
+  font-weight:900 !important;
+}
+
+/* 좌측 이슈 카드 */
+.fd-row{
+  position:relative !important;
+  display:block !important;
+  width:100% !important;
+  text-align:left !important;
+  padding:15px 15px 14px !important;
+  margin-bottom:9px !important;
+  border-radius:16px !important;
+  background:rgba(255,255,255,.94) !important;
+  border:1px solid rgba(241,226,233,.96) !important;
+  box-shadow:0 7px 18px rgba(159,58,105,.04) !important;
+}
+
+.fd-row:hover{
+  transform:translateY(-2px) !important;
+  border-color:rgba(231,110,166,.52) !important;
+  box-shadow:0 12px 26px rgba(159,58,105,.09) !important;
+}
+
+.fd-row.active{
+  background:linear-gradient(135deg,#FFF7FB 0%,#FFEAF3 100%) !important;
+  border-color:rgba(231,110,166,.62) !important;
+  box-shadow:0 12px 24px rgba(159,58,105,.08) !important;
+}
+
+.row-meta{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  margin-bottom:8px;
+}
+
+.row-type,
+.row-sub,
+.row-mini{
+  display:inline-flex;
+  align-items:center;
+  height:22px;
+  padding:0 8px;
+  border-radius:999px;
+  font-size:10.5px;
+  font-weight:900;
+  line-height:1;
+  white-space:nowrap;
+}
+
+.row-type.step{
+  color:#B84A80;
+  background:#FFF0F7;
+  border:1px solid rgba(231,110,166,.20);
+}
+
+.row-type.ref{
+  color:#0F8A64;
+  background:#EAFBF4;
+  border:1px solid rgba(15,138,100,.16);
+}
+
+.row-sub{
+  color:#778195;
+  background:#F7F8FA;
+  border:1px solid #EEF0F4;
+}
+
+.fd-row .fq{
+  display:block !important;
+  font-size:14px !important;
+  font-weight:920 !important;
+  color:#222834 !important;
+  line-height:1.55 !important;
+  letter-spacing:-.02em !important;
+}
+
+.row-foot{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+  min-height:0;
+  margin-top:8px;
+}
+
+.row-mini{
+  color:#9A6680;
+  background:#FFF8FB;
+  border:1px solid rgba(231,110,166,.14);
+  font-size:10px;
+}
+
+/* 우측 상세 카드 */
+.fd-detail{
+  min-height:680px !important;
+  padding:24px 26px !important;
+  border-radius:24px !important;
+  background:rgba(255,255,255,.96) !important;
+  border:1px solid rgba(241,226,233,.98) !important;
+  box-shadow:0 14px 34px rgba(159,58,105,.055) !important;
+}
+
+.detail-shell{
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+}
+
+.pro-detail-top{
+  margin-bottom:2px !important;
+  padding-bottom:12px;
+  border-bottom:1px solid rgba(241,226,233,.8);
+}
+
+.dhead{
+  display:flex !important;
+  flex-wrap:wrap !important;
+  align-items:center !important;
+  gap:7px !important;
+  margin-bottom:8px !important;
+}
+
+.dtag,
+.doc-pill,
+.doc-stat{
+  display:inline-flex;
+  align-items:center;
+  min-height:25px;
+  padding:0 10px;
+  border-radius:999px;
+  font-size:11px;
+  font-weight:950;
+}
+
+.dtag{
+  color:#9F3A69 !important;
+  background:#FFF0F7 !important;
+}
+
+.doc-pill.step{
+  color:#B84A80;
+  background:#FFF7FB;
+  border:1px solid rgba(231,110,166,.22);
+}
+
+.doc-pill.ref{
+  color:#0F8A64;
+  background:#EAFBF4;
+  border:1px solid rgba(15,138,100,.16);
+}
+
+.doc-stat{
+  color:#687386;
+  background:#F7F8FA;
+  border:1px solid #EEF0F4;
+}
+
+.fd-detail .dtitle{
+  font-size:21px !important;
+  font-weight:950 !important;
+  letter-spacing:-.025em !important;
+  color:#202631 !important;
+}
+
+/* 고객 문의 */
+.customer-question{
+  position:relative;
+  padding:18px 58px 18px 18px;
+  border-radius:20px;
+  background:linear-gradient(135deg,#FFF8FB 0%,#FDEFF5 100%);
+  border:1px solid rgba(231,110,166,.22);
+  box-shadow:0 10px 24px rgba(159,58,105,.055);
+}
+
+.customer-label{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  color:#B84A80;
+  font-size:12.5px;
+  font-weight:950;
+  margin-bottom:9px;
+}
+
+.customer-text{
+  color:#2C2330;
+  font-size:17px;
+  font-weight:860;
+  line-height:1.7;
+  letter-spacing:-.015em;
+  white-space:pre-wrap;
+}
+
+.customer-question .copy-btn{
+  position:absolute;
+  right:16px;
+  top:50%;
+  transform:translateY(-50%);
+}
+
+/* 섹션 헤더 */
+.pro-section{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+.pro-section-head{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-top:4px;
+}
+
+.pro-section-head .section-icon{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:32px;
+  height:32px;
+  border-radius:12px;
+  background:#FFF4F9;
+  border:1px solid rgba(231,110,166,.14);
+}
+
+.pro-section-head b{
+  display:block;
+  color:#202631;
+  font-size:14px;
+  font-weight:950;
+  letter-spacing:-.015em;
+}
+
+.pro-section-head small{
+  display:block;
+  color:#98A2B3;
+  font-size:11.5px;
+  font-weight:700;
+  margin-top:1px;
+}
+
+/* 참고형 대표 이미지 */
+.pro-ref-image{
+  margin:0 !important;
+  border-radius:20px !important;
+  border:1px solid rgba(241,226,233,.98) !important;
+  box-shadow:0 10px 26px rgba(159,58,105,.055) !important;
+  overflow:hidden !important;
+}
+
+.pro-ref-image img{
+  width:100% !important;
+  max-height:560px !important;
+  object-fit:contain !important;
+  background:#fff !important;
+}
+
+/* 설명 */
+.pro-explain{
+  margin-top:0 !important;
+  padding:18px 20px !important;
+  border-radius:20px !important;
+  background:#fff !important;
+  border:1px solid rgba(241,226,233,.98) !important;
+  box-shadow:0 8px 20px rgba(159,58,105,.04) !important;
+}
+
+.pro-explain .explain-content{
+  font-size:15.5px !important;
+  line-height:1.82 !important;
+  font-weight:650 !important;
+  color:#334155 !important;
+}
+
+/* 절차형 STEP */
+.guide-section-title{
+  display:none !important;
+}
+
+.pro-step-cards{
+  position:relative;
+  display:flex !important;
+  flex-direction:column !important;
+  gap:12px !important;
+}
+
+.pro-step-card{
+  position:relative !important;
+  padding:18px 18px 18px 22px !important;
+  border-radius:20px !important;
+  background:#fff !important;
+  border:1px solid rgba(241,226,233,.98) !important;
+  box-shadow:0 8px 22px rgba(159,58,105,.045) !important;
+}
+
+.pro-step-card::before{
+  content:"";
+  position:absolute;
+  left:0;
+  top:18px;
+  bottom:18px;
+  width:4px;
+  border-radius:0 999px 999px 0;
+  background:linear-gradient(180deg,#E76EA6,#C93F83);
+}
+
+.pro-step-card .step-top{
+  margin-bottom:10px !important;
+}
+
+.pro-step-card .step-badge{
+  min-width:38px !important;
+  height:30px !important;
+  padding:0 10px !important;
+  border-radius:10px !important;
+  background:linear-gradient(135deg,#E76EA6,#C93F83) !important;
+  color:#fff !important;
+  font-size:12px !important;
+  font-weight:950 !important;
+  box-shadow:0 8px 16px rgba(231,110,166,.22) !important;
+}
+
+.pro-step-card .step-title{
+  font-size:13.5px !important;
+  color:#9F3A69 !important;
+  font-weight:950 !important;
+}
+
+.pro-step-card .step-content{
+  font-size:16px !important;
+  line-height:1.82 !important;
+  font-weight:700 !important;
+  color:#263241 !important;
+  margin-top:8px !important;
+}
+
+.pro-step-image{
+  margin:14px 0 0 !important;
+  border-radius:16px !important;
+  border:1px solid rgba(241,226,233,.98) !important;
+  background:#fff !important;
+  overflow:hidden !important;
+}
+
+.pro-step-image img{
+  width:100% !important;
+  max-height:460px !important;
+  object-fit:contain !important;
+  background:#fff !important;
+}
+
+.pro-panel{
+  margin-top:0 !important;
+  border-radius:18px !important;
+  padding:16px 18px !important;
+  font-size:14.5px !important;
+  line-height:1.75 !important;
+}
+
+.pro-tags{
+  margin-top:2px !important;
+  padding-top:6px !important;
+}
+
+.pro-tags .ht{
+  height:28px;
+  display:inline-flex;
+  align-items:center;
+  padding:0 11px !important;
+  border-radius:999px !important;
+  font-size:12px !important;
+  font-weight:850 !important;
+  background:#FFF0F7 !important;
+  color:#B84A80 !important;
+}
+
+/* 이전 요약 박스 스타일은 새 customer-question으로 대체 */
+.guide-summary{
+  display:none !important;
+}
+
+@media(max-width:980px){
+  .cat-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  }
+
+  .fd{
+    grid-template-columns:1fr !important;
+  }
+
+  .fd-list{
+    max-height:360px !important;
+  }
+
+  .fd-detail{
+    min-height:420px !important;
+    padding:20px !important;
+  }
+
+  .customer-text{
+    font-size:15.5px !important;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -1120,9 +1703,22 @@ word-break:break-word;}
       currentCat='전체',activeChip='전체',curItems=[],curSel=0;
 
   function rowHTML(f,i,showSub){
-    /* showSub=true(전체·검색, cat 그룹): 소분류를 힌트로 / false(기기뷰, sub 그룹): 제목만 */
-    var hint=showSub&&f.sub?'<span class="fq-sub">'+esc(f.sub)+'</span>':'';
-    return '<button class="fd-row" data-i="'+i+'"><span class="fq">'+esc(f.q)+hint+'</span></button>';
+    /* Dense Pro Support View: 좌측 목록에서 문서타입/소분류/사진유무를 빠르게 파악 */
+    var type=(f.docType||'절차형').trim();
+    var hasImage=!!(f.refImage || ((f.steps||[]).some(function(s){return !!s.image;})));
+    var tagCount=(f.tags||[]).length;
+    var sub=f.sub||'기타';
+    var typeClass=(type==='참고형')?' ref':' step';
+    var imgMark=hasImage?'<span class="row-mini">이미지</span>':'';
+    var tagMark=tagCount?'<span class="row-mini">태그 '+tagCount+'</span>':'';
+    return '<button class="fd-row" data-i="'+i+'">'
+      +'<span class="row-meta">'
+        +'<span class="row-type'+typeClass+'">'+esc(type)+'</span>'
+        +'<span class="row-sub">'+esc(showSub ? (f.cat||sub) : sub)+'</span>'
+      +'</span>'
+      +'<span class="fq">'+esc(f.q)+'</span>'
+      +'<span class="row-foot">'+imgMark+tagMark+'</span>'
+    +'</button>';
   }
   function fmtSteps(t){
     t=(t||'').replace(/\r/g,'').trim();
@@ -1168,55 +1764,76 @@ word-break:break-word;}
     var type=(f.docType||f.type||'절차형').trim();
     var steps=normalizedSteps(f);
 
-    /* 참고형: STEP별 이미지가 아니라 대표 참고사진을 위에 따로 보여줌 */
+    /* 참고형: 대표 이미지를 크게, STEP 텍스트는 설명 문서처럼 출력 */
     if(type==='참고형'){
       var refImg=f.refImage||'';
       var ref=refImg
-        ? '<div class="ref-image-box">'
-            +'<div class="ref-image-head">📷 참고 이미지</div>'
-            +'<img src="'+esc(refImg)+'" alt="'+esc(f.q||'참고 이미지')+'">'
-          +'</div>'
+        ? '<section class="pro-section ref-mode">'
+            +'<div class="pro-section-head"><span class="section-icon">🖼️</span><div><b>참고 이미지</b><small>상담 중 바로 확인할 대표 화면입니다.</small></div></div>'
+            +'<div class="ref-image-box pro-ref-image">'
+              +'<img src="'+esc(refImg)+'" alt="'+esc(f.q||'참고 이미지')+'">'
+            +'</div>'
+          +'</section>'
         : '';
 
       var text=(steps||[]).map(function(s){return s.content;}).filter(Boolean).join('\n');
       if(!text) text=f.ment||'내용을 입력해주세요.';
 
       return ref
-        +'<div class="explain-box">'
-          +'<div class="explain-label">📝 설명</div>'
-          +'<div class="explain-content">'+esc(text)+'</div>'
-        +'</div>';
+        +'<section class="pro-section">'
+          +'<div class="pro-section-head"><span class="section-icon">📝</span><div><b>설명</b><small>이미지를 기준으로 확인해야 할 핵심 내용입니다.</small></div></div>'
+          +'<div class="explain-box pro-explain">'
+            +'<div class="explain-content">'+esc(text)+'</div>'
+          +'</div>'
+        +'</section>';
     }
 
-    /* 절차형: STEP마다 이미지가 있으면 같이 보여줌 */
+    /* 절차형: STEP마다 문구와 사진을 한 카드 안에 붙여 상담 흐름을 유지 */
     if(!steps.length) return '';
-    return '<div class="guide-section-title">조치 순서</div><div class="step-cards">'
+    return '<section class="pro-section">'
+      +'<div class="pro-section-head"><span class="section-icon">🛠️</span><div><b>조치 내역</b><small>상담사가 순서대로 따라갈 수 있는 처리 흐름입니다.</small></div></div>'
+      +'<div class="step-cards pro-step-cards">'
       +steps.map(function(s,i){
         var n=s.step||i+1;
         var img=s.image
-          ? '<div class="step-image"><img src="'+esc(s.image)+'" alt="STEP '+esc(String(n))+' 이미지">'+(s.caption?'<div class="step-image-caption">'+esc(s.caption)+'</div>':'')+'</div>'
+          ? '<div class="step-image pro-step-image"><img src="'+esc(s.image)+'" alt="STEP '+esc(String(n))+' 이미지">'+(s.caption?'<div class="step-image-caption">'+esc(s.caption)+'</div>':'')+'</div>'
           : '';
-        return '<div class="step-card">'
-          +'<div class="step-top"><span class="step-badge">'+String(n).padStart(2,'0')+' STEP</span>'
-          +(s.title?'<span class="step-title">'+esc(s.title)+'</span>':'')+'</div>'
-          +img
+        return '<div class="step-card pro-step-card">'
+          +'<div class="step-top"><span class="step-badge">'+String(n).padStart(2,'0')+'</span>'
+          +'<span class="step-title">'+esc(s.title||('STEP '+n))+'</span></div>'
           +'<div class="step-content">'+esc(s.content||'내용을 입력해주세요.')+'</div>'
+          +img
         +'</div>';
       }).join('')
-    +'</div>';
+      +'</div></section>';
   }
   function detailHTML(f){
     var tags=(f.tags||[]).map(function(t){return '<span class="ht">#'+esc(t)+'</span>';}).join('');
-    return '<div class="detail-top"><div class="detail-title-wrap">'
-      +'<div class="dhead"><span class="dtag">'+esc(f.cat)+(f.sub?' · '+esc(f.sub):'')+'</span></div>'
-      +'<div class="dtitle">'+esc(f.q)+'</div></div>'
+    var type=(f.docType||'절차형').trim();
+    var typeClass=(type==='참고형')?' ref':' step';
+    var imageCount=(f.refImage?1:0)+((f.steps||[]).filter(function(s){return !!s.image;}).length);
+    var stepCount=(f.steps||[]).length;
+    return '<div class="detail-shell">'
+      +'<div class="detail-top pro-detail-top"><div class="detail-title-wrap">'
+        +'<div class="dhead">'
+          +'<span class="dtag">'+esc(f.cat)+(f.sub?' · '+esc(f.sub):'')+'</span>'
+          +'<span class="doc-pill'+typeClass+'">'+esc(type)+'</span>'
+          +(stepCount?'<span class="doc-stat">'+stepCount+' steps</span>':'')
+          +(imageCount?'<span class="doc-stat">'+imageCount+' images</span>':'')
+        +'</div>'
+        +'<div class="dtitle">'+esc(f.q)+'</div>'
+      +'</div>'
       +'<button class="copy-btn fcopy-all" title="전체 복사">📋</button></div>'
-      +'<div class="guide-summary"><div class="sum-label">고객 문의</div><div class="sum-text">'+esc(f.says||f.q||'')+'</div>'
-      +'<button class="copy-btn fcopy-ment" title="1차 조치 복사" style="float:right;margin-top:-28px;">📋</button></div>'
+      +'<section class="customer-question">'
+        +'<div class="customer-label">💬 고객 문의</div>'
+        +'<div class="customer-text">'+esc(f.says||f.q||'')+'</div>'
+        +'<button class="copy-btn fcopy-ment" title="고객 문의 복사">📋</button>'
+      +'</section>'
       +stepCardsHTML(f)
-      +(f.next?'<div class="guide-panel transfer"><b>추가 조치 / 이관 기준</b>'+fmtSteps(f.next)+'</div>':'')
-      +(f.note?'<div class="guide-panel note"><b>비고</b>'+esc(f.note)+'</div>':'')
-      +(tags?'<div class="fhash">'+tags+'</div>':'');
+      +(f.next?'<section class="pro-section"><div class="pro-section-head"><span class="section-icon">↗️</span><div><b>추가 조치 / 이관 기준</b><small>1차 조치 이후 필요한 후속 처리입니다.</small></div></div><div class="guide-panel transfer pro-panel">'+fmtSteps(f.next)+'</div></section>':'')
+      +(f.note?'<section class="pro-section"><div class="pro-section-head"><span class="section-icon">📌</span><div><b>비고</b><small>상담 시 함께 확인할 보조 정보입니다.</small></div></div><div class="guide-panel note pro-panel">'+esc(f.note)+'</div></section>':'')
+      +(tags?'<div class="fhash pro-tags">'+tags+'</div>':'')
+    +'</div>';
   }
 
   function selectRow(i){
@@ -1484,7 +2101,7 @@ function renderCategory(name){
     function idx(){ for(var a=0;a<arguments.length;a++){var k=head.indexOf(arguments[a]); if(k>=0)return k;} return -1; }
     var iCat=idx('분류','cat'), iSub=idx('소분류','sub'), iQ=idx('제목','q','문의'),
         iType=idx('문서타입','type','docType'),
-        iSay=idx('요약','고객말','says'),
+        iSay=idx('요약','고객문의','고객 문의','문의','고객말','says'),
         iRef=idx('참고사진','참고형사진','대표사진','refImage'),
         iNext=idx('추가조치','next'),
         iNote=idx('비고','note'), iTag=idx('검색태그','tags','태그');
@@ -1526,7 +2143,22 @@ function renderCategory(name){
     }
     return out;
   }
-  function applyFAQ(arr){ FAQ.length=0; Array.prototype.push.apply(FAQ,arr); renderCategory('전체'); }
+  function updateCategoryCounts(){
+    var cards=document.querySelectorAll('.cat[data-cat]');
+    cards.forEach(function(card){
+      var name=card.getAttribute('data-cat');
+      var count=FAQ.filter(function(f){return f.cat===name;}).length;
+      var old=card.querySelector('.cat-count');
+      if(!old){
+        old=document.createElement('span');
+        old.className='cat-count';
+        card.appendChild(old);
+      }
+      old.textContent=count?count:'';
+      old.style.display=count?'inline-flex':'none';
+    });
+  }
+  function applyFAQ(arr){ FAQ.length=0; Array.prototype.push.apply(FAQ,arr); updateCategoryCounts(); renderCategory('전체'); }
   function loadError(msg){
     var fv=document.getElementById('faqView');
     if(fv) fv.innerHTML='<div style="padding:40px 16px;text-align:center;color:#98A2B3;font-size:14px;line-height:1.6;">'+msg+'</div>';
