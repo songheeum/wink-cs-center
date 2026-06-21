@@ -276,6 +276,59 @@
     background:rgba(255,255,255,.94);color:var(--ink-1);font-size:20px;line-height:1;cursor:pointer;
     box-shadow:0 4px 14px rgba(0,0,0,.25);}
   #lbClose:hover{background:#fff;}
+
+
+  /* ===== 참고형 문서: 참고 이미지 + 설명 박스 ===== */
+  .ref-image-box{
+    margin:16px 0 18px;
+    border:1px solid var(--border);
+    border-radius:16px;
+    overflow:hidden;
+    background:#fff;
+    box-shadow:0 10px 22px rgba(231,110,166,.07);
+  }
+  .ref-image-head{
+    display:flex;
+    align-items:center;
+    gap:7px;
+    padding:11px 13px;
+    font-size:12px;
+    font-weight:900;
+    color:var(--blue-deep);
+    background:var(--blue-soft);
+    border-bottom:1px solid var(--border);
+  }
+  .ref-image-box img{
+    display:block;
+    width:100%;
+    max-height:560px;
+    object-fit:contain;
+    background:#fff;
+    cursor:zoom-in;
+    transition:opacity .12s, transform .12s;
+  }
+  .ref-image-box img:hover{opacity:.94;transform:scale(1.005);}
+  .explain-box{
+    margin-top:12px;
+    background:#fff;
+    border:1px solid var(--border);
+    border-radius:15px;
+    padding:15px 16px;
+    box-shadow:0 7px 18px rgba(231,110,166,.04);
+  }
+  .explain-label{
+    font-size:12px;
+    font-weight:900;
+    color:var(--blue-deep);
+    margin-bottom:8px;
+  }
+  .explain-content{
+    font-size:14px;
+    line-height:1.75;
+    white-space:pre-wrap;
+    color:#3A2A33;
+  }
+
   .guide-panel{margin-top:12px;border-radius:14px;padding:13px 14px;font-size:14px;line-height:1.65;white-space:pre-wrap;}
   .guide-panel.warning{background:#FFF7E6;border:1px solid #FBE4A3;color:#6B4E00;}
   .guide-panel.transfer{background:#F4F7FF;border:1px solid #DDE7FF;color:#334155;}
@@ -632,7 +685,30 @@
     return splitTextSteps(f.ment);
   }
   function stepCardsHTML(f){
+    var type=(f.docType||f.type||'절차형').trim();
     var steps=normalizedSteps(f);
+
+    /* 참고형: STEP별 이미지가 아니라 대표 참고사진을 위에 따로 보여줌 */
+    if(type==='참고형'){
+      var refImg=f.refImage||'';
+      var ref=refImg
+        ? '<div class="ref-image-box">'
+            +'<div class="ref-image-head">📷 참고 이미지</div>'
+            +'<img src="'+esc(refImg)+'" alt="'+esc(f.q||'참고 이미지')+'">'
+          +'</div>'
+        : '';
+
+      var text=(steps||[]).map(function(s){return s.content;}).filter(Boolean).join('\n');
+      if(!text) text=f.ment||'내용을 입력해주세요.';
+
+      return ref
+        +'<div class="explain-box">'
+          +'<div class="explain-label">📝 설명</div>'
+          +'<div class="explain-content">'+esc(text)+'</div>'
+        +'</div>';
+    }
+
+    /* 절차형: STEP마다 이미지가 있으면 같이 보여줌 */
     if(!steps.length) return '';
     return '<div class="guide-section-title">조치 순서</div><div class="step-cards">'
       +steps.map(function(s,i){
@@ -786,7 +862,7 @@ function renderCategory(name){
   document.addEventListener('keydown',function(e){ if(e.key==='Escape') closeLightbox(); });
 
   fdDetail.addEventListener('click',function(e){
-    var im=e.target.closest('.step-image img');
+    var im=e.target.closest('.step-image img, .ref-image-box img');
     if(im){ openLightbox(im.getAttribute('src'), im.getAttribute('alt')); return; }
     var ht=e.target.closest('.ht');
     if(ht){ var kw=ht.textContent.replace('#',''); applyQuery(kw); window.scrollTo({top:0,behavior:'smooth'}); return; }
@@ -902,10 +978,17 @@ function renderCategory(name){
   }
   /* 사진 경로 정리: 파일명만 적으면 img/ 자동, 경로/URL 이면 그대로 */
   function resolveImg(v){
-    v=(v||'').trim(); if(!v) return '';
+    v=(v||'').trim();
+    if(!v) return '';
+
+    // 외부 URL이면 그대로 사용
     if(/^(https?:)?\/\//i.test(v)) return v;
-    if(v.indexOf('/')>=0) return v;            /* img/.. assets/.. 등 이미 경로 */
-    return IMG_BASE+v;
+
+    // 이미 assets/ 또는 img/로 시작하면 그대로 사용
+    if(/^(assets|img)\//i.test(v)) return v;
+
+    // 그 외에는 assets/guides/를 앞에 붙임
+    return IMG_BASE + v;
   }
   /* 시트 행 → FAQ 객체 (헤더 이름으로 매핑, 칼럼 순서 바뀌어도 안전) */
   function rowsToFAQ(rows){
@@ -913,7 +996,10 @@ function renderCategory(name){
     var head=rows[0].map(function(h){return (h||'').replace(/\s+/g,'').trim();});
     function idx(){ for(var a=0;a<arguments.length;a++){var k=head.indexOf(arguments[a]); if(k>=0)return k;} return -1; }
     var iCat=idx('분류','cat'), iSub=idx('소분류','sub'), iQ=idx('제목','q','문의'),
-        iSay=idx('요약','고객말','says'), iNext=idx('추가조치','next'),
+        iType=idx('문서타입','type','docType'),
+        iSay=idx('요약','고객말','says'),
+        iRef=idx('참고사진','참고형사진','대표사진','refImage'),
+        iNext=idx('추가조치','next'),
         iNote=idx('비고','note'), iTag=idx('검색태그','tags','태그');
     /* STEP / STEPn사진 칼럼 자동 탐지 */
     var stepCols=[];
@@ -936,7 +1022,18 @@ function renderCategory(name){
       }
       var tagsRaw=g(iTag);
       var tags=tagsRaw?tagsRaw.split(/[|,]/).map(function(t){return t.trim();}).filter(Boolean):[];
-      var f={ cat:cat, sub:g(iSub), q:q, says:g(iSay), next:g(iNext), note:g(iNote), tags:tags, steps:steps };
+      var f={
+        cat:cat,
+        sub:g(iSub),
+        q:q,
+        docType:g(iType)||'절차형',
+        says:g(iSay),
+        refImage:resolveImg(g(iRef)),
+        next:g(iNext),
+        note:g(iNote),
+        tags:tags,
+        steps:steps
+      };
       f.ment=steps.map(function(s){return s.content;}).filter(Boolean).join('\n'); /* 복사·검색·AI 호환용 */
       out.push(f);
     }
