@@ -753,6 +753,53 @@ word-break:break-word;}
   }
 }
 
+
+/* =====================================================================
+   DETAIL SUMMARY EMPHASIS PATCH
+   "요약" -> "고객 문의"
+   고객 문의 문구를 더 크고 강조되게 보여줍니다.
+   ===================================================================== */
+.guide-summary{
+  margin-top:14px !important;
+  background:linear-gradient(135deg,#FFF8FB 0%,#FDEFF5 100%) !important;
+  border:1px solid rgba(231,110,166,.22) !important;
+  border-radius:18px !important;
+  padding:16px 18px !important;
+  box-shadow:0 10px 24px rgba(159,58,105,.06) !important;
+}
+
+.guide-summary .sum-label{
+  display:inline-flex !important;
+  align-items:center !important;
+  gap:6px !important;
+  font-size:12.5px !important;
+  font-weight:950 !important;
+  color:#B84A80 !important;
+  margin-bottom:10px !important;
+  letter-spacing:-.01em !important;
+}
+
+.guide-summary .sum-label::before{
+  content:"💬";
+  font-size:13px;
+}
+
+.guide-summary .sum-text{
+  font-size:17px !important;
+  line-height:1.75 !important;
+  color:#2C2330 !important;
+  font-weight:800 !important;
+  white-space:pre-wrap !important;
+  letter-spacing:-.015em !important;
+}
+
+@media(max-width:760px){
+  .guide-summary .sum-text{
+    font-size:15.5px !important;
+    line-height:1.68 !important;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -1164,7 +1211,7 @@ word-break:break-word;}
       +'<div class="dhead"><span class="dtag">'+esc(f.cat)+(f.sub?' · '+esc(f.sub):'')+'</span></div>'
       +'<div class="dtitle">'+esc(f.q)+'</div></div>'
       +'<button class="copy-btn fcopy-all" title="전체 복사">📋</button></div>'
-      +'<div class="guide-summary"><div class="sum-label">요약</div><div class="sum-text">'+esc(f.says||f.q||'')+'</div>'
+      +'<div class="guide-summary"><div class="sum-label">고객 문의</div><div class="sum-text">'+esc(f.says||f.q||'')+'</div>'
       +'<button class="copy-btn fcopy-ment" title="1차 조치 복사" style="float:right;margin-top:-28px;">📋</button></div>'
       +stepCardsHTML(f)
       +(f.next?'<div class="guide-panel transfer"><b>추가 조치 / 이관 기준</b>'+fmtSteps(f.next)+'</div>':'')
