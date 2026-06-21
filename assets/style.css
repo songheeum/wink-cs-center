@@ -4958,3 +4958,17 @@ body{
   }
   .floating-card.speech-bubble{ display:none; }
 }
+
+
+/* 체크무늬 제거 후 히어로 이미지가 배경에 자연스럽게 붙도록 보정 */
+#heroMascotImg{
+  background:transparent !important;
+}
+#heroMascotImg.is-cleaned{
+  background:transparent !important;
+  filter:saturate(1.03) contrast(1.01) drop-shadow(0 18px 26px rgba(159,58,105,.10));
+}
+.hero-right-v3 .mascot-v3{
+  overflow:visible !important;
+  background:transparent !important;
+}

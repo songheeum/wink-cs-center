@@ -1068,6 +1068,94 @@ function renderCategory(name){
   }
   loadData();
 
+
+
+  /* 히어로 캐릭터 이미지에 체크무늬 배경이 포함된 경우 자동 제거 */
+  function cleanHeroMascotCheckerboard(){
+    var img=document.getElementById('heroMascotImg');
+    if(!img) return;
+    if(img.classList.contains('is-cleaned')) return;
+
+    function run(){
+      if(img.classList.contains('is-cleaned')) return;
+      try{
+        var w=img.naturalWidth, h=img.naturalHeight;
+        if(!w || !h) return;
+
+        var canvas=document.createElement('canvas');
+        canvas.width=w;
+        canvas.height=h;
+        var ctx=canvas.getContext('2d',{willReadFrequently:true});
+        ctx.drawImage(img,0,0);
+        var image=ctx.getImageData(0,0,w,h);
+        var d=image.data;
+
+        function isCheckerBgAt(p){
+          var i=p*4;
+          var r=d[i], g=d[i+1], b=d[i+2], a=d[i+3];
+          if(a<18) return true;
+          var max=Math.max(r,g,b), min=Math.min(r,g,b);
+          var neutral=(max-min)<38;
+          var bright=max>165;
+          var notPink=!(r>210 && g<190 && b>190);
+          return neutral && bright && notPink;
+        }
+
+        var seen=new Uint8Array(w*h);
+        var q=[];
+        var head=0;
+        function push(x,y){
+          if(x<0 || y<0 || x>=w || y>=h) return;
+          var p=y*w+x;
+          if(seen[p]) return;
+          if(!isCheckerBgAt(p)) return;
+          seen[p]=1;
+          q.push(p);
+        }
+
+        for(var x=0;x<w;x++){ push(x,0); push(x,h-1); }
+        for(var y=0;y<h;y++){ push(0,y); push(w-1,y); }
+
+        while(head<q.length){
+          var p=q[head++];
+          var x=p%w;
+          var y=(p/w)|0;
+          push(x+1,y); push(x-1,y); push(x,y+1); push(x,y-1);
+        }
+
+        /* 경계가 딱딱해 보이지 않도록 1px 확장 */
+        var soften=new Uint8Array(seen);
+        for(var p=0;p<seen.length;p++){
+          if(!seen[p]) continue;
+          var x=p%w, y=(p/w)|0;
+          for(var yy=-1; yy<=1; yy++){
+            for(var xx=-1; xx<=1; xx++){
+              var nx=x+xx, ny=y+yy;
+              if(nx<0 || ny<0 || nx>=w || ny>=h) continue;
+              var np=ny*w+nx;
+              if(isCheckerBgAt(np)) soften[np]=1;
+            }
+          }
+        }
+
+        for(var p=0;p<soften.length;p++){
+          if(soften[p]) d[p*4+3]=0;
+        }
+
+        ctx.putImageData(image,0,0);
+        img.classList.add('is-cleaned');
+        img.removeAttribute('crossorigin');
+        img.src=canvas.toDataURL('image/png');
+      }catch(e){
+        console.warn('히어로 캐릭터 배경 제거 실패:', e);
+      }
+    }
+
+    if(img.complete) run();
+    else img.addEventListener('load',run,{once:true});
+  }
+  cleanHeroMascotCheckerboard();
+
   /* 스크롤이 히어로를 지나면 고정 검색바를 부드럽게 표시 (fixed라 떨림 없음) */
   var stickyBar=document.getElementById('stickyBar'),sbTick=false;
   function onScroll(){
