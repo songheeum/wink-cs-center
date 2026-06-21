@@ -4811,6 +4811,157 @@ body{
   }
 }
 
+
+
+/* =====================================================================
+   FINAL HERO FIX BY CHATGPT
+   - 오른쪽 캐릭터 배치 정상화
+   - 히어로 PNG 체크무늬 제거 보조 처리
+   - 말풍선/글로우를 예시 이미지처럼 자연스럽게 재배치
+   ===================================================================== */
+.hero.hero-v3{
+  max-width:1180px;
+  min-height:405px;
+  grid-template-columns:minmax(0, 1fr) minmax(430px, .95fr);
+  align-items:center;
+  gap:28px;
+  padding:44px 54px 40px;
+  border-radius:30px;
+  background:
+    radial-gradient(circle at 14% 13%, rgba(255,255,255,.96) 0%, rgba(255,255,255,.62) 18%, transparent 35%),
+    radial-gradient(circle at 76% 28%, rgba(255,255,255,.72) 0%, rgba(255,247,251,.38) 24%, transparent 48%),
+    radial-gradient(circle at 77% 77%, rgba(255,194,219,.72) 0%, rgba(255,217,232,.34) 27%, transparent 52%),
+    linear-gradient(135deg,#FFF9FB 0%,#FFEAF3 48%,#FFD8E8 100%);
+  box-shadow:0 28px 74px rgba(159,58,105,.13), inset 0 1px 0 rgba(255,255,255,.82);
+}
+.hero-left-v3{
+  max-width:520px;
+  z-index:5;
+}
+.hero-title-v3{
+  font-size:clamp(42px,4vw,56px);
+  line-height:1.02;
+}
+.hero-sub-v3{
+  font-size:17px;
+  line-height:1.62;
+  color:#594757;
+}
+.hero-search-v3{
+  max-width:520px;
+}
+.hero-search-v3 input{
+  height:60px;
+  border-radius:20px;
+}
+.hero-right-v3{
+  position:relative;
+  min-height:318px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:0;
+  overflow:visible;
+  isolation:isolate;
+}
+.hero-right-v3::before{
+  content:"";
+  position:absolute;
+  width:470px;
+  height:470px;
+  left:50%;
+  top:50%;
+  transform:translate(-50%,-50%);
+  border-radius:50%;
+  background:radial-gradient(circle, rgba(255,255,255,.78) 0%, rgba(255,239,246,.54) 34%, rgba(255,201,224,.22) 61%, transparent 84%);
+  filter:blur(18px);
+  z-index:0;
+}
+.hero-right-v3::after{
+  content:"";
+  position:absolute;
+  width:370px;
+  height:104px;
+  left:50%;
+  bottom:12px;
+  transform:translateX(-50%);
+  border-radius:999px;
+  background:radial-gradient(ellipse at center, rgba(240,150,188,.23) 0%, rgba(255,216,232,.46) 34%, rgba(255,237,245,.18) 62%, transparent 82%);
+  filter:blur(16px);
+  z-index:1;
+}
+.mascot-v3{
+  position:relative;
+  z-index:4;
+  width:clamp(330px,32vw,430px);
+  height:clamp(270px,28vw,360px);
+  display:flex;
+  align-items:flex-end;
+  justify-content:center;
+  background:transparent !important;
+  overflow:visible;
+  filter:drop-shadow(0 22px 30px rgba(159,58,105,.16));
+}
+.mascot-v3::before,.mascot-v3::after{display:none !important;}
+.mascot-v3 img{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  object-position:center bottom;
+  background:transparent !important;
+  border-radius:0 !important;
+  box-shadow:none !important;
+}
+.mascot-v3 img.is-cleaned{
+  filter:saturate(1.03) contrast(1.01);
+}
+.floating-card.speech-bubble{
+  z-index:7;
+  pointer-events:none;
+}
+.floating-card.speech-bubble span{
+  padding:13px 17px;
+  border-radius:21px;
+  background:rgba(255,255,255,.76);
+  color:#8F3E66;
+  font-size:13px;
+  font-weight:900;
+  line-height:1.35;
+  box-shadow:0 16px 34px rgba(159,58,105,.12), inset 0 1px 0 rgba(255,255,255,.92);
+}
+.speech-1{left:28px;top:6px;}
+.speech-2{right:10px;top:46px;}
+.speech-3{right:14px;bottom:38px;left:auto;}
+.hero-ring{z-index:1;opacity:.22;}
+.ring-1{width:390px;height:390px;left:50%;top:50%;right:auto;transform:translate(-50%,-50%);}
+.ring-2{width:304px;height:304px;left:50%;top:50%;right:auto;transform:translate(-50%,-50%);opacity:.14;}
+.hero-cloud{z-index:2;opacity:.33;filter:blur(20px);}
+.cloud-1{right:24px;top:54px;}
+.cloud-2{left:86px;bottom:42px;right:auto;}
+.cloud-3{left:70px;top:150px;right:auto;}
+.sparkle,.glow-dot{z-index:6;}
+.sp-1{right:102px;top:18px;}
+.sp-2{left:42px;top:135px;right:auto;}
+.sp-3{right:22px;bottom:116px;}
+.sp-4{left:132px;top:40px;right:auto;}
+.sp-5{left:178px;bottom:42px;right:auto;}
+.gd-1{right:150px;top:122px;}
+.gd-2{right:80px;top:206px;}
+.gd-3{left:112px;top:186px;}
+@media (max-width:1024px){
+  .hero.hero-v3{grid-template-columns:1fr;min-height:auto;padding:34px 30px;}
+  .hero-right-v3{min-height:300px;}
+  .mascot-v3{width:min(390px,82vw);height:300px;}
+}
+@media (max-width:640px){
+  .hero.hero-v3{padding:28px 22px;border-radius:24px;}
+  .hero-title-v3{font-size:36px;}
+  .hero-sub-v3{font-size:14px;}
+  .hero-right-v3{min-height:230px;}
+  .mascot-v3{width:min(300px,82vw);height:230px;}
+  .floating-card.speech-bubble{display:none;}
+}
+
 </style>
 </head>
 <body>
@@ -4867,16 +5018,6 @@ body{
       </div>
 
       <div class="hero-right-v3" aria-hidden="true">
-        <div class="floating-card speech-bubble speech-1">
-          <span>상담할 때<br>활용해봐요!</span>
-        </div>
-        <div class="floating-card speech-bubble speech-2">
-          <span>프로님께 도움이<br>될거예요 :)</span>
-        </div>
-        <div class="floating-card speech-bubble speech-3">
-          <span>오늘 하루도<br>화이팅!</span>
-        </div>
-        </div>
         <span class="hero-cloud cloud-1"></span>
         <span class="hero-cloud cloud-2"></span>
         <span class="hero-cloud cloud-3"></span>
@@ -4887,22 +5028,22 @@ body{
         <div class="sparkle mid sp-3">✦</div>
         <div class="sparkle small sp-4">✦</div>
         <div class="sparkle small sp-5">✧</div>
-        <div class="sparkle small sp-6">✦</div>
-        <div class="sparkle small sp-7">✧</div>
         <span class="glow-dot gd-1"></span>
         <span class="glow-dot gd-2"></span>
         <span class="glow-dot gd-3"></span>
-        <span class="glow-dot gd-4"></span>
-        <span class="glow-dot gd-5"></span>
-        <span class="hero-dust dust-1"></span>
-        <span class="hero-dust dust-2"></span>
-        <span class="hero-dust dust-3"></span>
-        <span class="hero-dust dust-4"></span>
-        <span class="hero-dust dust-5"></span>
-        <span class="hero-dust dust-6"></span>
-        <span class="hero-dust dust-7"></span>
+
+        <div class="floating-card speech-bubble speech-1">
+          <span>상담할 때<br>활용해봐요!</span>
+        </div>
+        <div class="floating-card speech-bubble speech-2">
+          <span>프로님께 도움이<br>될거예요 :)</span>
+        </div>
+        <div class="floating-card speech-bubble speech-3">
+          <span>오늘 하루도<br>화이팅!</span>
+        </div>
+
         <div class="mascot mascot-v3">
-          <img src="assets/hero-characters-group-final.png" alt="단비 캐릭터 친구들" fetchpriority="high" decoding="async" onerror="this.onerror=null;this.src='assets/darae.png';">
+          <img id="heroMascotImg" src="assets/hero-characters-group-final.png" alt="단비 캐릭터 친구들" fetchpriority="high" decoding="async" crossorigin="anonymous" onerror="this.onerror=null;this.src='hero-characters-group-final.png';">
         </div>
       </div>
     </header>
@@ -6075,6 +6216,56 @@ function renderCategory(name){
     loadGeneralData();
   }
   loadData();
+
+
+
+  /* 히어로 이미지에 바둑판 배경이 함께 들어간 경우, 가장자리에서 연결된 밝은 무채색 픽셀을 투명 처리 */
+  function cleanHeroMascotCheckerboard(){
+    var img=document.getElementById('heroMascotImg');
+    if(!img) return;
+    function run(){
+      try{
+        var w=img.naturalWidth, h=img.naturalHeight;
+        if(!w||!h) return;
+        var canvas=document.createElement('canvas');
+        canvas.width=w; canvas.height=h;
+        var ctx=canvas.getContext('2d',{willReadFrequently:true});
+        ctx.drawImage(img,0,0);
+        var image=ctx.getImageData(0,0,w,h);
+        var d=image.data;
+        function isBg(i){
+          var r=d[i],g=d[i+1],b=d[i+2],a=d[i+3];
+          if(a<12) return true;
+          var max=Math.max(r,g,b), min=Math.min(r,g,b);
+          return max>168 && (max-min)<34;
+        }
+        var seen=new Uint8Array(w*h), q=[], head=0;
+        function push(x,y){
+          if(x<0||y<0||x>=w||y>=h) return;
+          var p=y*w+x; if(seen[p]) return;
+          var i=p*4; if(!isBg(i)) return;
+          seen[p]=1; q.push(p);
+        }
+        for(var x=0;x<w;x++){push(x,0);push(x,h-1);}
+        for(var y=0;y<h;y++){push(0,y);push(w-1,y);}
+        while(head<q.length){
+          var p=q[head++], x=p%w, y=(p/w)|0;
+          push(x+1,y); push(x-1,y); push(x,y+1); push(x,y-1);
+        }
+        for(var p=0;p<seen.length;p++){
+          if(seen[p]) d[p*4+3]=0;
+        }
+        ctx.putImageData(image,0,0);
+        img.src=canvas.toDataURL('image/png');
+        img.classList.add('is-cleaned');
+      }catch(e){
+        /* GitHub Pages 같은 동일 출처에서는 동작. 실패해도 화면은 그대로 유지 */
+      }
+    }
+    if(img.complete) run();
+    else img.addEventListener('load',run,{once:true});
+  }
+  cleanHeroMascotCheckerboard();
 
   /* 스크롤이 히어로를 지나면 고정 검색바를 부드럽게 표시 (fixed라 떨림 없음) */
   var stickyBar=document.getElementById('stickyBar'),sbTick=false;
