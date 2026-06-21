@@ -263,6 +263,18 @@
   .step-image img{display:block;width:100%;max-height:360px;object-fit:contain;background:#fff;}
   .step-image-caption{font-size:12px;color:var(--ink-3);padding:8px 10px;border-top:1px solid var(--border);background:#FCFCFD;}
   .step-image.empty{display:none;}
+  .step-image img{cursor:zoom-in;transition:opacity .12s;}
+  .step-image img:hover{opacity:.92;}
+  /* 사진 확대 보기 (라이트박스) */
+  #lightbox{position:fixed;inset:0;z-index:300;display:none;align-items:center;justify-content:center;
+    background:rgba(40,20,30,.8);padding:28px;cursor:zoom-out;}
+  #lightbox.show{display:flex;}
+  #lightbox img{max-width:95vw;max-height:90vh;border-radius:14px;background:#fff;cursor:default;
+    box-shadow:0 24px 70px rgba(0,0,0,.45);}
+  #lbClose{position:fixed;top:18px;right:22px;width:42px;height:42px;border:none;border-radius:50%;
+    background:rgba(255,255,255,.94);color:var(--ink-1);font-size:20px;line-height:1;cursor:pointer;
+    box-shadow:0 4px 14px rgba(0,0,0,.25);}
+  #lbClose:hover{background:#fff;}
   .guide-panel{margin-top:12px;border-radius:14px;padding:13px 14px;font-size:14px;line-height:1.65;white-space:pre-wrap;}
   .guide-panel.warning{background:#FFF7E6;border:1px solid #FBE4A3;color:#6B4E00;}
   .guide-panel.transfer{background:#F4F7FF;border:1px solid #DDE7FF;color:#334155;}
@@ -753,7 +765,28 @@ function renderCategory(name){
     selectRow(+row.getAttribute('data-i'));
   });
   /* 상세 영역: 해시태그 검색 / 복사 */
+  /* ===== 사진 확대 보기 (라이트박스) ===== */
+  var lightbox=null;
+  function openLightbox(src,alt){
+    if(!src) return;
+    if(!lightbox){
+      lightbox=document.createElement('div'); lightbox.id='lightbox';
+      lightbox.innerHTML='<button id="lbClose" title="닫기" aria-label="닫기">✕</button><img alt="">';
+      document.body.appendChild(lightbox);
+      lightbox.addEventListener('click',function(e){
+        if(e.target===lightbox || e.target.id==='lbClose') closeLightbox();
+      });
+    }
+    var img=lightbox.querySelector('img');
+    img.setAttribute('src',src); img.setAttribute('alt',alt||'');
+    lightbox.classList.add('show');
+  }
+  function closeLightbox(){ if(lightbox) lightbox.classList.remove('show'); }
+  document.addEventListener('keydown',function(e){ if(e.key==='Escape') closeLightbox(); });
+
   fdDetail.addEventListener('click',function(e){
+    var im=e.target.closest('.step-image img');
+    if(im){ openLightbox(im.getAttribute('src'), im.getAttribute('alt')); return; }
     var ht=e.target.closest('.ht');
     if(ht){ var kw=ht.textContent.replace('#',''); applyQuery(kw); window.scrollTo({top:0,behavior:'smooth'}); return; }
     var f=curItems[curSel]; if(!f) return;
@@ -851,7 +884,7 @@ function renderCategory(name){
      ▸ 시트가 안 열리면 자동으로 technical-faq.json 으로 대체(안전장치).
      ▸ STEP 사진: 시트 'STEPn사진' 칸에 파일명만 적으면 IMG_BASE 폴더에서 찾음.
      ===================================================================== */
-  var SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSEYbFjQgL9dYX-t3brc34goP1rdrgRMr7PJzbg8-04fTH0vE5t74VpLnlKdjGDkJ6M2vQ6mEn_pbXK/pub?gid=1815248879&single=true&output=csv";          /* 예: https://docs.google.com/.../pub?gid=0&single=true&output=csv */
+  var SHEET_CSV_URL = "";          /* 예: https://docs.google.com/.../pub?gid=0&single=true&output=csv */
   var IMG_BASE      = "img/";      /* 깃허브 사진 폴더 */
   var FALLBACK_JSON = "data/technical-faq.json";
 
