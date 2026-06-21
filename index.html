@@ -333,7 +333,7 @@
     <div class="lock-icon">
       <svg viewBox="0 0 24 24"><path d="M12 1a5 5 0 0 0-5 5v3H6a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-9a2 2 0 0 0-2-2h-1V6a5 5 0 0 0-5-5zm0 2a3 3 0 0 1 3 3v3H9V6a3 3 0 0 1 3-3zm0 11a2 2 0 0 1 1 3.73V19a1 1 0 0 1-2 0v-1.27A2 2 0 0 1 12 14z"/></svg>
     </div>
-    <div class="gate-brand">DANBI 공감</div>
+    <div class="gate-brand">단비 공감팀</div>
     <div class="gate-title">통합 메뉴얼</div>
     <div class="gate-sub">팀 내부 전용 페이지입니다</div>
     <div class="gate-action">
@@ -392,7 +392,7 @@
     <div class="feature active" id="featureCard" data-cat="전체">
       <div class="fic" data-edit="icon">🔍</div>
       <div class="ftext">
-        <div class="fname" data-edit="name">전체 통합 검색</div>
+        <div class="fname" data-edit="name">학습기 모델 상관없이 전체 통합 검색하기</div>
         <div class="fdesc" data-edit="desc">모든 메뉴에서 키워드로 한 번에 찾기</div>
       </div>
       <span class="arrow">→</span>
@@ -868,7 +868,7 @@ function renderCategory(name){
   }
   function initChat(){
     chatText.focus(); if(chatReady)return; chatReady=true;
-    addMsg("안녕하세요! 단비예요 🤖\n증상을 입력하면 점검 매뉴얼에서 1차 조치를 찾아드려요.",'bot');
+    addMsg("프로님 안녕하세요! 저는 다래예요.  🤖\n 실제ai 검색이 아니라, 증상을 입력하면 점검 매뉴얼에서 1차 조치를 찾아드려요.",'bot');
     SUGGEST.forEach(function(s){var c=document.createElement('button');c.className='chip';c.textContent=s;
       c.addEventListener('click',function(){ask(s);});chatSuggest.appendChild(c);});
     chatSend.addEventListener('click',function(){ask(chatText.value);});
@@ -885,7 +885,7 @@ function renderCategory(name){
      ▸ STEP 사진: 시트 'STEPn사진' 칸에 파일명만 적으면 IMG_BASE 폴더에서 찾음.
      ===================================================================== */
   var SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSEYbFjQgL9dYX-t3brc34goP1rdrgRMr7PJzbg8-04fTH0vE5t74VpLnlKdjGDkJ6M2vQ6mEn_pbXK/pub?gid=1815248879&single=true&output=csv";          /* 예: https://docs.google.com/.../pub?gid=0&single=true&output=csv */
-  var IMG_BASE      = "img/";      /* 깃허브 사진 폴더 */
+  var IMG_BASE      = "assets/guides/";      /* 깃허브 사진 폴더 */
   var FALLBACK_JSON = "data/technical-faq.json";
 
   /* CSV 파서 (따옴표·줄바꿈 안전) */
