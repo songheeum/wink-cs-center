@@ -693,7 +693,7 @@ function renderCategory(name){
     faqView.style.display='none';
     stubEl.style.display='none';
     chatPanel.style.display='block';
-    tipBox.innerHTML='💡 <span><b>AI 도움말</b> — 다래가 기술상담과 일반상담 전체에서 가까운 추천 답변 키워드를 먼저 보여드려요.</span>';
+    tipBox.innerHTML='💡 <span><b>AI 도움말</b> — 윙크가 기술상담과 일반상담 전체에서 가까운 추천 답변 키워드를 먼저 보여드려요.</span>';
     document.querySelectorAll('.guide-entry-card').forEach(function(x){x.classList.remove('active');});
     initChat();
     document.getElementById('chatPanel').scrollIntoView({block:'start',behavior:'smooth'});
@@ -744,7 +744,7 @@ function renderCategory(name){
   }
 
   function avatarHTML(grouped){
-    return '<div class="avatar">'+(grouped?'':'<img src="'+MASCOT+'" alt="다래">')+'</div>';
+    return '<div class="avatar">'+(grouped?'':'<img src="'+MASCOT+'" alt="윙크">')+'</div>';
   }
 
   function addMsg(text,who){
@@ -753,7 +753,7 @@ function renderCategory(name){
     var h='';
     if(who==='bot') h+=avatarHTML(grouped);
     h+='<div class="bubble-wrap">';
-    if(who==='bot'&&!grouped) h+='<div class="bname">다래</div>';
+    if(who==='bot'&&!grouped) h+='<div class="bname">윙크</div>';
     h+='<div class="brow"><div class="bubble"></div><span class="time">'+nowTime()+'</span></div></div>';
     row.innerHTML=h;
     row.querySelector('.bubble').textContent=text;
@@ -834,7 +834,7 @@ function renderCategory(name){
     var row=document.createElement('div'); row.className='msg-row bot ai-recommend-row'+(grouped?' grouped':'');
     var h=avatarHTML(grouped)
       +'<div class="bubble-wrap">';
-    if(!grouped) h+='<div class="bname">다래</div>';
+    if(!grouped) h+='<div class="bname">윙크</div>';
     h+='<div class="brow"><div class="bubble ai-recommend-bubble">'
       +'<div class="rec-title">추천 답변 키워드를 찾았어요</div>'
       +'<div class="rec-desc">입력한 <b>'+esc(q)+'</b>와 가까운 기술상담/일반상담 항목이에요. 답변을 보려면 키워드를 선택해주세요.</div>'

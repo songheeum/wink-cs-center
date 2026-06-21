@@ -3,7 +3,7 @@
   font-style:normal;
   font-weight:45 920;
   font-display:swap;
-  src:url('assets/pretendard.woff2') format('woff2');
+  src:url('./pretendard.woff2') format('woff2');
 }
 
 /* ============================================================
@@ -4861,4 +4861,100 @@ body{
   .floating-card.speech-bubble{
     display:none;
   }
+}
+
+/* =====================================================================
+   FINAL SPLIT FIX PATCH
+   - 분리 후 깨진 히어로 구조 보정
+   - 캐릭터/말풍선/별내림이 모두 hero-right-v3 안에서 동작하도록 최종값 고정
+   ===================================================================== */
+.hero.hero-v3{
+  max-width:1180px;
+  min-height:332px;
+  padding:34px 50px 26px;
+  grid-template-columns:minmax(390px,.92fr) minmax(500px,1.08fr);
+  gap:24px;
+  align-items:center;
+}
+
+.hero-right-v3{
+  position:relative;
+  z-index:2;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  min-height:276px;
+  overflow:visible;
+  isolation:isolate;
+}
+
+.mascot-v3,
+.hero-right-v3 .mascot-v3{
+  position:relative;
+  z-index:5;
+  width:clamp(385px,36vw,510px);
+  height:clamp(278px,27vw,382px);
+  transform:translate(8px,8px);
+  aspect-ratio:auto;
+  border-radius:0;
+  overflow:visible;
+  background:transparent !important;
+  filter:drop-shadow(0 20px 28px rgba(159,58,105,.15));
+}
+
+.mascot-v3 img,
+.hero-right-v3 .mascot-v3 img{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  object-position:center bottom;
+  border-radius:0 !important;
+  background:transparent !important;
+  box-shadow:none !important;
+  -webkit-mask-image:none !important;
+  mask-image:none !important;
+  mix-blend-mode:normal !important;
+}
+
+.floating-card.speech-bubble{
+  z-index:8;
+  pointer-events:none;
+}
+
+.speech-1{ left:78px; top:6px; }
+.speech-2{ right:8px; top:42px; }
+.speech-3{ left:auto; right:28px; bottom:18px; }
+
+.falling-star{
+  z-index:7;
+}
+
+@media (max-width:1024px){
+  .hero.hero-v3{
+    grid-template-columns:1fr;
+    min-height:auto;
+    padding:30px 28px 24px;
+  }
+  .hero-right-v3{
+    min-height:270px;
+  }
+  .mascot-v3,
+  .hero-right-v3 .mascot-v3{
+    transform:translateY(6px);
+    width:min(420px,82vw);
+    height:min(320px,64vw);
+  }
+  .speech-1{ left:10%; top:8px; }
+  .speech-2{ right:7%; top:70px; }
+  .speech-3{ left:auto; right:9%; bottom:18px; }
+}
+
+@media (max-width:640px){
+  .hero-right-v3{ min-height:218px; }
+  .mascot-v3,
+  .hero-right-v3 .mascot-v3{
+    width:min(300px,84vw);
+    height:min(230px,68vw);
+  }
+  .floating-card.speech-bubble{ display:none; }
 }
