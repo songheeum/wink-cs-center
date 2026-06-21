@@ -14,12 +14,13 @@ https://songheeum.github.io/wink-cs-center/
 
 ---
 
-## 제공 내용
+## 제공 기기
 
-현재 아래 항목에 대한 기술상담 가이드를 제공합니다.
+현재 아래 기기 및 서비스에 대한 기술상담 가이드를 제공하고 있습니다.
 
 * 윙크봇
-* 윙크스쿨
+* 윙크스쿨 1.0 (WT-10)
+* 윙크스쿨 2.0 (WT-20)
 * 삼성 태블릿
 * 레노버 K11
 * 레노버 P11
@@ -38,6 +39,14 @@ https://songheeum.github.io/wink-cs-center/
 * 상태 표시등 안내
 * 기기 구성 설명
 
+구성
+
+요약
+↓
+참고 이미지
+↓
+설명
+
 ---
 
 ### 절차형 가이드
@@ -51,11 +60,23 @@ https://songheeum.github.io/wink-cs-center/
 * 원격 연결
 * 와이파이 설정
 
+구성
+
+STEP 1
+↓
+이미지
+↓
+STEP 2
+↓
+이미지
+↓
+STEP 3
+
 ---
 
 ## 가이드 수정 방법
 
-가이드 내용은 Google Sheet에서 관리됩니다.
+기술상담 가이드는 Google Sheet에서 관리됩니다.
 
 내용 수정 후 저장하면 사이트에 자동 반영됩니다.
 
@@ -72,13 +93,44 @@ https://songheeum.github.io/wink-cs-center/
 
 가이드에 사용할 이미지는 아래 폴더에 업로드합니다.
 
+```text
 assets/guides/
+├─ winkbot/
+├─ winkschool-wt10/
+├─ winkschool-wt20/
+├─ samsung/
+├─ k11/
+└─ p11/
+```
 
-예시
+### 폴더 안내
 
-winkbot/winkbot_button_01.png
+| 폴더명             | 사용 기기    |
+| --------------- | -------- |
+| winkbot         | 윙크봇      |
+| winkschool-wt10 | 윙크스쿨 1.0 |
+| winkschool-wt20 | 윙크스쿨 2.0 |
+| samsung         | 삼성 태블릿   |
+| k11             | 레노버 K11  |
+| p11             | 레노버 P11  |
 
-시트에는 파일 경로만 입력하면 자동으로 연결됩니다.
+---
+
+### 시트 입력 예시
+
+이미지 파일이 아래 위치에 있다면
+
+```text
+assets/guides/winkschool-wt10/wifi_01.png
+```
+
+시트에는 아래와 같이 입력합니다.
+
+```text
+winkschool-wt10/wifi_01.png
+```
+
+※ "assets/guides/" 경로는 자동으로 추가됩니다.
 
 ---
 
@@ -86,19 +138,27 @@ winkbot/winkbot_button_01.png
 
 ### 운영 데이터
 
-Google Sheet (CSV)
+Google Sheet(CSV)
 
-사이트에서 사용하는 실제 데이터입니다.
+현재 사이트에서 사용하는 실제 데이터입니다.
+
+---
 
 ### 기술상담 백업 데이터
 
+```text
 data/technical-faq-backup.json
+```
 
-Google Sheet 연결에 문제가 발생했을 경우 사용할 비상 백업 파일입니다.
+Google Sheet 연결에 문제가 발생할 경우 사용할 비상 백업 파일입니다.
+
+---
 
 ### 일반상담 데이터
 
+```text
 data/general-faq.json
+```
 
 향후 일반상담 FAQ 기능 확장을 위해 준비된 파일입니다.
 
@@ -107,7 +167,7 @@ data/general-faq.json
 ## 사이트가 정상적으로 보이지 않을 경우
 
 1. 새로고침(F5)
-2. 잠시 후 재접속
+2. 잠시 후 다시 접속
 3. 관리자에게 문의
 
 Google Sheet 연결 오류 발생 시 백업 데이터를 사용하도록 설정되어 있습니다.
@@ -131,3 +191,5 @@ Google Sheet 연결 오류 발생 시 백업 데이터를 사용하도록 설정
 이미지 저장소 : assets/guides/
 
 문서 유형 : 참고형 / 절차형
+
+백업 데이터 : technical-faq-backup.json
