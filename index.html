@@ -2801,6 +2801,147 @@ body{
   }
 
 }
+
+/* =====================================================================
+   CONSULTING GUIDE ENTRY PATCH
+   - 히어로 바로가기 버튼 제거
+   - 기술상담/일반상담 확장 가능 구조 추가
+   - 명칭: 단비공감팀 상담가이드
+   ===================================================================== */
+
+.guide-entry{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+  margin:22px 0 22px;
+}
+
+.guide-entry-card{
+  position:relative;
+  display:flex;
+  align-items:center;
+  gap:14px;
+  min-height:82px;
+  padding:18px 20px;
+  border-radius:20px;
+  border:1px solid rgba(241,226,233,.96);
+  background:rgba(255,255,255,.88);
+  box-shadow:0 10px 24px rgba(159,58,105,.045);
+  cursor:pointer;
+  font-family:inherit;
+  text-align:left;
+  transition:transform .14s ease, border-color .14s ease, box-shadow .14s ease, background .14s ease;
+}
+
+.guide-entry-card:hover{
+  transform:translateY(-2px);
+  border-color:rgba(231,110,166,.42);
+  box-shadow:0 16px 34px rgba(159,58,105,.09);
+}
+
+.guide-entry-card.active{
+  background:linear-gradient(135deg,#FFF7FB 0%,#FFEAF3 100%);
+  border-color:rgba(231,110,166,.58);
+}
+
+.guide-entry-card.soon{
+  background:linear-gradient(135deg,#FFFFFF 0%,#FBF8FF 100%);
+}
+
+.guide-entry-icon{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:44px;
+  height:44px;
+  border-radius:16px;
+  background:#FFF4F9;
+  border:1px solid rgba(231,110,166,.14);
+  font-size:22px;
+  flex:0 0 auto;
+}
+
+.guide-entry-card.soon .guide-entry-icon{
+  background:#F7F0FF;
+}
+
+.guide-entry-text{
+  display:block;
+  min-width:0;
+  flex:1;
+}
+
+.guide-entry-text b{
+  display:block;
+  color:#202631;
+  font-size:17px;
+  font-weight:780;
+  letter-spacing:-.018em;
+  line-height:1.35;
+}
+
+.guide-entry-text small{
+  display:block;
+  margin-top:3px;
+  color:#8A96A8;
+  font-size:12.5px;
+  font-weight:500;
+  line-height:1.45;
+}
+
+.guide-entry-arrow{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:32px;
+  height:32px;
+  border-radius:999px;
+  background:#fff;
+  color:#C93F83;
+  font-size:17px;
+  font-weight:800;
+  border:1px solid rgba(231,110,166,.16);
+  flex:0 0 auto;
+}
+
+.guide-entry-badge{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  height:28px;
+  padding:0 10px;
+  border-radius:999px;
+  background:#F4EEF7;
+  color:#8F6B9C;
+  font-size:11.5px;
+  font-weight:720;
+  flex:0 0 auto;
+}
+
+.hero.hero-v3{
+  margin-bottom:22px;
+}
+
+.hero-chips-v3{
+  display:none;
+}
+
+@media(max-width:760px){
+  .guide-entry{
+    grid-template-columns:1fr;
+    margin:16px 0 18px;
+  }
+
+  .guide-entry-card{
+    min-height:74px;
+    padding:15px 16px;
+  }
+
+  .guide-entry-text b{
+    font-size:15.5px;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -2842,26 +2983,17 @@ body{
       <div class="hero-left-v3">
         <span class="eyebrow hero-eyebrow">✨ Support Workspace</span>
         <h1 class="hero-title-v3">
-          단비교육<br>
-          <span>단비공감팀 기술 가이드</span>
+          단비공감팀<br>
+          <span>상담가이드</span>
         </h1>
         <p class="hero-sub hero-sub-v3">
-          정확한 키워드로 검색하여<br class="pc-only">
-          고객 문제를 빠르게 해결하세요.
+          기술상담과 일반상담 가이드를<br class="pc-only">
+          빠르게 검색하고 활용하세요.
         </p>
 
         <div class="hero-search hero-search-v3">
           <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27a6.5 6.5 0 1 0-.7.7l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0A4.5 4.5 0 1 1 14 9.5 4.5 4.5 0 0 1 9.5 14z"/></svg>
           <input id="searchInput" type="text" placeholder="예) 충전, 와이파이, 키보드" autocomplete="off">
-        </div>
-
-        <div class="hero-chips-v3" aria-label="추천 검색어">
-          <button type="button" data-query="충전 안됨">충전 안됨</button>
-          <button type="button" data-query="TV 연결">TV 연결</button>
-          <button type="button" data-query="로그인 오류">로그인 오류</button>
-          <button type="button" data-query="와이파이 연결">와이파이 연결</button>
-          <button type="button" data-query="초기화 방법">초기화 방법</button>
-          <button type="button" data-query="원격 연결">원격 연결</button>
         </div>
       </div>
 
@@ -2908,8 +3040,27 @@ body{
       </div>
     </header>
 
+    <section class="guide-entry" aria-label="상담 가이드 바로가기">
+      <button type="button" class="guide-entry-card active" data-guide="tech">
+        <span class="guide-entry-icon">🎧</span>
+        <span class="guide-entry-text">
+          <b>기술상담 가이드</b>
+          <small>기기 · 앱 · 네트워크 오류 대응</small>
+        </span>
+        <span class="guide-entry-arrow">→</span>
+      </button>
+      <button type="button" class="guide-entry-card soon" data-guide="general">
+        <span class="guide-entry-icon">💬</span>
+        <span class="guide-entry-text">
+          <b>일반상담 가이드</b>
+          <small>이용 · 변경 · 해지 · 환불 안내 예정</small>
+        </span>
+        <span class="guide-entry-badge">준비중</span>
+      </button>
+    </section>
+
     <div class="cat-head">
-      <span class="sec-label">카테고리 <span class="admin-badge">🔧 관리자 모드</span></span>
+      <span class="sec-label">기술상담 카테고리 <span class="admin-badge">🔧 관리자 모드</span></span>
       <div class="cat-tools">
         <div id="adminLock">
           <input id="adminPin" type="password" inputmode="numeric" maxlength="8" placeholder="관리자 PIN" autocomplete="off">
@@ -2945,7 +3096,7 @@ body{
       <div class="cat" data-cat="단비폰"><div class="emoji">📱</div><div class="name">단비폰 점검 가이드</div><div class="desc">원격지원 · 2차 점검</div></div>
     </div>
 
-    <div class="tip" id="tipBox">💡 <span><b>전체 검색</b> — 검색창에 키워드를 입력하면 모든 메뉴에서 통합 검색됩니다.</span></div>
+    <div class="tip" id="tipBox">💡 <span><b>기술상담</b> — 카테고리를 선택하거나 검색창에 키워드를 입력해 가이드를 확인하세요.</span></div>
 
     <div class="content-stub" id="stub">
       <div class="ico">🗂️</div>
@@ -3411,6 +3562,26 @@ function renderCategory(name){
       if(editMode) return;
       if(e.target.isContentEditable) return;
       selectCat(card);
+    });
+  });
+
+  /* ===== 상담 가이드 전환 카드 ===== */
+  document.querySelectorAll('.guide-entry-card').forEach(function(card){
+    card.addEventListener('click',function(){
+      var guide=card.getAttribute('data-guide');
+      document.querySelectorAll('.guide-entry-card').forEach(function(x){x.classList.remove('active');});
+      card.classList.add('active');
+      if(guide==='tech'){
+        renderCategory('전체');
+        document.querySelector('.cat-head').scrollIntoView({block:'start',behavior:'smooth'});
+      }else{
+        faqView.style.display='none';
+        chatPanel.style.display='none';
+        stubEl.style.display='';
+        tipBox.innerHTML='💡 <span><b>일반상담 가이드</b> — 추후 이용/변경/해지/환불/정책 상담 자료를 연결할 수 있어요.</span>';
+        stubEl.innerHTML='<div class="ico">💬</div><div class="ttl"><b>일반상담 가이드</b> 준비 중</div><div class="sub">일반상담 DB가 추가되면 이 영역에서 별도 카테고리와 FAQ로 보여줄 수 있어요.</div>';
+        document.querySelector('.cat-head').scrollIntoView({block:'start',behavior:'smooth'});
+      }
     });
   });
 
