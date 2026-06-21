@@ -4059,6 +4059,159 @@ body{
   }
 }
 
+
+
+/* =====================================================================
+   HERO NATURAL BLEND RENEWAL
+   - 캐릭터 바닥톤을 배너 배경과 자연스럽게 연결
+   - 플로팅 카드가 캐릭터와 부딪히지 않도록 재배치
+   - 캐릭터 폭/시선 흐름 정리
+   ===================================================================== */
+.hero.hero-v3{
+  grid-template-columns:minmax(0,1.26fr) minmax(250px,.74fr);
+  gap:26px;
+  min-height:314px;
+  padding:34px 42px 30px;
+  background:
+    radial-gradient(circle at 16% 12%, rgba(255,255,255,.86), transparent 23%),
+    radial-gradient(circle at 80% 16%, rgba(255,255,255,.56), transparent 21%),
+    radial-gradient(circle at 77% 78%, rgba(255,223,236,.62), transparent 28%),
+    linear-gradient(135deg,#FFF7FA 0%,#FFE9F1 48%,#FFD9E9 100%);
+}
+.hero-right-v3{
+  min-height:244px;
+  padding-right:8px;
+  align-items:center;
+  justify-content:center;
+  isolation:isolate;
+}
+.hero-right-v3::before{
+  width:310px;
+  height:310px;
+  right:50%;
+  top:47%;
+  transform:translate(50%,-50%);
+  background:radial-gradient(circle, rgba(255,255,255,.72) 0%, rgba(255,233,242,.50) 34%, rgba(255,212,229,.22) 60%, transparent 82%);
+  filter:blur(16px);
+  opacity:.90;
+}
+.hero-right-v3::after{
+  width:320px;
+  height:94px;
+  right:50%;
+  top:auto;
+  bottom:20px;
+  transform:translateX(50%);
+  border-radius:999px;
+  background:radial-gradient(ellipse at center, rgba(255,218,232,.72) 0%, rgba(255,233,241,.38) 42%, rgba(255,240,245,.12) 60%, rgba(255,240,245,0) 82%);
+  filter:blur(18px);
+  opacity:.95;
+}
+.hero-right-v3 .mascot-v3{
+  width:clamp(220px,22vw,270px);
+  height:clamp(220px,22vw,270px);
+  transform:translateY(0);
+  filter:drop-shadow(0 14px 20px rgba(159,58,105,.10));
+}
+.hero-right-v3 .mascot-v3::before{
+  inset:16px;
+  background:radial-gradient(circle, rgba(255,255,255,.28) 0%, rgba(255,241,247,.10) 52%, transparent 74%);
+  filter:blur(16px);
+}
+.hero-right-v3 .mascot-v3::after{
+  display:none;
+}
+.hero-right-v3 .mascot-v3 img{
+  object-fit:contain;
+  object-position:center bottom;
+}
+.floating-card{
+  min-width:126px;
+  padding:8px 10px;
+  border-radius:15px;
+  background:rgba(255,255,255,.58);
+  box-shadow:0 10px 22px rgba(159,58,105,.07);
+}
+.floating-card b{font-size:11px;}
+.floating-card small{font-size:9px;}
+.fc-icon{width:26px;height:26px;border-radius:9px;}
+.fc-1{
+  left:-4px;
+  top:6px;
+  transform:none;
+}
+.fc-2{
+  right:-2px;
+  top:84px;
+  transform:none;
+}
+.fc-3{
+  left:18px;
+  bottom:16px;
+  transform:none;
+}
+.ring-1{
+  width:292px;
+  height:292px;
+  right:50%;
+  top:48%;
+  transform:translate(50%,-50%);
+  opacity:.22;
+}
+.ring-2{
+  width:232px;
+  height:232px;
+  right:50%;
+  top:48%;
+  transform:translate(50%,-50%);
+  opacity:.14;
+}
+.hero-cloud{opacity:.42;}
+.cloud-1{right:18px;top:36px;}
+.cloud-2{right:112px;bottom:28px;}
+.sparkle.big,.sparkle.mid{opacity:.55;}
+.sp-1{right:118px;top:26px;}
+.sp-3{right:18px;bottom:54px;}
+.sp-5{right:128px;top:176px;}
+.gd-1{right:180px;top:116px;}
+.gd-2{right:96px;top:200px;}
+.gd-4{right:22px;top:88px;}
+@media (max-width:980px){
+  .hero.hero-v3{
+    grid-template-columns:1fr;
+    gap:14px;
+    padding:30px 28px 28px;
+  }
+  .hero-right-v3{
+    min-height:220px;
+    padding-right:0;
+  }
+  .hero-right-v3::after{
+    width:250px;
+    height:78px;
+    bottom:10px;
+  }
+  .hero-right-v3 .mascot-v3{
+    width:min(250px,66vw);
+    height:min(250px,66vw);
+  }
+  .fc-1{left:12px;top:14px;}
+  .fc-2{right:10px;top:78px;}
+  .fc-3{left:28px;bottom:18px;}
+}
+@media (max-width:600px){
+  .hero.hero-v3{padding:28px 22px 26px;}
+  .hero-right-v3{min-height:196px;}
+  .hero-right-v3 .mascot-v3{
+    width:min(220px,72vw);
+    height:min(220px,72vw);
+  }
+  .hero-right-v3::after{
+    width:210px;height:64px;bottom:8px;
+  }
+  .floating-card{display:none;}
+}
+
 </style>
 </head>
 <body>
