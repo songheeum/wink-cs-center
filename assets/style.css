@@ -3230,3 +3230,364 @@ body{
   .floating-card.speech-bubble,.hero-cloud,.hero-ring,.hero-dust{display:none;}
   .pc-only{display:none;}
 }
+
+/* =====================================================================
+   AI HELP CHAT FINAL POLISH
+   - AI도움말 회색 배경 제거
+   - 현재 핑크 SaaS 테마와 통일
+   - 챗봇 프로필 흰 배경 제거
+   - Pretendard 폰트 강제 적용
+   ===================================================================== */
+
+#chatPanel,
+#chatPanel *,
+.chat-log,
+.chat-log *,
+.chat-suggest,
+.chat-suggest *,
+.chat-input,
+.chat-input *{
+  font-family:'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+}
+
+/* AI도움말 안내 바 */
+#tipBox.tip{
+  background:linear-gradient(135deg, rgba(255,248,251,.94) 0%, rgba(255,243,248,.96) 100%);
+  border:1px solid rgba(231,110,166,.18);
+  color:#A64273;
+  box-shadow:0 10px 24px rgba(159,58,105,.035), inset 0 1px 0 rgba(255,255,255,.78);
+}
+
+#tipBox.tip b{
+  color:#B84A80;
+  font-weight:850;
+}
+
+/* 채팅 로그 박스: 회색 제거 */
+#chatPanel .chat-log,
+.chat-log#chatLog{
+  position:relative;
+  min-height:360px;
+  max-height:420px;
+  padding:22px 18px;
+  border-radius:24px;
+  overflow-y:auto;
+  background:
+    radial-gradient(circle at 18% 14%, rgba(255,255,255,.86) 0%, rgba(255,255,255,0) 25%),
+    radial-gradient(circle at 86% 74%, rgba(255,221,235,.42) 0%, rgba(255,221,235,0) 34%),
+    linear-gradient(180deg, rgba(255,248,251,.95) 0%, rgba(255,242,247,.97) 100%);
+  border:1px solid rgba(231,110,166,.18);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.82), 0 16px 38px rgba(159,58,105,.06);
+}
+
+#chatPanel .chat-log::-webkit-scrollbar,
+.chat-log#chatLog::-webkit-scrollbar{
+  width:10px;
+}
+
+#chatPanel .chat-log::-webkit-scrollbar-track,
+.chat-log#chatLog::-webkit-scrollbar-track{
+  background:rgba(255,255,255,.40);
+  border-radius:999px;
+}
+
+#chatPanel .chat-log::-webkit-scrollbar-thumb,
+.chat-log#chatLog::-webkit-scrollbar-thumb{
+  background:rgba(231,110,166,.30);
+  border-radius:999px;
+  border:3px solid rgba(255,248,251,.95);
+}
+
+#chatPanel .chat-log::-webkit-scrollbar-thumb:hover,
+.chat-log#chatLog::-webkit-scrollbar-thumb:hover{
+  background:rgba(231,110,166,.45);
+}
+
+/* 봇 메시지 행 */
+#chatPanel .msg-row.bot{
+  align-items:flex-end;
+  gap:10px;
+}
+
+/* 봇 프로필: 흰색 원형 배경 제거 */
+#chatPanel .msg-row.bot .avatar,
+#chatPanel .avatar{
+  width:44px;
+  height:44px;
+  flex:0 0 44px;
+  background:transparent;
+  border:none;
+  border-radius:0;
+  overflow:visible;
+  box-shadow:none;
+}
+
+#chatPanel .msg-row.bot .avatar img,
+#chatPanel .avatar img{
+  width:44px;
+  height:44px;
+  display:block;
+  object-fit:contain;
+  background:transparent;
+  border:none;
+  border-radius:0;
+  box-shadow:none;
+  filter:drop-shadow(0 8px 12px rgba(159,58,105,.12)) saturate(1.03);
+}
+
+/* 말하는 캐릭터 이름 */
+#chatPanel .bname,
+.bname{
+  margin:0 0 5px 6px;
+  color:#9B5B78;
+  font-size:11.5px;
+  font-weight:650;
+  line-height:1.2;
+  letter-spacing:-.01em;
+}
+
+/* 봇 말풍선 */
+#chatPanel .msg-row.bot .bubble,
+.msg-row.bot .bubble{
+  max-width:min(520px,72vw);
+  padding:13px 16px;
+  border-radius:20px;
+  border-top-left-radius:8px;
+  background:linear-gradient(180deg, rgba(255,255,255,.98) 0%, rgba(255,250,252,.98) 100%);
+  border:1px solid rgba(245,216,229,.94);
+  color:#2C3340;
+  font-size:14.5px;
+  font-weight:500;
+  line-height:1.7;
+  letter-spacing:-.01em;
+  box-shadow:0 10px 24px rgba(159,58,105,.065), inset 0 1px 0 rgba(255,255,255,.85);
+}
+
+/* 유저 말풍선 */
+#chatPanel .msg-row.user .bubble,
+.msg-row.user .bubble{
+  border-radius:18px;
+  border-top-right-radius:8px;
+  background:linear-gradient(135deg,#E76EA6 0%,#D75A97 100%);
+  color:#fff;
+  font-size:14.5px;
+  font-weight:650;
+  line-height:1.62;
+  letter-spacing:-.01em;
+  box-shadow:0 10px 22px rgba(231,110,166,.20);
+}
+
+#chatPanel .time,
+.time{
+  color:#A7A0A8;
+  font-size:10.5px;
+  font-weight:500;
+}
+
+/* 추천 답변 카드 */
+#chatPanel .ai-recommend-bubble,
+.ai-recommend-bubble{
+  width:min(460px,74vw);
+  padding:16px;
+}
+
+#chatPanel .rec-title,
+.rec-title{
+  color:#202631;
+  font-size:15px;
+  font-weight:820;
+  line-height:1.35;
+  letter-spacing:-.018em;
+}
+
+#chatPanel .rec-desc,
+.rec-desc{
+  margin-top:6px;
+  color:#747D8D;
+  font-size:12.5px;
+  font-weight:460;
+  line-height:1.6;
+  letter-spacing:-.005em;
+}
+
+#chatPanel .rec-desc b,
+.rec-desc b{
+  color:#C93F83;
+  font-weight:760;
+}
+
+#chatPanel .rec-list,
+.rec-list{
+  display:flex;
+  flex-direction:column;
+  gap:9px;
+  margin-top:13px;
+}
+
+#chatPanel .answer-option,
+.answer-option{
+  width:100%;
+  padding:13px 14px;
+  border-radius:16px;
+  border:1px solid rgba(231,110,166,.20);
+  background:radial-gradient(circle at 8% 10%, rgba(255,255,255,.80), rgba(255,255,255,0) 28%), linear-gradient(135deg,#FFF8FB 0%,#FFFFFF 100%);
+  cursor:pointer;
+  text-align:left;
+  font-family:'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  transition:transform .14s ease, border-color .14s ease, box-shadow .14s ease, background .14s ease;
+}
+
+#chatPanel .answer-option:hover,
+.answer-option:hover{
+  transform:translateY(-1px);
+  border-color:rgba(231,110,166,.46);
+  background:linear-gradient(135deg,#FFF3F8 0%,#FFFFFF 100%);
+  box-shadow:0 12px 24px rgba(159,58,105,.085);
+}
+
+#chatPanel .answer-main,
+.answer-main{
+  display:block;
+  color:#222B38;
+  font-size:14px;
+  font-weight:780;
+  line-height:1.45;
+  letter-spacing:-.012em;
+}
+
+#chatPanel .answer-sub,
+.answer-sub{
+  display:block;
+  margin-top:4px;
+  color:#98A2B3;
+  font-size:11.5px;
+  font-weight:520;
+  line-height:1.45;
+}
+
+/* 추천 칩 */
+#chatPanel #chatSuggest,
+#chatPanel .chat-suggest,
+.chat-suggest{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin:14px 0 10px;
+}
+
+#chatPanel #chatSuggest .chip,
+#chatPanel .chat-suggest .chip,
+.chat-suggest .chip{
+  height:32px;
+  padding:0 13px;
+  border-radius:999px;
+  background:#FFF7FB;
+  border:1px solid rgba(231,110,166,.20);
+  color:#B84A80;
+  font-size:12.5px;
+  font-weight:720;
+  letter-spacing:-.01em;
+  box-shadow:0 6px 14px rgba(159,58,105,.035);
+}
+
+#chatPanel #chatSuggest .chip:hover,
+#chatPanel .chat-suggest .chip:hover,
+.chat-suggest .chip:hover{
+  background:#FFEAF3;
+  border-color:rgba(231,110,166,.36);
+}
+
+/* 입력 영역 */
+#chatPanel .chat-input,
+.chat-input{
+  display:flex;
+  gap:10px;
+  margin-top:10px;
+}
+
+#chatPanel .chat-input input,
+.chat-input input{
+  height:48px;
+  border-radius:16px;
+  border:1px solid rgba(231,110,166,.20);
+  background:#fff;
+  color:#2F3745;
+  font-size:14.5px;
+  font-weight:520;
+  letter-spacing:-.01em;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.8), 0 8px 18px rgba(159,58,105,.035);
+}
+
+#chatPanel .chat-input input::placeholder,
+.chat-input input::placeholder{
+  color:#A4AAB5;
+  font-weight:500;
+}
+
+#chatPanel .chat-input input:focus,
+.chat-input input:focus{
+  border-color:rgba(231,110,166,.58);
+  box-shadow:0 0 0 4px rgba(231,110,166,.12), 0 10px 24px rgba(159,58,105,.055);
+}
+
+#chatPanel .chat-input button,
+.chat-input button{
+  min-width:66px;
+  height:48px;
+  border-radius:16px;
+  background:linear-gradient(135deg,#E76EA6 0%,#D35792 100%);
+  color:#fff;
+  font-size:14px;
+  font-weight:800;
+  box-shadow:0 10px 22px rgba(231,110,166,.24);
+}
+
+#chatPanel .chat-input button:hover,
+.chat-input button:hover{
+  background:linear-gradient(135deg,#DD5F9B 0%,#C84886 100%);
+}
+
+@media(max-width:760px){
+  #chatPanel .chat-log,
+  .chat-log#chatLog{
+    min-height:320px;
+    max-height:380px;
+    padding:18px 14px;
+    border-radius:20px;
+  }
+
+  #chatPanel .msg-row.bot .avatar,
+  #chatPanel .avatar{
+    width:38px;
+    height:38px;
+    flex-basis:38px;
+  }
+
+  #chatPanel .msg-row.bot .avatar img,
+  #chatPanel .avatar img{
+    width:38px;
+    height:38px;
+  }
+
+  #chatPanel .msg-row.bot .bubble,
+  .msg-row.bot .bubble{
+    max-width:78vw;
+    font-size:14px;
+  }
+
+  #chatPanel .ai-recommend-bubble,
+  .ai-recommend-bubble{
+    width:min(360px,78vw);
+  }
+
+  #chatPanel .chat-input,
+  .chat-input{
+    gap:7px;
+  }
+
+  #chatPanel .chat-input button,
+  .chat-input button{
+    min-width:58px;
+  }
+}
+
