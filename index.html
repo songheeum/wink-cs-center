@@ -213,16 +213,25 @@
   .faq-count{font-size:13px;color:var(--ink-3);margin-bottom:12px;}
   .faq-count b{color:var(--ink-1);}
   .faq-list{display:flex;flex-direction:column;gap:10px;}
-  /* 목록·상세 2분할 */
-  .fd{display:grid;grid-template-columns:300px 1fr;gap:14px;align-items:start;}
-  .fd-list{display:flex;flex-direction:column;gap:6px;max-height:560px;overflow-y:auto;padding-right:2px;}
-  .fd-row{display:flex;align-items:center;gap:9px;width:100%;text-align:left;cursor:pointer;font-family:inherit;
-    background:#fff;border:1px solid var(--border);border-radius:12px;padding:11px 12px;transition:background .12s,border-color .12s;}
+  /* 목록·상세 2분할 (왼쪽 = 소분류 그룹형) */
+  .fd{display:grid;grid-template-columns:312px 1fr;gap:14px;align-items:start;}
+  .fd-list{display:flex;flex-direction:column;max-height:580px;overflow-y:auto;padding-right:3px;}
+  /* 소분류/기기 묶음 머리글 */
+  .fd-group{display:flex;align-items:center;gap:7px;padding:11px 4px 7px;margin-top:2px;
+    font-size:11.5px;font-weight:800;color:var(--blue-deep);letter-spacing:-.01em;}
+  .fd-group:not(:first-child){border-top:1px solid var(--border);margin-top:6px;}
+  .fd-group .fd-gcount{font-size:11px;font-weight:600;color:var(--ink-3);
+    background:var(--blue-soft);border-radius:999px;padding:1px 8px;}
+  /* 그룹 내 항목 */
+  .fd-row{display:block;width:100%;text-align:left;cursor:pointer;font-family:inherit;
+    background:#fff;border:1px solid var(--border);border-radius:10px;padding:10px 12px;margin-bottom:5px;
+    transition:background .12s,border-color .12s;}
   .fd-row:hover{border-color:var(--blue-soft2);}
-  .fd-row.active{background:var(--blue-soft);border-color:var(--blue-light);}
-  .fd-row .ftag{font-size:10.5px;font-weight:700;color:var(--blue-deep);background:var(--blue-soft);border-radius:6px;padding:2px 7px;white-space:nowrap;flex:0 0 auto;}
-  .fd-row.active .ftag{background:#fff;}
-  .fd-row .fq{font-size:13.5px;font-weight:600;color:var(--ink-1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .fd-row.active{background:var(--blue-soft);border-color:var(--blue);}
+  .fd-row .fq{display:block;font-size:13.5px;font-weight:600;color:var(--ink-1);line-height:1.45;
+    word-break:break-word;}
+  .fd-row.active .fq{color:var(--blue-deep);}
+  .fd-row .fq-sub{display:inline-block;margin-left:7px;font-size:10.5px;font-weight:600;color:var(--ink-3);}
   .fd-detail{background:#fff;border:1px solid var(--border);border-radius:16px;padding:20px 22px;min-height:320px;}
   .fd-detail .dhead{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
   
@@ -564,9 +573,10 @@
       chatPanel=document.getElementById('chatPanel'),tipBox=document.getElementById('tipBox'),
       currentCat='전체',activeChip='전체',curItems=[],curSel=0;
 
-  function rowHTML(f,i,showCat){
-    var tag=showCat?f.cat:(f.sub||f.cat);
-    return '<button class="fd-row" data-i="'+i+'"><span class="ftag">'+esc(tag)+'</span><span class="fq">'+esc(f.q)+'</span></button>';
+  function rowHTML(f,i,showSub){
+    /* showSub=true(전체·검색, cat 그룹): 소분류를 힌트로 / false(기기뷰, sub 그룹): 제목만 */
+    var hint=showSub&&f.sub?'<span class="fq-sub">'+esc(f.sub)+'</span>':'';
+    return '<button class="fd-row" data-i="'+i+'"><span class="fq">'+esc(f.q)+hint+'</span></button>';
   }
   function fmtSteps(t){
     t=(t||'').replace(/\r/g,'').trim();
@@ -642,11 +652,15 @@
 
   function selectRow(i){
     curSel=i;
-    var rows=fdList.children;
-    for(var k=0;k<rows.length;k++) rows[k].classList.toggle('active',k===i);
+    var rows=fdList.querySelectorAll('.fd-row'),hit=null;
+    for(var k=0;k<rows.length;k++){
+      var on=(+rows[k].getAttribute('data-i')===i);
+      rows[k].classList.toggle('active',on);
+      if(on) hit=rows[k];
+    }
     var f=curItems[i];
     fdDetail.innerHTML = f ? detailHTML(f) : '<div class="fd-empty">왼쪽에서 항목을 선택하세요.</div>';
-    if(rows[i]&&rows[i].scrollIntoView) rows[i].scrollIntoView({block:'nearest'});
+    if(hit&&hit.scrollIntoView) hit.scrollIntoView({block:'nearest'});
   }
   function renderItems(items,showCat){
     curItems=items;
@@ -655,7 +669,21 @@
       fdDetail.innerHTML='<div class="fd-empty">관련 답변을 못 찾았어요. 간략하게 다시 단어를 적어 시도해주세요.</div>';
       return;
     }
-    fdList.innerHTML=items.map(function(f,i){return rowHTML(f,i,showCat);}).join('');
+    /* 전체·검색은 기기(cat)로, 기기 선택뷰는 소분류(sub)로 묶음 */
+    var groupKey=showCat?'cat':'sub';
+    var order=[],bucket={};
+    items.forEach(function(f,i){
+      var g=(f[groupKey]||'기타');
+      if(!bucket[g]){ bucket[g]=[]; order.push(g); }
+      bucket[g].push(i);                     /* curItems 원본 인덱스 보존 */
+    });
+    var html='';
+    order.forEach(function(g){
+      var ids=bucket[g];
+      html+='<div class="fd-group">'+esc(g)+'<span class="fd-gcount">'+ids.length+'</span></div>';
+      html+=ids.map(function(i){ return rowHTML(items[i],i,showCat); }).join('');
+    });
+    fdList.innerHTML=html;
     selectRow(0);
   }
   function chipValues(name){
@@ -814,15 +842,97 @@ function renderCategory(name){
     chatText.addEventListener('keydown',function(e){if(e.key==='Enter')ask(chatText.value);});
   }
 
-  /* 데이터(technical-faq.json) 불러온 뒤 첫 화면 렌더 */
-function loadData(){
-  fetch('data/technical-faq.json?v='+Date.now())
+  /* =====================================================================
+     데이터 연결 설정
+     ─────────────────────────────────────────────────────────────────────
+     ▸ 구글시트 '웹에 게시 > CSV' 주소를 아래 SHEET_CSV_URL 에 붙여넣으세요.
+       (정책 바뀌면 시트만 고치면 약 5분 내 자동 반영됩니다)
+     ▸ 비워두면 data/technical-faq.json 으로 동작합니다.
+     ▸ 시트가 안 열리면 자동으로 technical-faq.json 으로 대체(안전장치).
+     ▸ STEP 사진: 시트 'STEPn사진' 칸에 파일명만 적으면 IMG_BASE 폴더에서 찾음.
+     ===================================================================== */
+  var SHEET_CSV_URL = "";          /* 예: https://docs.google.com/.../pub?gid=0&single=true&output=csv */
+  var IMG_BASE      = "img/";      /* 깃허브 사진 폴더 */
+  var FALLBACK_JSON = "data/technical-faq.json";
+
+  /* CSV 파서 (따옴표·줄바꿈 안전) */
+  function parseCSV(text){
+    var rows=[],row=[],cur="",q=false;
+    for(var i=0;i<text.length;i++){var c=text[i];
+      if(q){ if(c==='"'){ if(text[i+1]==='"'){cur+='"';i++;} else q=false; } else cur+=c; }
+      else { if(c==='"')q=true; else if(c===','){row.push(cur);cur="";}
+             else if(c==='\n'){row.push(cur);rows.push(row);row=[];cur="";}
+             else if(c==='\r'){} else cur+=c; } }
+    if(cur!==""||row.length){row.push(cur);rows.push(row);}
+    return rows;
+  }
+  /* 사진 경로 정리: 파일명만 적으면 img/ 자동, 경로/URL 이면 그대로 */
+  function resolveImg(v){
+    v=(v||'').trim(); if(!v) return '';
+    if(/^(https?:)?\/\//i.test(v)) return v;
+    if(v.indexOf('/')>=0) return v;            /* img/.. assets/.. 등 이미 경로 */
+    return IMG_BASE+v;
+  }
+  /* 시트 행 → FAQ 객체 (헤더 이름으로 매핑, 칼럼 순서 바뀌어도 안전) */
+  function rowsToFAQ(rows){
+    if(!rows||!rows.length) return [];
+    var head=rows[0].map(function(h){return (h||'').replace(/\s+/g,'').trim();});
+    function idx(){ for(var a=0;a<arguments.length;a++){var k=head.indexOf(arguments[a]); if(k>=0)return k;} return -1; }
+    var iCat=idx('분류','cat'), iSub=idx('소분류','sub'), iQ=idx('제목','q','문의'),
+        iSay=idx('요약','고객말','says'), iNext=idx('추가조치','next'),
+        iNote=idx('비고','note'), iTag=idx('검색태그','tags','태그');
+    /* STEP / STEPn사진 칼럼 자동 탐지 */
+    var stepCols=[];
+    head.forEach(function(h,i){
+      var m=h.match(/^STEP\s*(\d+)$/i); if(m){ var n=+m[1]; (stepCols[n]=stepCols[n]||{}).c=i; }
+      var p=h.match(/^STEP\s*(\d+)\s*(사진|이미지|img|image)$/i); if(p){ var n2=+p[1]; (stepCols[n2]=stepCols[n2]||{}).img=i; }
+    });
+    var out=[];
+    for(var r=1;r<rows.length;r++){
+      var row=rows[r]; if(!row) continue;
+      var g=function(k){ return (k>=0 && row[k]!=null) ? String(row[k]).trim() : ''; };
+      var cat=g(iCat), q=g(iQ);
+      if(!cat && !q) continue;                 /* 빈 줄 건너뜀 */
+      var steps=[];
+      for(var n=1;n<stepCols.length;n++){
+        var sc=stepCols[n]; if(!sc) continue;
+        var content=sc.c!=null?g(sc.c):'';
+        var image  =sc.img!=null?resolveImg(g(sc.img)):'';
+        if(content||image) steps.push({step:n,content:content,image:image});
+      }
+      var tagsRaw=g(iTag);
+      var tags=tagsRaw?tagsRaw.split(/[|,]/).map(function(t){return t.trim();}).filter(Boolean):[];
+      var f={ cat:cat, sub:g(iSub), q:q, says:g(iSay), next:g(iNext), note:g(iNote), tags:tags, steps:steps };
+      f.ment=steps.map(function(s){return s.content;}).filter(Boolean).join('\n'); /* 복사·검색·AI 호환용 */
+      out.push(f);
+    }
+    return out;
+  }
+  function applyFAQ(arr){ FAQ.length=0; Array.prototype.push.apply(FAQ,arr); renderCategory('전체'); }
+  function loadError(msg){
+    var fv=document.getElementById('faqView');
+    if(fv) fv.innerHTML='<div style="padding:40px 16px;text-align:center;color:#98A2B3;font-size:14px;line-height:1.6;">'+msg+'</div>';
+  }
+  function loadJSON(){
+    return fetch(FALLBACK_JSON+'?v='+Date.now())
       .then(function(r){ if(!r.ok) throw new Error(r.status); return r.json(); })
-      .then(function(arr){ FAQ.length=0; Array.prototype.push.apply(FAQ,arr); renderCategory('전체'); })
-      .catch(function(e){
-        var fv=document.getElementById('faqView');
-        if(fv) fv.innerHTML='<div style="padding:40px 16px;text-align:center;color:#98A2B3;font-size:14px;line-height:1.6;">데이터(technical-faq.json)를 불러오지 못했어요.<br>파일을 직접 열지 말고 공유받은 주소로 접속해 주세요.</div>';
+      .then(function(arr){ applyFAQ(arr); });
+  }
+  function loadData(){
+    if(SHEET_CSV_URL){
+      fetch(SHEET_CSV_URL+(SHEET_CSV_URL.indexOf('?')<0?'?':'&')+'t='+Date.now())
+        .then(function(r){ if(!r.ok) throw new Error(r.status); return r.text(); })
+        .then(function(t){ var arr=rowsToFAQ(parseCSV(t)); if(!arr.length) throw new Error('empty'); applyFAQ(arr); })
+        .catch(function(){
+          loadJSON().catch(function(){
+            loadError('시트를 불러오지 못했어요.<br>게시 상태와 CSV 주소를 확인해 주세요.');
+          });
+        });
+    } else {
+      loadJSON().catch(function(){
+        loadError('데이터를 불러오지 못했어요.<br>파일을 직접 열지 말고 공유받은 주소로 접속해 주세요.');
       });
+    }
   }
   loadData();
 
