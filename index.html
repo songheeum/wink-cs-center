@@ -4212,6 +4212,97 @@ body{
   .floating-card{display:none;}
 }
 
+
+
+/* =====================================================================
+   FINAL GITHUB ASSET PATCH
+   - 히어로: assets/hero-characters-group-final.png
+   - 챗봇 썸네일: assets/rabbit-3d-side.png
+   - 캐릭터 바닥톤/플로팅카드 최종 보정
+   ===================================================================== */
+
+.hero-right-v3 .mascot-v3 img{
+  background:transparent;
+  object-fit:contain;
+  object-position:center bottom;
+}
+
+.msg-row.bot .avatar{
+  background:transparent;
+  box-shadow:none;
+  overflow:visible;
+  border-radius:0;
+}
+
+.msg-row.bot .avatar img{
+  object-fit:contain;
+  background:transparent;
+  filter:drop-shadow(0 8px 12px rgba(159,58,105,.12));
+}
+
+.bname{
+  color:#8B6476;
+  font-weight:600;
+}
+
+/* 히어로 캐릭터 주변 자연스러운 바닥톤 */
+.hero-right-v3::after{
+  width:320px;
+  height:94px;
+  right:50%;
+  top:auto;
+  bottom:20px;
+  transform:translateX(50%);
+  border-radius:999px;
+  background:radial-gradient(ellipse at center, rgba(255,218,232,.72) 0%, rgba(255,233,241,.38) 42%, rgba(255,240,245,.12) 60%, rgba(255,240,245,0) 82%);
+  filter:blur(18px);
+  opacity:.95;
+}
+
+/* 플로팅 카드가 캐릭터와 겹치지 않도록 여백 확보 */
+.fc-1{
+  left:-4px;
+  top:6px;
+}
+
+.fc-2{
+  right:-2px;
+  top:84px;
+}
+
+.fc-3{
+  left:18px;
+  bottom:16px;
+}
+
+.floating-card{
+  min-width:126px;
+  padding:8px 10px;
+  border-radius:15px;
+  background:rgba(255,255,255,.58);
+  box-shadow:0 10px 22px rgba(159,58,105,.07);
+}
+
+.floating-card b{
+  font-size:11px;
+}
+
+.floating-card small{
+  font-size:9px;
+}
+
+.fc-icon{
+  width:26px;
+  height:26px;
+  border-radius:9px;
+}
+
+@media (max-width:600px){
+  .floating-card{
+    display:none;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -5282,7 +5373,7 @@ function renderCategory(name){
 
   function initChat(){
     chatText.focus(); if(chatReady)return; chatReady=true;
-    addMsg("프로님 안녕하세요! 저는 다래예요. 🐰\n실제 AI 생성 답변이 아니라, 기술상담/일반상담 구글시트에서 가까운 추천 답변 키워드를 먼저 찾아드려요.",'bot');
+    addMsg("프로님 안녕하세요!\n실제 AI 생성 답변이 아니라, 메뉴얼에서 만들어진 추천 답변 키워드를 먼저 찾아드려요.",'bot');
     SUGGEST.forEach(function(s){
       var c=document.createElement('button'); c.className='chip'; c.textContent=s;
       c.addEventListener('click',function(){ask(s);}); chatSuggest.appendChild(c);
