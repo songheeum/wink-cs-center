@@ -20,6 +20,7 @@
     --blue:#E76EA6;--blue-dark:#D35792;--blue-deep:#9F3A69;
     --blue-light:#F4ABCB;--blue-soft:#FCF1F6;--blue-soft2:#F8DEEA;
     --radius:18px;
+    --page-zoom:.80; /* 전체 화면을 브라우저 80% 배율처럼 보이게 조정 */
   }
   *{box-sizing:border-box;margin:0;padding:0;}
   html,body{height:100%;background:var(--bg);}
@@ -68,8 +69,22 @@
   /* ===== 본문 ===== */
   #app{display:none;}
   #app.show{display:block;animation:fade .5s ease;}
+
+  /* 전체 페이지 배율: Chrome 브라우저 80% 줌처럼 보이게 처리 */
+  @supports (zoom:1){
+    #app.show{zoom:var(--page-zoom);}
+  }
+  @supports not (zoom:1){
+    #app.show{
+      transform:scale(var(--page-zoom));
+      transform-origin:top center;
+      width:calc(100% / var(--page-zoom));
+      margin-left:calc((100% - (100% / var(--page-zoom))) / 2);
+    }
+  }
   @keyframes fade{from{opacity:0;}to{opacity:1;}}
-  .wrap{max-width:900px;margin:0 auto;padding:22px 22px 80px;}
+  /* 전체 콘텐츠 폭을 히어로 배너와 동일하게 확장 */
+  .wrap{max-width:1480px;margin:0 auto;padding:22px 22px 80px;}
 
   /* 히어로 */
   .hero{position:relative;overflow:hidden;border-radius:26px;
@@ -83,7 +98,7 @@
     border-bottom:1px solid var(--border);padding:10px 22px;
     transform:translateY(-110%);opacity:0;pointer-events:none;transition:transform .25s ease,opacity .2s ease;}
   #stickyBar.show{transform:translateY(0);opacity:1;pointer-events:auto;}
-  .sticky-inner{max-width:900px;margin:0 auto;position:relative;}
+  .sticky-inner{max-width:1480px;margin:0 auto;position:relative;}
   .sticky-inner svg{position:absolute;left:16px;top:50%;transform:translateY(-50%);width:18px;height:18px;fill:var(--blue);}
   #searchInput2{width:100%;height:44px;border:1px solid var(--border);border-radius:13px;
     padding:0 16px 0 44px;font-family:inherit;font-size:15px;outline:none;background:#fff;}
@@ -106,6 +121,11 @@
 
   /* 카테고리 헤더 + 도구 */
   .cat-head{display:flex;align-items:center;justify-content:space-between;margin:30px 2px 12px;}
+  /* 히어로 하단 영역도 같은 폭으로 정렬 */
+  .feature{min-height:82px;}
+  .cat-grid{grid-template-columns:repeat(auto-fit,minmax(190px,1fr));}
+  #faqView,.tip,.content-stub,#chatPanel,footer{width:100%;}
+
   .sec-label{font-size:13px;font-weight:700;color:var(--ink-3);letter-spacing:.04em;text-transform:uppercase;}
   .cat-tools{display:none;gap:8px;}
   #app.admin .cat-tools{display:flex;align-items:center;}
@@ -384,6 +404,177 @@ word-break:break-word;}
     .cat-grid{grid-template-columns:repeat(2,1fr);}
     .cat-head{flex-wrap:wrap;gap:8px;}
   }
+
+/* =====================================================================
+   HERO ONLY PATCH — Premium SaaS Hero Banner
+   아래 CSS는 기존 본문/카테고리/FAQ 구조는 그대로 두고 상단 히어로 배너만 교체합니다.
+   ===================================================================== */
+.hero.hero-v3{
+  min-height:400px;
+  width:100%;
+  margin:0 0 26px;
+  transform:none;
+  display:grid;
+  grid-template-columns:minmax(0,1.14fr) minmax(410px,.86fr);
+  gap:28px;
+  align-items:center;
+  padding:54px 58px;
+  border-radius:34px;
+  overflow:hidden;
+  position:relative;
+  border:1px solid rgba(255,255,255,.8);
+  background:
+    radial-gradient(circle at 18% 10%,rgba(255,255,255,.86),transparent 22%),
+    radial-gradient(circle at 82% 18%,rgba(255,255,255,.64),transparent 24%),
+    radial-gradient(circle at 68% 86%,rgba(255,197,222,.68),transparent 30%),
+    linear-gradient(135deg,#FFF7FA 0%,#FFE6F0 49%,#FFD6E8 100%);
+  box-shadow:0 28px 90px rgba(159,58,105,.16);
+}
+.hero.hero-v3::before,
+.hero.hero-v3::after{display:none;}
+.hero-bg-orb{position:absolute;border-radius:999px;filter:blur(46px);pointer-events:none;opacity:.78;}
+.orb-a{width:420px;height:420px;background:rgba(255,255,255,.58);right:-110px;top:-120px;}
+.orb-b{width:360px;height:360px;background:rgba(255,205,226,.72);left:38%;bottom:-190px;}
+.orb-c{width:260px;height:260px;background:rgba(255,255,255,.55);left:-70px;top:120px;}
+.hero-left-v3{position:relative;z-index:2;min-width:0;}
+.hero-eyebrow{font-size:13px;font-weight:900;letter-spacing:.02em;color:var(--blue-deep);background:rgba(255,255,255,.72);border:1px solid rgba(255,255,255,.92);box-shadow:0 8px 22px rgba(159,58,105,.08);padding:8px 14px;margin-bottom:18px;}
+.hero-title-v3{font-size:58px;font-weight:920;letter-spacing:-.055em;line-height:1.04;color:#141821;margin:0;}
+.hero-title-v3 span{display:inline-block;background:linear-gradient(90deg,#E76EA6 0%,#C93F83 54%,#9F3A69 100%);-webkit-background-clip:text;background-clip:text;color:transparent;}
+.hero-sub-v3{font-size:18px;line-height:1.72;color:#6B4258;margin-top:20px;font-weight:600;}
+.hero-search-v3{margin-top:30px;max-width:650px;position:relative;}
+.hero-search-v3 input{height:68px;border-radius:22px;font-size:18px;font-weight:700;padding-left:58px;background:rgba(255,255,255,.92);border:1px solid rgba(255,255,255,.95);box-shadow:0 20px 60px rgba(159,58,105,.16), inset 0 0 0 1px rgba(255,255,255,.6);}
+.hero-search-v3 input:focus{box-shadow:0 22px 65px rgba(159,58,105,.19),0 0 0 5px rgba(231,110,166,.13);}
+.hero-search-v3 svg{left:22px;width:22px;height:22px;fill:var(--blue);}
+.hero-chips-v3{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px;}
+.hero-chips-v3 button{font-family:inherit;border:1px solid rgba(255,255,255,.88);background:rgba(255,255,255,.58);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);color:#8F3E66;border-radius:999px;padding:10px 15px;font-size:13px;font-weight:850;cursor:pointer;box-shadow:0 8px 18px rgba(159,58,105,.07);transition:transform .12s,background .15s,box-shadow .15s;}
+.hero-chips-v3 button:hover{transform:translateY(-2px);background:rgba(255,255,255,.86);box-shadow:0 12px 26px rgba(159,58,105,.12);}
+.hero-right-v3{position:relative;z-index:2;min-height:300px;display:flex;align-items:center;justify-content:center;isolation:isolate;}
+.hero-right-v3::before{
+  content:"";
+  position:absolute;
+  width:380px;height:380px;
+  border-radius:50%;
+  right:44px;top:-8px;
+  background:radial-gradient(circle, rgba(255,255,255,.70) 0%, rgba(255,220,235,.62) 28%, rgba(255,191,220,.34) 55%, transparent 80%);
+  filter:blur(20px);
+  opacity:.98;
+  z-index:0;
+}
+.hero-right-v3::after{
+  content:"";
+  position:absolute;
+  width:290px;height:290px;
+  border-radius:50%;
+  right:116px;bottom:-10px;
+  background:radial-gradient(circle, rgba(255,255,255,.48) 0%, rgba(255,238,246,.24) 42%, transparent 76%);
+  filter:blur(16px);
+  z-index:0;
+}
+.hero-cloud,
+.hero-dust,
+.hero-ring{position:absolute;pointer-events:none;z-index:1;}
+.hero-cloud{border-radius:999px;filter:blur(20px);opacity:.72;mix-blend-mode:screen;}
+.cloud-1{width:182px;height:94px;right:34px;top:48px;background:radial-gradient(circle at 35% 50%, rgba(255,255,255,.86), rgba(255,238,246,.38) 52%, transparent 78%);animation:cloudy 8.5s ease-in-out infinite;}
+.cloud-2{width:148px;height:80px;right:160px;bottom:44px;background:radial-gradient(circle at 50% 50%, rgba(255,255,255,.68), rgba(255,223,238,.32) 52%, transparent 78%);animation:cloudy 10s ease-in-out infinite 1.2s;}
+.cloud-3{width:126px;height:68px;left:112px;top:146px;background:radial-gradient(circle at 50% 50%, rgba(255,255,255,.58), rgba(255,230,241,.24) 50%, transparent 76%);animation:cloudy 9.2s ease-in-out infinite .6s;}
+.hero-ring{border-radius:999px;border:1px solid rgba(255,255,255,.36);box-shadow:0 0 0 1px rgba(255,255,255,.08) inset;opacity:.55;}
+.ring-1{width:312px;height:312px;right:84px;top:10px;filter:blur(.2px);}
+.ring-2{width:236px;height:236px;right:118px;top:54px;opacity:.38;}
+.hero-dust{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,.92);box-shadow:0 0 14px rgba(255,255,255,.75),0 0 20px rgba(255,213,232,.38);animation:dustFloat 6.2s ease-in-out infinite;}
+.mascot-v3{width:260px;height:260px;position:relative;z-index:3;filter:drop-shadow(0 24px 38px rgba(159,58,105,.22));}
+.mascot-v3::before{content:"";position:absolute;inset:22px;border-radius:50%;background:rgba(255,255,255,.42);filter:blur(18px);z-index:-1;}
+.mascot-v3 img{width:100%;height:100%;object-fit:contain;display:block;}
+.floating-card{position:absolute;display:flex;align-items:center;gap:10px;min-width:172px;padding:13px 14px;border-radius:20px;background:rgba(255,255,255,.62);border:1px solid rgba(255,255,255,.85);box-shadow:0 20px 45px rgba(159,58,105,.12);-webkit-backdrop-filter:blur(18px) saturate(160%);backdrop-filter:blur(18px) saturate(160%);z-index:2;}
+.floating-card b{display:block;font-size:13px;color:#172033;letter-spacing:-.02em;}
+.floating-card small{display:block;font-size:11px;color:#8B5A72;margin-top:1px;font-weight:650;}
+.fc-icon{display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:12px;background:linear-gradient(135deg,#FFFFFF,#FFF0F7);}
+.fc-1{left:4px;top:26px;animation:floaty 5.2s ease-in-out infinite;}
+.fc-2{right:4px;top:88px;animation:floaty 5.8s ease-in-out infinite .4s;}
+.fc-3{left:24px;bottom:36px;animation:floaty 6.1s ease-in-out infinite .2s;}
+
+/* 더 자연스럽고 화려한 반짝임 */
+.sparkle{
+  position:absolute;
+  display:flex;align-items:center;justify-content:center;
+  color:rgba(255,255,255,.98);
+  text-shadow:0 6px 18px rgba(159,58,105,.18), 0 0 18px rgba(255,255,255,.75);
+  z-index:1;
+  animation:twinkle 4.2s ease-in-out infinite;
+}
+.sparkle::before{
+  content:"";
+  position:absolute;
+  inset:-8px;
+  border-radius:50%;
+  background:radial-gradient(circle, rgba(255,255,255,.48), rgba(255,255,255,0));
+  filter:blur(8px);
+  z-index:-1;
+}
+.sparkle.big{font-size:24px;}
+.sparkle.mid{font-size:18px;}
+.sparkle.small{font-size:14px;}
+.sp-1{right:86px;top:34px;animation-delay:.2s;}
+.sp-2{left:84px;top:118px;animation-delay:1.2s;}
+.sp-3{right:48px;bottom:46px;animation-delay:2.1s;}
+.sp-4{left:156px;top:56px;animation-delay:.8s;}
+.sp-5{right:142px;top:178px;animation-delay:1.8s;}
+.sp-6{right:14px;bottom:120px;animation-delay:2.9s;}
+.sp-7{left:118px;bottom:82px;animation-delay:3.4s;}
+.glow-dot{
+  position:absolute;border-radius:999px;pointer-events:none;z-index:1;
+  background:radial-gradient(circle, rgba(255,255,255,.95) 0%, rgba(255,255,255,.55) 32%, rgba(255,255,255,0) 72%);
+  filter:blur(1px);
+  animation:glimmer 5.8s ease-in-out infinite;
+}
+.gd-1{width:12px;height:12px;right:172px;top:126px;animation-delay:.3s;}
+.gd-2{width:8px;height:8px;right:110px;top:220px;animation-delay:1.7s;}
+.gd-3{width:10px;height:10px;left:126px;top:164px;animation-delay:2.5s;}
+.gd-4{width:7px;height:7px;right:34px;top:72px;animation-delay:3.2s;}
+.gd-5{width:9px;height:9px;left:168px;bottom:44px;animation-delay:4.1s;}
+.dust-1{right:210px;top:86px;animation-delay:.4s;}
+.dust-2{right:76px;top:158px;animation-delay:1.6s;}
+.dust-3{left:140px;top:102px;animation-delay:2.5s;}
+.dust-4{left:96px;bottom:116px;animation-delay:3.2s;}
+.dust-5{right:188px;bottom:72px;animation-delay:4s;}
+.dust-6{right:34px;bottom:154px;animation-delay:4.8s;}
+.dust-7{left:184px;top:214px;animation-delay:5.2s;}
+@keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+@keyframes twinkle{
+  0%,100%{opacity:.35;transform:scale(.84) rotate(0deg);}
+  25%{opacity:.92;transform:scale(1.08) rotate(10deg);}
+  50%{opacity:.52;transform:scale(.94) rotate(-8deg);}
+  75%{opacity:1;transform:scale(1.14) rotate(6deg);}
+}
+@keyframes glimmer{
+  0%,100%{opacity:.2;transform:scale(.8);}
+  50%{opacity:.95;transform:scale(1.35);}
+}
+@keyframes cloudy{
+  0%,100%{transform:translate3d(0,0,0) scale(1); opacity:.58;}
+  50%{transform:translate3d(8px,-6px,0) scale(1.05); opacity:.84;}
+}
+@keyframes dustFloat{
+  0%,100%{transform:translate3d(0,0,0) scale(.72); opacity:.15;}
+  30%{transform:translate3d(-5px,-8px,0) scale(1); opacity:.62;}
+  60%{transform:translate3d(6px,-14px,0) scale(1.18); opacity:.96;}
+  80%{transform:translate3d(2px,-9px,0) scale(.92); opacity:.48;}
+}
+.pc-only{display:block;}
+@media(max-width:980px){
+  .hero.hero-v3{grid-template-columns:1fr;min-height:auto;padding:36px 28px;width:100%;}
+  .hero-right-v3{min-height:210px;}
+  .floating-card,.hero-cloud,.hero-ring,.hero-dust{display:none;}
+  .mascot-v3{width:220px;height:220px;}
+}
+@media(max-width:600px){
+  .hero.hero-v3{padding:30px 22px;border-radius:28px;}
+  .hero-title-v3{font-size:38px;}
+  .hero-sub-v3{font-size:15px;}
+  .hero-search-v3 input{height:58px;font-size:16px;}
+  .mascot-v3{width:180px;height:180px;}
+  .pc-only{display:none;}
+}
+
 </style>
 </head>
 <body>
@@ -417,20 +608,77 @@ word-break:break-word;}
   </div>
   <div class="wrap">
 
-    <header class="hero">
-      <div class="hero-row">
-        <div class="hero-text">
-          <span class="eyebrow">📘 단비공감팀 통합 메뉴얼</span>
-          <h1>일반상담 <b>&amp; 기술상담</b> 가이드</h1>
-          <p class="hero-sub">업무하면서 활용해보세요! 😊</p>
+    <header class="hero hero-v3">
+      <div class="hero-bg-orb orb-a"></div>
+      <div class="hero-bg-orb orb-b"></div>
+      <div class="hero-bg-orb orb-c"></div>
+
+      <div class="hero-left-v3">
+        <span class="eyebrow hero-eyebrow">✨ Premium Support Workspace</span>
+        <h1 class="hero-title-v3">
+          문제 해결,<br>
+          <span>검색으로 빠르게!</span>
+        </h1>
+        <p class="hero-sub hero-sub-v3">
+          정확한 가이드를 검색하여<br class="pc-only">
+          고객 문제를 빠르게 해결하세요.
+        </p>
+
+        <div class="hero-search hero-search-v3">
+          <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27a6.5 6.5 0 1 0-.7.7l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0A4.5 4.5 0 1 1 14 9.5 4.5 4.5 0 0 1 9.5 14z"/></svg>
+          <input id="searchInput" type="text" placeholder="무엇이 문제인가요?" autocomplete="off">
         </div>
-        <div class="mascot" aria-hidden="true">
-          <img src="assets/darae.png">
+
+        <div class="hero-chips-v3" aria-label="추천 검색어">
+          <button type="button" data-query="충전 안됨">충전 안됨</button>
+          <button type="button" data-query="TV 연결">TV 연결</button>
+          <button type="button" data-query="로그인 오류">로그인 오류</button>
+          <button type="button" data-query="와이파이 연결">와이파이 연결</button>
+          <button type="button" data-query="초기화 방법">초기화 방법</button>
+          <button type="button" data-query="원격 연결">원격 연결</button>
         </div>
       </div>
-      <div class="hero-search">
-        <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27a6.5 6.5 0 1 0-.7.7l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0A4.5 4.5 0 1 1 14 9.5 4.5 4.5 0 0 1 9.5 14z"/></svg>
-        <input id="searchInput" type="text" placeholder="예) 전원 안켜짐, 화면 끊김, 로그인 안됨, 충전 안됨, TV연결">
+
+      <div class="hero-right-v3" aria-hidden="true">
+        <div class="floating-card fc-1">
+          <span class="fc-icon">⚡</span>
+          <div><b>Quick Solve</b><small>1차 조치 바로 확인</small></div>
+        </div>
+        <div class="floating-card fc-2">
+          <span class="fc-icon">📋</span>
+          <div><b>Copy Guide</b><small>상담 멘트 복사</small></div>
+        </div>
+        <div class="floating-card fc-3">
+          <span class="fc-icon">🧭</span>
+          <div><b>Step Flow</b><small>절차형 문서 지원</small></div>
+        </div>
+        <span class="hero-cloud cloud-1"></span>
+        <span class="hero-cloud cloud-2"></span>
+        <span class="hero-cloud cloud-3"></span>
+        <span class="hero-ring ring-1"></span>
+        <span class="hero-ring ring-2"></span>
+        <div class="sparkle big sp-1">✦</div>
+        <div class="sparkle mid sp-2">✧</div>
+        <div class="sparkle mid sp-3">✦</div>
+        <div class="sparkle small sp-4">✦</div>
+        <div class="sparkle small sp-5">✧</div>
+        <div class="sparkle small sp-6">✦</div>
+        <div class="sparkle small sp-7">✧</div>
+        <span class="glow-dot gd-1"></span>
+        <span class="glow-dot gd-2"></span>
+        <span class="glow-dot gd-3"></span>
+        <span class="glow-dot gd-4"></span>
+        <span class="glow-dot gd-5"></span>
+        <span class="hero-dust dust-1"></span>
+        <span class="hero-dust dust-2"></span>
+        <span class="hero-dust dust-3"></span>
+        <span class="hero-dust dust-4"></span>
+        <span class="hero-dust dust-5"></span>
+        <span class="hero-dust dust-6"></span>
+        <span class="hero-dust dust-7"></span>
+        <div class="mascot mascot-v3">
+          <img src="assets/rabbit-3d-side.png" alt="Wink rabbit mascot" onerror="this.onerror=null;this.src='assets/darae.png';">
+        </div>
       </div>
     </header>
 
@@ -910,6 +1158,13 @@ function renderCategory(name){
   }
   searchInput.addEventListener('input',function(){ applyQuery(this.value); });
   searchInput2.addEventListener('input',function(){ applyQuery(this.value); });
+
+  document.querySelectorAll('.hero-chips-v3 [data-query]').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      applyQuery(this.getAttribute('data-query')||this.textContent);
+      document.getElementById('faqView').scrollIntoView({block:'start',behavior:'smooth'});
+    });
+  });
 
   /* ===== AI도움말 챗봇 (같은 FAQ 사용) ===== */
   var SUGGEST=["전원이 안 켜져요","화면이 끊겨요","로그인 안돼요","충전이 안돼요"];
