@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>💻 자마드 점검 현황</title>
+<title>💻 자마드 점검</title>
 <script>
   var SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTGdaw55jIrzBzL_Mg9Q-MbCgyqK-8oPrEsk32q8gT218vd6YHTJDPtep7vCPfFABzjGmuxokXI7f0t/pub?gid=742834396&single=true&output=csv";
 </script>
@@ -88,4 +88,360 @@ header h1 span{font-size:12px;background:var(--blue2);color:var(--blue-deep);pad
 .modal-close{width:100%;padding:14px;background:#F2F4F6;border:none;border-radius:14px;font-weight:600;cursor:pointer;margin-top:16px;}
 
 /* 기간 선택 레이어 */
-.range-panel{position:absolute;top:48px;left:0;background:#fff;border:1px solid #E5E8EB;border
+.range-panel{position:absolute;top:48px;left:0;background:#fff;border:1px solid #E5E8EB;border-radius:16px;padding:16px;box-shadow:0 8px 24px rgba(0,0,0,0.08);display:none;width:280px;z-index:100;}
+.range-panel.show{display:block;}
+.cal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;font-weight:600;}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center;font-size:12px;}
+.cal-day{padding:6px;cursor:pointer;border-radius:6px;}
+.cal-day.active{background:var(--blue);color:#fff;}
+.cal-day.in-range{background:var(--blue2);}
+
+/* 카테고리 메뉴 */
+.cat-menu{position:absolute;top:48px;left:0;right:0;background:#fff;border:1px solid #E5E8EB;border-radius:16px;box-shadow:0 8px 24px rgba(0,0,0,0.08);display:none;z-index:100;max-height:200px;overflow-y:auto;}
+.cat-menu.show{display:block;}
+.cat-item{padding:12px 16px;cursor:pointer;font-size:14px;}
+.cat-item:hover{background:#F9FAFB;}
+
+/* 작업자 토글 패널 */
+.member-picker{position:absolute;top:48px;left:0;right:0;background:#fff;border:1px solid #E5E8EB;border-radius:16px;box-shadow:0 8px 24px rgba(0,0,0,0.08);display:none;z-index:100;padding:8px;}
+.member-picker.open{display:block;}
+.mem-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;}
+.mem-btn{padding:8px;border:1px solid #E5E8EB;border-radius:8px;background:#fff;font-size:13px;cursor:pointer;}
+.mem-btn.on{background:var(--blue);color:#fff;border-color:var(--blue);}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>💻 자마드 점검 <span id="ver">로딩중</span></h1>
+  <button class="refresh-btn" onclick="fetchData()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg></button>
+</header>
+
+<div class="filter-sec">
+  <div class="search-wrap">
+    <input type="text" id="search" placeholder="교사 또는 아동 이름 검색" oninput="render()">
+  </div>
+  <div class="row2">
+    <div class="period-wrap">
+      <button class="p-btn" id="periodBtn">📅 전체 기간</button>
+      <div class="range-panel" id="rangePanel">
+        <div class="cal-head">
+          <button id="prevMonth">&lt;</button>
+          <span id="calTitle">2026.06</span>
+          <button id="nextMonth">&gt;</button>
+        </div>
+        <div class="cal-grid" id="calGrid"></div>
+        <div style="margin-top:12px;display:flex;gap:6px;">
+          <button id="clearRange" style="flex:1;padding:8px;border:none;background:#F2F4F6;border-radius:8px;font-size:12px;cursor:pointer;">초기화</button>
+          <button id="closeRange" style="flex:1;padding:8px;border:none;background:var(--blue);color:#fff;border-radius:8px;font-size:12px;cursor:pointer;">확인</button>
+        </div>
+      </div>
+    </div>
+    <div class="cat-wrap">
+      <button class="c-btn" id="catBtn">📂 전체 구분</button>
+      <div class="cat-menu" id="catMenu"></div>
+    </div>
+    <div class="owner-wrap">
+      <button class="o-btn" id="mine">👤 전체 작업자</button>
+      <div class="member-picker" id="memberPicker">
+        <div class="mem-grid" id="memGrid"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="content">
+  <div class="list-header">
+    <div class="count">검색 결과 <span id="totalCnt">0</span>건</div>
+  </div>
+  <div class="list-wrap" id="list"></div>
+</div>
+
+<div class="modal" id="modal" onclick="closeEdit()">
+  <div class="modal-content" onclick="event.stopPropagation()">
+    <div class="modal-title" id="mTitle">상세 정보</div>
+    <div id="mBody" style="font-size:14px;line-height:1.6;color:var(--sub);white-space:pre-wrap;"></div>
+    <button class="modal-close" onclick="closeEdit()">닫기</button>
+  </div>
+</div>
+
+<script>
+var RAW = [];
+var FILTERED = [];
+
+// 달력 필터용 변수
+var calYear = new Date().getFullYear();
+var calMonth = new Date().getMonth();
+var filterStart = '';
+var filterEnd = '';
+var draftStart = '';
+var draftEnd = '';
+
+// 구분 필터용
+var selectedCat = '전체';
+// 작업자 필터용
+var selectedOwner = '전체';
+
+function fetchData() {
+  var verEl = document.getElementById('ver');
+  verEl.textContent = '불러오는 중...';
+  fetch(SHEET_CSV_URL + "&t=" + Date.now())
+    .then(r => r.text())
+    .then(txt => {
+      parseCSV(txt);
+      verEl.textContent = '실시간';
+    })
+    .catch(e => {
+      verEl.textContent = '오류';
+      document.getElementById('list').innerHTML = '<div style="padding:40px;text-align:center;color:var(--muted);">데이터를 불러오지 못했습니다.</div>';
+    });
+}
+
+function parseCSV(txt) {
+  var lines = txt.split('\n');
+  if(lines.length === 0) return;
+  
+  // 헤더 추출
+  var headers = lines[0].replace('\r','').split(',');
+  var arr = [];
+  
+  for(var i=1; i<lines.length; i++){
+    if(!lines[i].trim()) continue;
+    var cols = lines[i].replace('\r','').split(',');
+    var obj = {};
+    headers.forEach((h, idx) => {
+      obj[h.trim()] = cols[idx] ? cols[idx].trim() : '';
+    });
+    arr.push(obj);
+  }
+  
+  // 최근순 정렬
+  arr.sort((a,b) => b.날짜.localeCompare(a.날짜));
+  RAW = arr;
+  
+  // 필터 메뉴 구성
+  buildCatMenu();
+  buildMemberPicker();
+  
+  render();
+}
+
+function buildCatMenu() {
+  var cats = new Set();
+  RAW.forEach(d => { if(d.구분) cats.add(d.구분); });
+  var menu = document.getElementById('catMenu');
+  var html = '<div class="cat-item" onclick="setCat(\'전체\')">📂 전체 구분</div>';
+  cats.forEach(c => {
+    html += '<div class="cat-item" onclick="setCat(\''+c+'\')">' + c + '</div>';
+  });
+  menu.innerHTML = html;
+}
+
+function setCat(c) {
+  selectedCat = c;
+  document.getElementById('catBtn').textContent = c === '전체' ? '📂 전체 구분' : c;
+  document.getElementById('catMenu').classList.remove('show');
+  render();
+}
+
+function buildMemberPicker() {
+  var owners = new Set();
+  RAW.forEach(d => { if(d.작업자) owners.add(d.작업자); });
+  var grid = document.getElementById('memGrid');
+  var html = '<button class="mem-btn on" onclick="setOwner(this, \'전체\')">전체</button>';
+  owners.forEach(o => {
+    html += '<button class="mem-btn" onclick="setOwner(this, \''+o+'\')">' + o + '</button>';
+  });
+  grid.innerHTML = html;
+}
+
+function setOwner(btn, o) {
+  var btns = document.querySelectorAll('.mem-btn');
+  btns.forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  selectedOwner = o;
+  document.getElementById('mine').textContent = o === '전체' ? '👤 전체 작업자' : '👤 ' + o;
+  if(o !== '전체') document.getElementById('mine').classList.add('on');
+  else document.getElementById('mine').classList.remove('on');
+  document.getElementById('memberPicker').classList.remove('open');
+  render();
+}
+
+function render() {
+  var k = document.getElementById('search').value.toLowerCase();
+  
+  FILTERED = RAW.filter(d => {
+    // 키워드 필터
+    var matchK = !k || (d.교사 && d.교사.toLowerCase().includes(k)) || (d.아동 && d.아동.toLowerCase().includes(k));
+    // 구분 필터
+    var matchC = selectedCat === '전체' || d.구분 === selectedCat;
+    // 작업자 필터
+    var matchO = selectedOwner === '전체' || d.작업자 === selectedOwner;
+    // 날짜 필터
+    var matchD = true;
+    if(filterStart && filterEnd) {
+      matchD = d.날짜 >= filterStart && d.날짜 <= filterEnd;
+    }
+    return matchK && matchC && matchO && matchD;
+  });
+  
+  document.getElementById('totalCnt').textContent = FILTERED.length;
+  
+  var listEl = document.getElementById('list');
+  if(FILTERED.length === 0) {
+    listEl.innerHTML = '<div style="padding:40px;text-align:center;color:var(--muted);font-size:14px;">조건에 맞는 점검 내역이 없습니다.</div>';
+    return;
+  }
+  
+  // ⭐ 리스트 렌더링을 쫀득한 계층 구조로 매핑
+  var html = '';
+  FILTERED.forEach((d, i) => {
+    html += '<div class="item" onclick="openEdit(' + i + ')">';
+    html += '  <div style="flex: 1; min-width: 0; padding-right: 8px;">';
+    html += '    <div style="font-size: 15px; font-weight: 600; color: var(--ink); margin-bottom: 4px;">' + d.교사 + ' <span style="font-size:12px; color:var(--muted); font-weight:normal; margin-left:4px;">' + d.구분 + '</span></div>';
+    html += '    <div style="font-size: 13px; color: var(--sub); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">' + d.아동 + '</div>';
+    html += '  </div>';
+    html += '  <div style="display: flex; align-items: center; gap: 12px; flex-shrink: 0;">';
+    html += '    <span class="status ' + d.상태 + '">' + d.상태 + '</span>';
+    html += '    <span style="font-size: 12px; color: var(--muted); width: 42px; text-align: right;">' + (d.날짜 ? d.날짜.substring(5) : '') + '</span>';
+    html += '  </div>';
+    html += '</div>';
+  });
+  listEl.innerHTML = html;
+}
+
+function openEdit(idx) {
+  var d = FILTERED[idx];
+  document.getElementById('mTitle').textContent = d.교사 + " 교사 (" + d.구분 + ")";
+  
+  var bodyHtml = "";
+  for(var key in d) {
+    if(d.hasOwnProperty(key)) {
+      bodyHtml += "<b>" + key + "</b>: " + d[key] + "\n";
+    }
+  }
+  
+  document.getElementById('mBody').innerHTML = bodyHtml;
+  document.getElementById('modal').classList.add('show');
+}
+
+function closeEdit() {
+  document.getElementById('modal').classList.remove('show');
+}
+
+// 달력 그리기 로직
+function renderCalendar() {
+  var title = document.getElementById('calTitle');
+  title.textContent = calYear + '.' + String(calMonth + 1).padStart(2, '0');
+  
+  var firstDay = new Date(calYear, calMonth, 1).getDay();
+  var lastDate = new Date(calYear, calMonth + 1, 0).getDate();
+  
+  var grid = document.getElementById('calGrid');
+  var html = '';
+  
+  var days = ['일','월','화','수','목','금','토'];
+  days.forEach(dy => html += '<div style="font-weight:600;color:var(--muted);font-size:11px;">'+dy+'</div>');
+  
+  for(var i=0; i<firstDay; i++) html += '<div></div>';
+  
+  var dStart = draftStart;
+  var dEnd = draftEnd || dStart;
+  if(dStart && dEnd && dStart > dEnd) { var tmp = dStart; dStart = dEnd; dEnd = tmp; }
+  
+  for(var d=1; d<=lastDate; d++) {
+    var curStr = calYear + '-' + String(calMonth + 1).padStart(2, '0') + '-' + String(d).padStart(2, '0');
+    var cls = 'cal-day';
+    if(dStart && curStr === dStart) cls += ' active';
+    else if(dEnd && curStr === dEnd) cls += ' active';
+    else if(dStart && dEnd && curStr > dStart && curStr < dEnd) cls += ' in-range';
+    
+    html += '<div class="'+cls+'" onclick="clickDate(\''+curStr+'\')">'+d+'</div>';
+  }
+  grid.innerHTML = html;
+}
+
+function clickDate(dateStr) {
+  if(!draftStart || (draftStart && draftEnd)) {
+    draftStart = dateStr;
+    draftEnd = '';
+  } else {
+    draftEnd = dateStr;
+  }
+  renderCalendar();
+}
+
+function clearPeriod() {
+  filterStart = '';
+  filterEnd = '';
+  draftStart = '';
+  draftEnd = '';
+  document.getElementById('periodBtn').textContent = '📅 전체 기간';
+  renderCalendar();
+  render();
+  document.getElementById('rangePanel').classList.remove('show');
+}
+
+function updatePeriodLabel() {
+  if(filterStart && filterEnd) {
+    if(filterStart === filterEnd) {
+      document.getElementById('periodBtn').textContent = filterStart.substring(5);
+    } else {
+      document.getElementById('periodBtn').textContent = filterStart.substring(5) + '~' + filterEnd.substring(5);
+    }
+  } else {
+    document.getElementById('periodBtn').textContent = '📅 전체 기간';
+  }
+}
+
+function orderedRange(s, e) { return s <= e ? [s, e] : [e, s]; }
+
+// 이벤트 바인딩
+document.getElementById('periodBtn').onclick = function(e) {
+  e.stopPropagation();
+  draftStart = filterStart;
+  draftEnd = filterEnd;
+  renderCalendar();
+  document.getElementById('rangePanel').classList.toggle('show');
+};
+
+document.getElementById('mine').onclick = function(e) {
+  e.stopPropagation();
+  document.getElementById('memberPicker').classList.toggle('open');
+};
+
+document.getElementById('prevMonth').onclick = function(e) {
+  e.stopPropagation();
+  calMonth--; if(calMonth < 0) { calMonth = 11; calYear--; }
+  renderCalendar();
+};
+document.getElementById('nextMonth').onclick = function(e) {
+  e.stopPropagation();
+  calMonth++; if(calMonth > 11) { calMonth = 0; calYear++; }
+  renderCalendar();
+};
+document.getElementById('clearRange').onclick = function(e) { e.stopPropagation(); clearPeriod(); };
+document.getElementById('closeRange').onclick = function(e) {
+  e.stopPropagation();
+  if(draftStart) {
+    var rr = orderedRange(draftStart, draftEnd || draftStart);
+    filterStart = rr[0]; filterEnd = rr[1];
+    draftStart = ''; draftEnd = '';
+    updatePeriodLabel();
+  }
+  document.getElementById('rangePanel').classList.remove('show');
+  render();
+};
+
+document.getElementById('catBtn').onclick = function(e) { e.stopPropagation(); document.getElementById('catMenu').classList.toggle('show'); };
+document.addEventListener('click', function() {
+  document.getElementById('rangePanel').classList.remove('show');
+  document.getElementById('catMenu').classList.remove('show');
+  document.getElementById('memberPicker').classList.remove('open');
+});
+
+// 초기 구동
+fetchData();
+</script>
+</body>
+</html>
