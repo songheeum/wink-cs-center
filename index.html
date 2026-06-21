@@ -3891,6 +3891,174 @@ body{
   }
 }
 
+
+
+/* =====================================================================
+   HERO CHARACTER COMPACT FINAL FIX
+   - 체크무늬/사각 배경 제거용 투명 PNG 전용
+   - 오른쪽 캐릭터 폭 축소
+   - 기존 히어로 레이아웃은 유지하되 캐릭터가 자연스럽게 녹아들도록 최종값만 덮어씀
+   ===================================================================== */
+
+.hero.hero-v3{
+  grid-template-columns:minmax(0,1.22fr) minmax(260px,.78fr);
+  gap:24px;
+  min-height:318px;
+  padding:34px 42px;
+}
+
+.hero-right-v3{
+  min-height:250px;
+  justify-content:center;
+  align-items:center;
+  padding-right:0;
+  overflow:visible;
+}
+
+.hero-right-v3::before{
+  width:320px;
+  height:320px;
+  right:50%;
+  top:50%;
+  transform:translate(50%,-50%);
+  background:radial-gradient(circle, rgba(255,255,255,.70) 0%, rgba(255,228,239,.48) 38%, rgba(255,203,224,.16) 62%, transparent 82%);
+  filter:blur(18px);
+  opacity:.92;
+}
+
+.hero-right-v3::after{
+  width:230px;
+  height:230px;
+  right:50%;
+  top:50%;
+  bottom:auto;
+  transform:translate(50%,-50%);
+  background:radial-gradient(circle, rgba(255,255,255,.28) 0%, rgba(255,255,255,.12) 48%, transparent 76%);
+  filter:blur(10px);
+  opacity:.72;
+}
+
+.hero-right-v3 .mascot-v3{
+  width:clamp(230px,23vw,290px);
+  height:clamp(230px,23vw,290px);
+  aspect-ratio:1 / 1;
+  border-radius:0;
+  overflow:visible;
+  background:transparent;
+  transform:translateY(2px);
+  filter:drop-shadow(0 18px 26px rgba(159,58,105,.16));
+}
+
+.hero-right-v3 .mascot-v3::before{
+  inset:14px;
+  border-radius:50%;
+  background:radial-gradient(circle, rgba(255,255,255,.36) 0%, rgba(255,241,247,.18) 48%, transparent 76%);
+  filter:blur(18px);
+  z-index:-1;
+}
+
+.hero-right-v3 .mascot-v3::after{
+  content:"";
+  position:absolute;
+  left:50%;
+  bottom:4px;
+  width:72%;
+  height:22px;
+  transform:translateX(-50%);
+  border-radius:999px;
+  background:radial-gradient(circle, rgba(173,104,132,.20) 0%, rgba(173,104,132,.10) 40%, rgba(173,104,132,0) 76%);
+  filter:blur(10px);
+  z-index:1;
+  pointer-events:none;
+}
+
+.hero-right-v3 .mascot-v3 img{
+  position:relative;
+  z-index:2;
+  width:100%;
+  height:100%;
+  display:block;
+  object-fit:contain;
+  object-position:center center;
+  border-radius:0;
+  background:transparent;
+  mix-blend-mode:normal;
+  filter:saturate(1.02) contrast(1.01);
+  -webkit-mask-image:none;
+  mask-image:none;
+}
+
+.fc-1{ left:6px; top:24px; }
+.fc-2{ right:0; top:82px; }
+.fc-3{ left:18px; bottom:26px; }
+
+.floating-card{
+  min-width:136px;
+  padding:8px 10px;
+  border-radius:15px;
+  background:rgba(255,255,255,.60);
+  box-shadow:0 12px 26px rgba(159,58,105,.08);
+}
+
+.floating-card b{ font-size:11px; }
+.floating-card small{ font-size:9px; }
+.fc-icon{ width:27px; height:27px; }
+
+.ring-1{
+  width:300px;
+  height:300px;
+  right:50%;
+  top:50%;
+  transform:translate(50%,-50%);
+  opacity:.30;
+}
+
+.ring-2{
+  width:240px;
+  height:240px;
+  right:50%;
+  top:50%;
+  transform:translate(50%,-50%);
+  opacity:.18;
+}
+
+@media (max-width:980px){
+  .hero.hero-v3{
+    grid-template-columns:1fr;
+    gap:14px;
+    min-height:auto;
+    padding:30px 28px;
+  }
+
+  .hero-right-v3{
+    min-height:225px;
+  }
+
+  .hero-right-v3 .mascot-v3{
+    width:min(280px,70vw);
+    height:min(280px,70vw);
+  }
+}
+
+@media (max-width:600px){
+  .hero.hero-v3{
+    padding:28px 22px;
+  }
+
+  .hero-right-v3{
+    min-height:198px;
+  }
+
+  .hero-right-v3 .mascot-v3{
+    width:min(235px,76vw);
+    height:min(235px,76vw);
+  }
+
+  .floating-card{
+    display:none;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -3984,7 +4152,7 @@ body{
         <span class="hero-dust dust-6"></span>
         <span class="hero-dust dust-7"></span>
         <div class="mascot mascot-v3">
-          <img src="assets/rabbit-3d-side.png" alt="3D 캐릭터 그룹 마스코트" fetchpriority="high" decoding="async" onerror="this.onerror=null;this.src='assets/darae.png';">
+          <img src="assets/hero-characters-group-final.png" alt="단비 캐릭터 친구들" fetchpriority="high" decoding="async" onerror="this.onerror=null;this.src='assets/darae.png';">
         </div>
       </div>
     </header>
