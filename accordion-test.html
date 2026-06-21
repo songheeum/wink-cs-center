@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SaaS 지식베이스 대시보드</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <style>
+        @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+        body { 
+            font-family: 'Pretendard', sans-serif; 
+            background-color: #FAFBFC;
+        }
+        @keyframes marquee {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+        .animate-marquee {
+            animation: marquee 25s linear infinite;
+        }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-thumb { background: #FBCFE8; border-radius: 10px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+    </style>
+</head>
+<body class="text-gray-800 pb-20">
+    
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const KnowledgeBaseDashboard = () => {
+            return (
+                <div className="min-h-screen bg-[#FAFBFC] text-[#1F2937] pb-20 font-sans">
+                    {/* Header */}
+                    <header className="w-full bg-white h-16 flex items-center justify-between px-8 shadow-sm border-b border-[#E5E7EB] sticky top-0 z-40">
+                        <div className="flex items-center gap-2 font-bold text-lg">
+                            <div className="w-8 h-8 rounded-lg bg-[#FF5A8A] flex items-center justify-center text-white">
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                </svg>
+                            </div>
+                            <span>기술상담 가이드</span>
+                        </div>
+                        <div className="flex items-center gap-4 text-sm font-medium">
+                            <button className="text-gray-500 hover:text-[#FF5A8A] transition-colors">즐겨찾기</button>
+                            <button className="text-gray-500 hover:text-[#FF5A8A] transition-colors">최근 본 문서</button>
+                            <div className="w-8 h-8 rounded-full bg-[#FFF3F7] text-[#FF5A8A] flex items-center justify-center font-bold ml-4 border border-[#FF5A8A] cursor-pointer hover:bg-[#FF5A8A] hover:text-white transition">
+                                엄
+                            </div>
+                        </div>
+                    </header>
+
+                    <main className="max-w-[1440px] mx-auto px-8 py-8 flex flex-col gap-8">
+                        
+                        {/* SECTION 1: HeroSearchSection */}
+                        <section className="h-[360px] rounded-[24px] overflow-hidden relative flex bg-gradient-to-r from-[#FFF3F7] to-white shadow-[0_8px_32px_rgba(0,0,0,0.05)] border border-[#FFF3F7]">
+                            <div className="flex-1 flex flex-col justify-center p-12 z-10">
+                                <h1 className="text-4xl font-extrabold leading-tight mb-3">
+                                    문제 해결, <br />
+                                    <span className="text-[#FF5A8A]">검색으로 빠르게!</span>
+                                </h1>
+                                <p className="text-gray-500 text-lg mb-8">정확한 가이드를 검색하여 고객 문제를 빠르게 해결하세요.</p>
+                                
+                                <div className="relative max-w-2xl w-full mb-4">
+                                    <div className="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
+                                        <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                                    </div>
+                                    <input 
+                                        type="text" 
+                                        placeholder="무엇이 문제인가요? (예: 삼성탭 충전 안됨, TV 연결 화면 안나옴)" 
+                                        className="w-full h-16 pl-14 pr-32 rounded-full border border-[#E5E7EB] bg-white shadow-sm focus:outline-none focus:border-[#FF5A8A] focus:ring-1 focus:ring-[#FF5A8A] text-lg transition-all"
+                                    />
+                                    <button className="absolute inset-y-2 right-2 bg-[#FF5A8A] hover:bg-[#e04576] transition-colors text-white font-semibold rounded-full px-8">
+                                        검색
+                                    </button>
+                                </div>
+
+                                <div className="flex flex-wrap items-center gap-2">
+                                    <span className="text-sm text-gray-400 font-medium mr-2">추천 검색어</span>
+                                    {["충전 안됨", "TV 연결", "로그인 오류", "와이파이 연결", "초기화 방법", "원격 연결"].map((chip, idx) => (
+                                        <button key={idx} className="px-4 py-1.5 rounded-full bg-white border border-[#E5E7EB] text-sm text-gray-600 hover:border-[#FF5A8A] hover:text-[#FF5A8A] transition-colors shadow-sm">
+                                            {chip}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <div className="hidden lg:flex w-1/3 relative items-center justify-center p-12">
+                                <div className="absolute w-64 h-64 bg-[#FF5A8A] opacity-5 rounded-full blur-3xl"></div>
+                                <div className="relative z-10 w-48 h-48 bg-white/60 backdrop-blur-md border border-white rounded-[32px] shadow-lg flex flex-col items-center justify-center rotate-3 transform hover:rotate-0 transition-transform">
+                                    <span className="text-6xl mb-2">🤖</span>
+                                    <div className="bg-[#FFF3F7] text-[#FF5A8A] text-xs font-bold px-3 py-1 rounded-full">Support Agent</div>
+                                </div>
+                            </div>
+                        </section>
+
+                        {/* SECTION 2: CategoryExplorer */}
+                        <section>
+                            <div className="mb-6">
+                                <h2 className="text-2xl font-bold mb-1">카테고리별 검색</h2>
+                                <p className="text-gray-500 text-sm">제품 또는 서비스를 선택하여 관련 가이드를 확인하세요.</p>
+                            </div>
+                            
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                                {[
+                                    { icon: "📱", title: "삼성탭", desc: "삼성탭 관련 가이드", count: "32개 문서" },
+                                    { icon: "💻", title: "레노버", desc: "레노버 관련 가이드", count: "24개 문서" },
+                                    { icon: "🤖", title: "윙크봇", desc: "서비스 운영 가이드", count: "18개 문서" },
+                                    { icon: "👨‍👩‍👧", title: "학부모앱", desc: "학부모 앱 사용 가이드", count: "15개 문서" },
+                                    { icon: "📚", title: "윙크스쿨", desc: "학습 서비스 가이드", count: "20개 문서" },
+                                    { icon: "🛠", title: "업무점검", desc: "운영 점검 매뉴얼", count: "12개 문서" },
+                                    { icon: "🧰", title: "지원도구", desc: "양식 및 업무도구", count: "10개 문서" },
+                                    { icon: "📂", title: "전체 문서", desc: "모든 가이드 보기", count: "131개 문서" }
+                                ].map((cat, idx) => (
+                                    <div key={idx} className="bg-white rounded-[24px] p-6 border border-[#E5E7EB] shadow-[0_8px_32px_rgba(0,0,0,0.03)] hover:-translate-y-1 hover:shadow-[0_8px_32px_rgba(0,0,0,0.08)] transition-all cursor-pointer flex items-start gap-4 group">
+                                        <div className="w-12 h-12 rounded-[16px] bg-[#FAFBFC] border border-[#E5E7EB] flex items-center justify-center text-2xl group-hover:bg-[#FFF3F7] transition-colors">
+                                            {cat.icon}
+                                        </div>
+                                        <div className="flex-1">
+                                            <h3 className="font-bold text-gray-800 text-lg group-hover:text-[#FF5A8A] transition-colors">{cat.title}</h3>
+                                            <p className="text-xs text-gray-400 mt-1 mb-3">{cat.desc}</p>
+                                            <span className="inline-block bg-[#FFF3F7] text-[#FF5A8A] text-xs font-semibold px-2.5 py-1 rounded-md">
+                                                {cat.count}
+                                            </span>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </section>
+
+                        {/* SECTION 4: QuickActions */}
+                        <section className="bg-white p-6 rounded-[24px] shadow-[0_8px_32px_rgba(0,0,0,0.03)] border border-[#E5E7EB]">
+                            <h3 className="text-sm font-bold text-gray-400 mb-4 uppercase tracking-wider">Quick Actions</h3>
+                            <div className="flex flex-wrap gap-3">
+                                {["원격지원", "점검확인", "기기초기화", "설치가이드", "출고조회", "반납절차", "고객정보조회", "A/S 절차"].map((action, idx) => (
+                                    <button key={idx} className="px-5 py-2.5 rounded-full bg-[#FAFBFC] border border-[#E5E7EB] text-gray-700 font-medium hover:bg-[#FFF3F7] hover:text-[#FF5A8A] hover:border-[#FF5A8A] transition-all text-sm">
+                                        {action}
+                                    </button>
+                                ))}
+                            </div>
+                        </section>
+
+                        {/* SECTION 3 & 5: Widgets Layout */}
+                        <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                            
+                            {/* 최근 수정 문서 */}
+                            <div className="bg-white rounded-[24px] p-8 border border-[#E5E7EB] shadow-[0_8px_32px_rgba(0,0,0,0.03)] flex flex-col h-full">
+                                <div className="flex justify-between items-center mb-6">
+                                    <h3 className="font-bold text-lg flex items-center gap-2">
+                                        <span className="w-2 h-2 rounded-full bg-[#FF5A8A]"></span> 최근 수정 문서
+                                    </h3>
+                                </div>
+                                <ul className="flex flex-col gap-4 flex-1">
+                                    {[
+                                        { date: "06.21", title: "삼성탭 초기화 절차 변경", isNew: true },
+                                        { date: "06.20", title: "TV 연결 방법 수정", isNew: false },
+                                        { date: "06.19", title: "충전 오류 가이드 수정", isNew: false },
+                                        { date: "06.18", title: "로그인 절차 변경", isNew: false },
+                                        { date: "06.17", title: "원격지원 정책 변경", isNew: false }
+                                    ].map((item, idx) => (
+                                        <li key={idx} className="flex items-center gap-3 cursor-pointer group">
+                                            <span className="text-xs font-mono text-gray-400 w-10 shrink-0">{item.date}</span>
+                                            <span className="text-sm text-gray-700 font-medium truncate group-hover:text-[#FF5A8A] transition-colors">{item.title}</span>
+                                            {item.isNew && <span className="ml-auto text-[10px] bg-[#FF5A8A] text-white px-2 py-0.5 rounded-full font-bold">NEW</span>}
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+
+                            {/* 인기 질문 TOP 5 */}
+                            <div className="bg-white rounded-[24px] p-8 border border-[#E5E7EB] shadow-[0_8px_32px_rgba(0,0,0,0.03)] flex flex-col h-full">
+                                <div className="flex justify-between items-center mb-6">
+                                    <h3 className="font-bold text-lg flex items-center gap-2">
+                                        <span className="w-2 h-2 rounded-full bg-[#FF5A8A]"></span> 인기 질문 TOP 5
+                                    </h3>
+                                </div>
+                                <ul className="flex flex-col gap-4 flex-1">
+                                    {[
+                                        "충전해도 충전되지 않아요",
+                                        "TV 연결 방법",
+                                        "로그인 오류",
+                                        "기기가 느려졌어요",
+                                        "비밀번호를 잊어버렸어요"
+                                    ].map((item, idx) => (
+                                        <li key={idx} className="flex items-center gap-3 cursor-pointer group">
+                                            <span className={`w-5 text-center text-sm font-bold ${idx < 3 ? 'text-[#FF5A8A]' : 'text-gray-300'}`}>{idx + 1}</span>
+                                            <span className="text-sm text-gray-700 font-medium truncate group-hover:text-[#FF5A8A] transition-colors">{item}</span>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+
+                            {/* 내 즐겨찾기 */}
+                            <div className="bg-white rounded-[24px] p-8 border border-[#E5E7EB] shadow-[0_8px_32px_rgba(0,0,0,0.03)] flex flex-col h-full">
+                                <div className="flex justify-between items-center mb-6">
+                                    <h3 className="font-bold text-lg flex items-center gap-2">
+                                        <span className="w-2 h-2 rounded-full bg-[#FF5A8A]"></span> 내 즐겨찾기
+                                    </h3>
+                                </div>
+                                <ul className="flex flex-col gap-4 flex-1">
+                                    {[
+                                        "삼성탭 초기 설정",
+                                        "TV 연결 방법",
+                                        "원격 연결 가이드",
+                                        "레노버 프로그램 설치",
+                                        "점검 절차"
+                                    ].map((item, idx) => (
+                                        <li key={idx} className="flex items-center gap-3 cursor-pointer group">
+                                            <svg className="w-4 h-4 text-yellow-400 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
+                                            <span className="text-sm text-gray-700 font-medium truncate group-hover:text-[#FF5A8A] transition-colors">{item}</span>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        </section>
+                    </main>
+
+                    {/* SECTION 6: GlobalNoticeBar */}
+                    <div className="fixed bottom-0 w-full bg-white border-t border-[#FFF3F7] shadow-[0_-8px_32px_rgba(0,0,0,0.05)] h-12 flex items-center z-50">
+                        <div className="max-w-[1440px] mx-auto px-8 w-full flex items-center overflow-hidden">
+                            <div className="shrink-0 bg-[#FFF3F7] text-[#FF5A8A] px-3 py-1 rounded-md text-xs font-bold mr-4 z-10 flex items-center gap-2">
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" /></svg>
+                                공지사항
+                            </div>
+                            <div className="flex-1 overflow-hidden relative">
+                                <div className="flex whitespace-nowrap animate-marquee items-center gap-12 text-sm text-gray-600 font-medium">
+                                    <span>📢 삼성탭 초기화 절차 변경 안내</span>
+                                    <span>📢 단비 점검 항목 추가</span>
+                                    <span>📢 윙크봇 업데이트</span>
+                                    <span aria-hidden="true">📢 삼성탭 초기화 절차 변경 안내</span>
+                                    <span aria-hidden="true">📢 단비 점검 항목 추가</span>
+                                    <span aria-hidden="true">📢 윙크봇 업데이트</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<KnowledgeBaseDashboard />);
+    </script>
+</body>
+</html>
