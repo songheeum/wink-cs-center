@@ -3128,7 +3128,7 @@ body{
         <span class="guide-entry-icon">💬</span>
         <span class="guide-entry-text">
           <b>일반상담 가이드</b>
-          <small>이용 · 변경 · 해지 · 환불 안내 예정</small>
+          <small>체험 · 결제 · 배송 · 해지 · 응대 FAQ</small>
         </span>
         <span class="guide-entry-badge">준비중</span>
       </button>
@@ -3746,7 +3746,7 @@ function renderCategory(name){
     renderGeneralCards();
     tipBox.innerHTML=GENERAL_FAQ.length
       ? '💡 <span><b>일반상담 가이드</b> — 카테고리를 선택하거나 검색창으로 응대 멘트를 찾아보세요.</span>'
-      : '💡 <span><b>일반상담 가이드</b> — CSV 연결 전 뼈대 미리보기입니다. 추후 일반상담 구글시트 주소만 연결하면 됩니다.</span>';
+      : '💡 <span><b>일반상담 가이드</b> — 구글시트 CSV에서 일반상담 데이터를 불러옵니다.</span>';
     renderGeneralItems(currentCat);
   }
 
@@ -3979,7 +3979,7 @@ function renderCategory(name){
      ▸ STEP 사진: 시트 'STEPn사진' 칸에 파일명만 적으면 IMG_BASE 폴더에서 찾음.
      ===================================================================== */
   var SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSEYbFjQgL9dYX-t3brc34goP1rdrgRMr7PJzbg8-04fTH0vE5t74VpLnlKdjGDkJ6M2vQ6mEn_pbXK/pub?gid=1815248879&single=true&output=csv";          /* 기술상담 CSV */
-  var GENERAL_CSV_URL = "";  /* 일반상담 CSV 주소를 나중에 여기에 붙여넣으세요 */
+  var GENERAL_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSEYbFjQgL9dYX-t3brc34goP1rdrgRMr7PJzbg8-04fTH0vE5t74VpLnlKdjGDkJ6M2vQ6mEn_pbXK/pub?gid=1858229244&single=true&output=csv";  /* 일반상담 CSV */
   var IMG_BASE      = "assets/guides/";      /* 깃허브 사진 폴더 */
   var FALLBACK_JSON = "data/technical-faq.backup.json";
 
@@ -4126,7 +4126,7 @@ function renderCategory(name){
         Array.prototype.push.apply(GENERAL_FAQ, rowsToGeneralFAQ(parseCSV(t)));
         if(currentGuide==='general') renderGeneralGuide(currentCat||'전체');
       })
-      .catch(function(){ console.warn('일반상담 CSV를 불러오지 못했습니다.'); });
+      .catch(function(){ console.warn('일반상담 CSV를 불러오지 못했습니다. CSV 게시 상태와 주소를 확인해 주세요.'); });
   }
   function loadData(){
     if(SHEET_CSV_URL){
