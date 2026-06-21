@@ -12,6 +12,193 @@
   font-display:swap;
   src:url('assets/pretendard.woff2') format('woff2');
 }
+
+
+/* =====================================================================
+   HERO POLISH FINAL PATCH
+   - 배너 높이 약 2뼘 축소
+   - 캐릭터는 크게 유지하되 오른쪽 영역에 꽉 차게 배치
+   - 뽀샤시 글로우, 꽃 장식, 빛 궤적 추가
+   ===================================================================== */
+.hero.hero-v3{
+  min-height:332px;
+  padding:34px 50px 26px;
+  grid-template-columns:minmax(390px,.92fr) minmax(500px,1.08fr);
+  gap:24px;
+  background:
+    radial-gradient(circle at 15% 14%, rgba(255,255,255,.98) 0%, rgba(255,255,255,.60) 16%, rgba(255,255,255,0) 34%),
+    radial-gradient(circle at 68% 38%, rgba(255,255,255,.82) 0%, rgba(255,244,249,.48) 28%, rgba(255,244,249,0) 55%),
+    radial-gradient(ellipse at 76% 80%, rgba(255,183,214,.80) 0%, rgba(255,218,233,.38) 36%, rgba(255,218,233,0) 66%),
+    linear-gradient(135deg,#FFF9FB 0%,#FFEAF3 45%,#FFD6E7 100%);
+}
+
+.hero.hero-v3::before{
+  content:"";
+  position:absolute;
+  z-index:1;
+  width:560px;
+  height:220px;
+  right:48px;
+  bottom:14px;
+  border-radius:50%;
+  background:
+    radial-gradient(ellipse at center, rgba(255,255,255,.42) 0%, rgba(255,246,250,.28) 38%, transparent 70%);
+  filter:blur(18px);
+  pointer-events:none;
+}
+
+.hero.hero-v3::after{
+  content:"";
+  position:absolute;
+  z-index:2;
+  right:58px;
+  bottom:42px;
+  width:560px;
+  height:150px;
+  border-radius:50%;
+  border:1.5px solid rgba(255,255,255,.42);
+  border-left-color:rgba(255,255,255,.10);
+  border-bottom-color:rgba(255,255,255,.18);
+  transform:rotate(-10deg);
+  filter:blur(.2px);
+  opacity:.78;
+  pointer-events:none;
+}
+
+.hero-right-v3{
+  min-height:276px;
+  padding-right:4px;
+}
+
+.hero-right-v3::before{
+  width:520px;
+  height:430px;
+  top:52%;
+  background:radial-gradient(circle, rgba(255,255,255,.86) 0%, rgba(255,239,247,.58) 34%, rgba(255,199,224,.28) 63%, transparent 84%);
+  filter:blur(20px);
+}
+
+.hero-right-v3::after{
+  width:470px;
+  height:104px;
+  bottom:-2px;
+  background:radial-gradient(ellipse at center, rgba(255,189,217,.82) 0%, rgba(255,228,239,.48) 42%, rgba(255,238,246,.13) 64%, transparent 84%);
+  filter:blur(17px);
+}
+
+.mascot-v3,
+.hero-right-v3 .mascot-v3{
+  width:clamp(385px,36vw,510px);
+  height:clamp(278px,27vw,382px);
+  transform:translate(8px,8px);
+  filter:drop-shadow(0 20px 28px rgba(159,58,105,.15));
+}
+
+.ring-1{width:500px;height:390px;opacity:.20;}
+.ring-2{width:386px;height:300px;opacity:.12;}
+
+/* 꽃 장식 */
+.hero-flower{
+  position:absolute;
+  z-index:6;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:28px;
+  height:28px;
+  border-radius:999px;
+  color:#F28BB6;
+  font-size:24px;
+  line-height:1;
+  text-shadow:0 8px 18px rgba(159,58,105,.16), 0 0 14px rgba(255,255,255,.85);
+  filter:drop-shadow(0 6px 10px rgba(231,110,166,.12));
+  opacity:.86;
+  animation:flowerFloat 7s ease-in-out infinite;
+  pointer-events:none;
+}
+
+.hero-flower::after{
+  content:"";
+  position:absolute;
+  inset:4px;
+  border-radius:50%;
+  background:radial-gradient(circle, rgba(255,255,255,.58), rgba(255,255,255,0) 72%);
+  z-index:-1;
+  filter:blur(6px);
+}
+
+.flower-1{right:438px;top:78px;transform:rotate(-12deg);animation-delay:.2s;}
+.flower-2{right:116px;top:164px;font-size:19px;color:#F7A6C8;animation-delay:1.1s;}
+.flower-3{right:360px;bottom:74px;font-size:20px;color:#F08CB8;animation-delay:2s;}
+.flower-4{right:30px;top:118px;font-size:17px;color:#F7B3CE;animation-delay:2.7s;}
+.flower-5{right:272px;top:38px;font-size:16px;color:#F4A0C2;animation-delay:3.4s;}
+.flower-6{right:72px;bottom:52px;font-size:16px;color:#F29CBC;animation-delay:4.2s;}
+
+@keyframes flowerFloat{
+  0%,100%{margin-top:0;opacity:.70;}
+  50%{margin-top:-8px;opacity:1;}
+}
+
+.floating-card.speech-bubble span{
+  background:rgba(255,255,255,.82);
+  box-shadow:0 16px 34px rgba(159,58,105,.13), inset 0 1px 0 rgba(255,255,255,.95);
+}
+
+.speech-1{left:78px;top:6px;}
+.speech-2{right:8px;top:42px;}
+.speech-3{right:28px;bottom:18px;}
+
+.sp-1{right:196px;top:22px;}
+.sp-2{right:46px;top:142px;}
+.sp-3{right:78px;bottom:54px;}
+.sp-4{right:364px;bottom:34px;}
+.sp-5{right:306px;top:196px;}
+.sp-6{right:18px;bottom:122px;}
+.sp-7{right:420px;top:100px;}
+
+@media (max-width:1180px){
+  .hero.hero-v3{
+    min-height:320px;
+    padding:32px 42px 24px;
+    grid-template-columns:minmax(340px,.92fr) minmax(420px,1.08fr);
+  }
+  .mascot-v3,
+  .hero-right-v3 .mascot-v3{
+    width:clamp(350px,35vw,450px);
+    height:clamp(260px,27vw,340px);
+  }
+  .speech-1{left:42px;top:4px;}
+}
+
+@media (max-width:1024px){
+  .hero.hero-v3{
+    grid-template-columns:1fr;
+    min-height:auto;
+    padding:30px 28px 24px;
+  }
+  .hero-right-v3{min-height:270px;}
+  .mascot-v3,
+  .hero-right-v3 .mascot-v3{
+    width:min(420px,82vw);
+    height:min(320px,64vw);
+  }
+  .flower-1{right:70%;top:36px;}
+  .flower-2{right:12%;top:140px;}
+  .flower-3{right:62%;bottom:52px;}
+  .flower-4,.flower-5,.flower-6{display:none;}
+}
+
+@media (max-width:640px){
+  .hero.hero-v3{padding:26px 22px 22px;}
+  .hero-right-v3{min-height:218px;}
+  .mascot-v3,
+  .hero-right-v3 .mascot-v3{
+    width:min(300px,84vw);
+    height:min(230px,68vw);
+  }
+  .hero-flower{display:none;}
+}
+
 </style>
 <style>
 /* ============================================================
@@ -5160,6 +5347,193 @@ body{
   .hero-right-v3::after{width:280px;height:72px;}
   .floating-card.speech-bubble{display:none;}
 }
+
+
+/* =====================================================================
+   HERO POLISH FINAL PATCH
+   - 배너 높이 약 2뼘 축소
+   - 캐릭터는 크게 유지하되 오른쪽 영역에 꽉 차게 배치
+   - 뽀샤시 글로우, 꽃 장식, 빛 궤적 추가
+   ===================================================================== */
+.hero.hero-v3{
+  min-height:332px;
+  padding:34px 50px 26px;
+  grid-template-columns:minmax(390px,.92fr) minmax(500px,1.08fr);
+  gap:24px;
+  background:
+    radial-gradient(circle at 15% 14%, rgba(255,255,255,.98) 0%, rgba(255,255,255,.60) 16%, rgba(255,255,255,0) 34%),
+    radial-gradient(circle at 68% 38%, rgba(255,255,255,.82) 0%, rgba(255,244,249,.48) 28%, rgba(255,244,249,0) 55%),
+    radial-gradient(ellipse at 76% 80%, rgba(255,183,214,.80) 0%, rgba(255,218,233,.38) 36%, rgba(255,218,233,0) 66%),
+    linear-gradient(135deg,#FFF9FB 0%,#FFEAF3 45%,#FFD6E7 100%);
+}
+
+.hero.hero-v3::before{
+  content:"";
+  position:absolute;
+  z-index:1;
+  width:560px;
+  height:220px;
+  right:48px;
+  bottom:14px;
+  border-radius:50%;
+  background:
+    radial-gradient(ellipse at center, rgba(255,255,255,.42) 0%, rgba(255,246,250,.28) 38%, transparent 70%);
+  filter:blur(18px);
+  pointer-events:none;
+}
+
+.hero.hero-v3::after{
+  content:"";
+  position:absolute;
+  z-index:2;
+  right:58px;
+  bottom:42px;
+  width:560px;
+  height:150px;
+  border-radius:50%;
+  border:1.5px solid rgba(255,255,255,.42);
+  border-left-color:rgba(255,255,255,.10);
+  border-bottom-color:rgba(255,255,255,.18);
+  transform:rotate(-10deg);
+  filter:blur(.2px);
+  opacity:.78;
+  pointer-events:none;
+}
+
+.hero-right-v3{
+  min-height:276px;
+  padding-right:4px;
+}
+
+.hero-right-v3::before{
+  width:520px;
+  height:430px;
+  top:52%;
+  background:radial-gradient(circle, rgba(255,255,255,.86) 0%, rgba(255,239,247,.58) 34%, rgba(255,199,224,.28) 63%, transparent 84%);
+  filter:blur(20px);
+}
+
+.hero-right-v3::after{
+  width:470px;
+  height:104px;
+  bottom:-2px;
+  background:radial-gradient(ellipse at center, rgba(255,189,217,.82) 0%, rgba(255,228,239,.48) 42%, rgba(255,238,246,.13) 64%, transparent 84%);
+  filter:blur(17px);
+}
+
+.mascot-v3,
+.hero-right-v3 .mascot-v3{
+  width:clamp(385px,36vw,510px);
+  height:clamp(278px,27vw,382px);
+  transform:translate(8px,8px);
+  filter:drop-shadow(0 20px 28px rgba(159,58,105,.15));
+}
+
+.ring-1{width:500px;height:390px;opacity:.20;}
+.ring-2{width:386px;height:300px;opacity:.12;}
+
+/* 꽃 장식 */
+.hero-flower{
+  position:absolute;
+  z-index:6;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:28px;
+  height:28px;
+  border-radius:999px;
+  color:#F28BB6;
+  font-size:24px;
+  line-height:1;
+  text-shadow:0 8px 18px rgba(159,58,105,.16), 0 0 14px rgba(255,255,255,.85);
+  filter:drop-shadow(0 6px 10px rgba(231,110,166,.12));
+  opacity:.86;
+  animation:flowerFloat 7s ease-in-out infinite;
+  pointer-events:none;
+}
+
+.hero-flower::after{
+  content:"";
+  position:absolute;
+  inset:4px;
+  border-radius:50%;
+  background:radial-gradient(circle, rgba(255,255,255,.58), rgba(255,255,255,0) 72%);
+  z-index:-1;
+  filter:blur(6px);
+}
+
+.flower-1{right:438px;top:78px;transform:rotate(-12deg);animation-delay:.2s;}
+.flower-2{right:116px;top:164px;font-size:19px;color:#F7A6C8;animation-delay:1.1s;}
+.flower-3{right:360px;bottom:74px;font-size:20px;color:#F08CB8;animation-delay:2s;}
+.flower-4{right:30px;top:118px;font-size:17px;color:#F7B3CE;animation-delay:2.7s;}
+.flower-5{right:272px;top:38px;font-size:16px;color:#F4A0C2;animation-delay:3.4s;}
+.flower-6{right:72px;bottom:52px;font-size:16px;color:#F29CBC;animation-delay:4.2s;}
+
+@keyframes flowerFloat{
+  0%,100%{margin-top:0;opacity:.70;}
+  50%{margin-top:-8px;opacity:1;}
+}
+
+.floating-card.speech-bubble span{
+  background:rgba(255,255,255,.82);
+  box-shadow:0 16px 34px rgba(159,58,105,.13), inset 0 1px 0 rgba(255,255,255,.95);
+}
+
+.speech-1{left:78px;top:6px;}
+.speech-2{right:8px;top:42px;}
+.speech-3{right:28px;bottom:18px;}
+
+.sp-1{right:196px;top:22px;}
+.sp-2{right:46px;top:142px;}
+.sp-3{right:78px;bottom:54px;}
+.sp-4{right:364px;bottom:34px;}
+.sp-5{right:306px;top:196px;}
+.sp-6{right:18px;bottom:122px;}
+.sp-7{right:420px;top:100px;}
+
+@media (max-width:1180px){
+  .hero.hero-v3{
+    min-height:320px;
+    padding:32px 42px 24px;
+    grid-template-columns:minmax(340px,.92fr) minmax(420px,1.08fr);
+  }
+  .mascot-v3,
+  .hero-right-v3 .mascot-v3{
+    width:clamp(350px,35vw,450px);
+    height:clamp(260px,27vw,340px);
+  }
+  .speech-1{left:42px;top:4px;}
+}
+
+@media (max-width:1024px){
+  .hero.hero-v3{
+    grid-template-columns:1fr;
+    min-height:auto;
+    padding:30px 28px 24px;
+  }
+  .hero-right-v3{min-height:270px;}
+  .mascot-v3,
+  .hero-right-v3 .mascot-v3{
+    width:min(420px,82vw);
+    height:min(320px,64vw);
+  }
+  .flower-1{right:70%;top:36px;}
+  .flower-2{right:12%;top:140px;}
+  .flower-3{right:62%;bottom:52px;}
+  .flower-4,.flower-5,.flower-6{display:none;}
+}
+
+@media (max-width:640px){
+  .hero.hero-v3{padding:26px 22px 22px;}
+  .hero-right-v3{min-height:218px;}
+  .mascot-v3,
+  .hero-right-v3 .mascot-v3{
+    width:min(300px,84vw);
+    height:min(230px,68vw);
+  }
+  .hero-flower{display:none;}
+}
+
 </style>
 </head>
 <body>
