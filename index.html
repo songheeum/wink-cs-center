@@ -4614,6 +4614,203 @@ body{
   }
 }
 
+
+
+/* =====================================================================
+   PREMIUM HERO SPEECH BUBBLE UPGRADE
+   - 기존 Quick Solve / Copy Guide / Step Flow 제거
+   - 말풍선형 응원 문구로 변경
+   - 캐릭터 뒤 고급 글로우 / 링 / 스파클 정리
+   ===================================================================== */
+
+.hero.hero-v3{
+  background:
+    radial-gradient(circle at 17% 16%, rgba(255,255,255,.95) 0%, rgba(255,255,255,0) 25%),
+    radial-gradient(circle at 76% 24%, rgba(255,255,255,.72) 0%, rgba(255,255,255,0) 23%),
+    radial-gradient(circle at 77% 76%, rgba(255,202,225,.64) 0%, rgba(255,202,225,0) 29%),
+    linear-gradient(135deg,#FFF9FB 0%,#FFEAF3 47%,#FFD9E9 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.82),
+    0 28px 70px rgba(159,58,105,.11);
+}
+
+.hero-right-v3{
+  min-height:238px;
+}
+
+.hero-right-v3::before{
+  width:360px;
+  height:360px;
+  background:
+    radial-gradient(circle, rgba(255,255,255,.82) 0%, rgba(255,237,246,.56) 34%, rgba(255,201,225,.20) 62%, transparent 83%);
+  filter:blur(20px);
+  opacity:.96;
+}
+
+.hero-right-v3::after{
+  width:306px;
+  height:86px;
+  bottom:8px;
+  background:radial-gradient(ellipse at center, rgba(255,216,232,.72) 0%, rgba(255,234,242,.40) 42%, rgba(255,234,242,0) 78%);
+  filter:blur(14px);
+}
+
+.mascot-v3{
+  width:clamp(218px,21.5vw,268px);
+  height:clamp(218px,21.5vw,268px);
+  filter:drop-shadow(0 14px 22px rgba(159,58,105,.13));
+}
+
+/* 기존 카드 스타일을 말풍선으로 완전 전환 */
+.floating-card.speech-bubble{
+  position:absolute;
+  z-index:5;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  min-width:auto;
+  max-width:none;
+  gap:0;
+  padding:0;
+  border:none;
+  background:transparent;
+  box-shadow:none;
+  -webkit-backdrop-filter:none;
+  backdrop-filter:none;
+  animation:speechFloat 5.8s ease-in-out infinite;
+}
+
+.floating-card.speech-bubble span{
+  position:relative;
+  display:block;
+  padding:11px 15px;
+  border-radius:20px;
+  background:rgba(255,255,255,.78);
+  border:1px solid rgba(255,255,255,.92);
+  box-shadow:
+    0 14px 34px rgba(159,58,105,.12),
+    inset 0 1px 0 rgba(255,255,255,.92);
+  -webkit-backdrop-filter:blur(18px) saturate(170%);
+  backdrop-filter:blur(18px) saturate(170%);
+  color:#8F3E66;
+  font-size:12px;
+  font-weight:850;
+  line-height:1.38;
+  letter-spacing:-.02em;
+  white-space:nowrap;
+}
+
+.floating-card.speech-bubble span::after{
+  content:"";
+  position:absolute;
+  width:13px;
+  height:13px;
+  background:rgba(255,255,255,.78);
+  border-right:1px solid rgba(255,255,255,.92);
+  border-bottom:1px solid rgba(255,255,255,.92);
+  transform:rotate(45deg);
+}
+
+/* 말풍선 배치: 캐릭터와 부딪히지 않게 외곽으로 */
+.speech-1{
+  left:-10px;
+  top:18px;
+  animation-delay:.1s;
+}
+
+.speech-1 span::after{
+  right:16px;
+  bottom:-6px;
+}
+
+.speech-2{
+  right:-14px;
+  top:76px;
+  animation-delay:.7s;
+}
+
+.speech-2 span::after{
+  left:16px;
+  bottom:-6px;
+}
+
+.speech-3{
+  left:18px;
+  bottom:20px;
+  animation-delay:1.2s;
+}
+
+.speech-3 span::after{
+  right:20px;
+  top:-6px;
+  transform:rotate(225deg);
+}
+
+/* 더 고급스러운 배경 장식 */
+.hero-ring{
+  border-color:rgba(255,255,255,.42);
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,.08) inset,
+    0 0 42px rgba(255,255,255,.24);
+}
+
+.ring-1{
+  width:314px;
+  height:314px;
+  opacity:.20;
+}
+
+.ring-2{
+  width:238px;
+  height:238px;
+  opacity:.13;
+}
+
+.hero-cloud{
+  opacity:.32;
+  mix-blend-mode:screen;
+}
+
+.sparkle{
+  text-shadow:
+    0 6px 20px rgba(159,58,105,.16),
+    0 0 18px rgba(255,255,255,.85);
+}
+
+.sp-1{ right:122px; top:24px; }
+.sp-2{ right:24px; top:144px; }
+.sp-3{ right:24px; bottom:50px; }
+.sp-4{ right:178px; bottom:30px; }
+.sp-5{ right:150px; top:176px; }
+.sp-6{ right:8px; bottom:116px; }
+.sp-7{ right:194px; top:92px; }
+
+@keyframes speechFloat{
+  0%,100%{
+    transform:translate3d(0,0,0);
+  }
+  50%{
+    transform:translate3d(0,-6px,0);
+  }
+}
+
+@media (max-width:1024px){
+  .floating-card.speech-bubble span{
+    font-size:11.5px;
+    padding:10px 13px;
+  }
+
+  .speech-1{ left:8px; top:10px; }
+  .speech-2{ right:8px; top:72px; }
+  .speech-3{ left:22px; bottom:16px; }
+}
+
+@media (max-width:640px){
+  .floating-card.speech-bubble{
+    display:none;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -4670,17 +4867,15 @@ body{
       </div>
 
       <div class="hero-right-v3" aria-hidden="true">
-        <div class="floating-card fc-1">
-          <span class="fc-icon">⚡</span>
-          <div><b>Quick Solve</b><small>1차 조치 바로 확인</small></div>
+        <div class="floating-card speech-bubble speech-1">
+          <span>상담할 때<br>활용해봐요!</span>
         </div>
-        <div class="floating-card fc-2">
-          <span class="fc-icon">📋</span>
-          <div><b>Copy Guide</b><small>상담 멘트 복사</small></div>
+        <div class="floating-card speech-bubble speech-2">
+          <span>프로님께 도움이<br>될거예요 :)</span>
         </div>
-        <div class="floating-card fc-3">
-          <span class="fc-icon">🧭</span>
-          <div><b>Step Flow</b><small>절차형 문서 지원</small></div>
+        <div class="floating-card speech-bubble speech-3">
+          <span>오늘 하루도<br>화이팅!</span>
+        </div>
         </div>
         <span class="hero-cloud cloud-1"></span>
         <span class="hero-cloud cloud-2"></span>
