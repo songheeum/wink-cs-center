@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>단비공감팀 통합 메뉴얼</title>
+<title>단비공감팀 통합 메뉴얼 - Accordion Test</title>
 <style>
 @font-face{
   font-family:'Pretendard Variable';
@@ -214,7 +214,7 @@
   .faq-count b{color:var(--ink-1);}
   .faq-list{display:flex;flex-direction:column;gap:10px;}
   /* 목록·상세 2분할 (왼쪽 = 소분류 그룹형) */
-  .fd{display:grid;grid-template-columns:240px 1fr;gap:14px;align-items:start;}
+  .fd{display:block;}
   .fd-list{display:flex;flex-direction:column;max-height:720px;overflow-y:auto;padding-right:3px;}
   /* 소분류/기기 묶음 머리글 */
   .fd-group{display:flex;align-items:center;gap:7px;padding:11px 4px 7px;margin-top:2px;
@@ -1089,3 +1089,13 @@ function renderCategory(name){
 </script>
 </body>
 </html>
+
+<style>
+/* Accordion Test Override */
+.fd-list{max-height:none !important;overflow:visible !important;}
+.fd-detail{margin-top:12px;}
+.fd-row{
+  border-radius:16px !important;
+  margin-bottom:10px !important;
+}
+</style>
