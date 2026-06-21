@@ -596,6 +596,64 @@ word-break:break-word;}
   }
 }
 
+
+/* =====================================================================
+   PAGE WIDTH PATCH
+   히어로 배너 + 카테고리 + FAQ 영역 전체를 같은 폭으로 축소 정렬합니다.
+   수치만 바꾸고 싶으면 아래 --content-width 값만 수정하세요.
+   ===================================================================== */
+:root{
+  --content-width:1180px;
+}
+
+.wrap,
+.sticky-inner{
+  max-width:var(--content-width) !important;
+}
+
+.hero.hero-v3{
+  width:100% !important;
+  max-width:var(--content-width) !important;
+  margin-left:auto !important;
+  margin-right:auto !important;
+}
+
+/* 카테고리 카드가 좁아진 폭 안에서 균형 있게 보이도록 재정렬 */
+.cat-grid{
+  grid-template-columns:repeat(4,minmax(0,1fr)) !important;
+  gap:12px !important;
+}
+
+/* FAQ 목록/상세 영역도 좁은 폭에 맞게 안정화 */
+.fd{
+  grid-template-columns:minmax(260px,330px) minmax(0,1fr) !important;
+  gap:18px !important;
+}
+
+.fd-detail{
+  min-width:0 !important;
+}
+
+/* 중간 화면 대응 */
+@media(max-width:980px){
+  .wrap,
+  .sticky-inner{
+    max-width:100% !important;
+  }
+
+  .hero.hero-v3{
+    max-width:100% !important;
+  }
+
+  .cat-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  }
+
+  .fd{
+    grid-template-columns:1fr !important;
+  }
+}
+
 </style>
 </head>
 <body>
