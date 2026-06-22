@@ -125,13 +125,52 @@
   /* ===== 유틸 ===== */
   function norm(s){ return (s||'').replace(/\s+/g,'').toLowerCase(); }
   function esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-  function copyText(t){
-    if(navigator.clipboard&&navigator.clipboard.writeText){
-      navigator.clipboard.writeText(t).then(function(){toast('복사됐어요');},function(){legacyCopy(t);});
-    }else legacyCopy(t);
+  function copyText(t, btn){
+    t = (t==null) ? '' : String(t);
+    function ok(){
+      toast('복사됐어요');
+      if(btn){
+        if(!btn.getAttribute('data-label')) btn.setAttribute('data-label', btn.textContent);
+        btn.textContent='복사됨 ✓';
+        btn.classList.add('copied');
+        clearTimeout(btn._copyTimer);
+        btn._copyTimer=setTimeout(function(){
+          btn.textContent=btn.getAttribute('data-label')||'복사';
+          btn.classList.remove('copied');
+        },1300);
+      }
+    }
+    function fallback(){
+      try{
+        var ta=document.createElement('textarea');
+        ta.value=t;
+        ta.setAttribute('readonly','');     /* iOS: readonly + contentEditable 조합이 안전 */
+        ta.contentEditable='true';
+        ta.style.cssText='position:fixed;left:0;top:0;width:1px;height:1px;padding:0;border:0;outline:0;box-shadow:none;background:transparent;opacity:0;';
+        document.body.appendChild(ta);
+        var range=document.createRange();
+        range.selectNodeContents(ta);
+        var sel=window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(range);
+        try{ ta.setSelectionRange(0, t.length); }catch(e){}
+        ta.focus();
+        var done=false;
+        try{ done=document.execCommand('copy'); }catch(e){ done=false; }
+        document.body.removeChild(ta);
+        if(done){ ok(); }
+        else { window.prompt('아래 내용을 길게 눌러 복사해 주세요', t); }
+      }catch(e){
+        try{ window.prompt('아래 내용을 길게 눌러 복사해 주세요', t); }catch(e2){}
+      }
+    }
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(t).then(ok, fallback);
+    } else {
+      fallback();
+    }
   }
-  function legacyCopy(t){var ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();
-    try{document.execCommand('copy');toast('복사됐어요');}catch(e){}document.body.removeChild(ta);}
+  function legacyCopy(t){ copyText(t); }  /* 하위 호환용 */
 
   /* ===== FAQ 렌더링 ===== */
   var faqView=document.getElementById('faqView'),faqChips=document.getElementById('faqChips'),
@@ -400,13 +439,18 @@ function renderCategory(name){
     var ht=e.target.closest('.ht');
     if(ht){ var kw=ht.textContent.replace('#',''); applyQuery(kw); window.scrollTo({top:0,behavior:'smooth'}); return; }
     var f=curItems[curSel]; if(!f) return;
+    var ff=(f && f.source && f.f) ? f.f : f;   /* 통합검색 결과는 {source,f} 래퍼라 풀어줌 */
+    if(e.target.closest('.copy-general-reply')){
+      copyText(ff.reply || ff.q || '', e.target.closest('.copy-btn'));
+      return;
+    }
     if(e.target.closest('.copy-explain, .copy-action')){
-      var steps=normalizedSteps(f);
+      var steps=normalizedSteps(ff);
       var body=(steps||[]).map(function(s,i){
         var n=s.step||i+1;
         return String(n).padStart(2,'0')+'. '+(s.content||'');
       }).filter(Boolean).join('\n');
-      copyText(body || f.ment || f.q || '');
+      copyText(body || ff.ment || ff.q || '', e.target.closest('.copy-btn'));
       return;
     }
   });

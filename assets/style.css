@@ -1939,6 +1939,12 @@ body{
   border-color:rgba(231,110,166,.36);
 }
 
+.copy-btn.copied{
+  background:#E9FBF2 !important;
+  border-color:rgba(15,138,100,.30) !important;
+  color:#0F8A64 !important;
+}
+
 .pro-section-head small{
   display:block;
   margin-top:1px;
