@@ -807,9 +807,9 @@ function renderCategory(name){
 
   function matchScore(f,nq,tokens){
     var score=0;
+    /* AI 추천 매칭 대상: 제목(C)·요약(E)·분류(A)·소분류(B)만. STEP 본문(ment/next/note 등)은 제외해 오검색 방지 */
     var fields=[
-      {v:f.q,w:5},{v:f.says,w:4},{v:(f.tags||[]).join(' '),w:5},
-      {v:f.ment,w:3},{v:f.next,w:2},{v:f.note,w:1},{v:f.cat,w:1},{v:f.sub,w:1}
+      {v:f.q,w:5},{v:f.says,w:4},{v:f.cat,w:2},{v:f.sub,w:2}
     ];
     fields.forEach(function(field){
       var nv=norm(field.v);
@@ -836,8 +836,7 @@ function renderCategory(name){
     generalData().forEach(function(f){
       var s=0;
       [
-        {v:f.q,w:5},{v:f.says,w:4},{v:(f.tags||[]).join(' '),w:5},
-        {v:f.reply,w:4},{v:f.criteria,w:3},{v:f.process,w:3},{v:f.caution,w:2},{v:f.cat,w:1},{v:f.sub,w:1}
+        {v:f.q,w:5},{v:f.says,w:4},{v:f.cat,w:2},{v:f.sub,w:2}
       ].forEach(function(field){
         var nv=norm(field.v);
         if(!nv) return;
