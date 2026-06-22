@@ -2475,8 +2475,8 @@ body{
 }
 
 .guide-entry-card[data-guide="general"].active{
-  background:linear-gradient(135deg,#FBF7FF 0%,#FFF0F7 100%);
-  border-color:rgba(154,112,191,.34);
+  background:linear-gradient(135deg,#FFF7FB 0%,#FFEAF3 100%);
+  border-color:rgba(231,110,166,.58);
 }
 
 @media(max-width:760px){
@@ -2509,20 +2509,16 @@ body{
   cursor:pointer;
   font-family:inherit;
   overflow:hidden;
-  background:
-    radial-gradient(120% 180% at 0% 0%, rgba(255,255,255,.55) 0%, rgba(255,255,255,0) 40%),
-    linear-gradient(135deg,#FFE9F2 0%,#FFDCEC 52%,#FCD2F0 100%);
-  border:1px solid rgba(231,110,166,.30);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.7), 0 12px 30px rgba(214,77,143,.14), 0 2px 6px rgba(159,58,105,.06);
-  -webkit-backdrop-filter:blur(8px) saturate(150%);
-  backdrop-filter:blur(8px) saturate(150%);
+  background:rgba(255,255,255,.88);
+  border:1px solid rgba(241,226,233,.96);
+  box-shadow:0 10px 24px rgba(159,58,105,.045);
   transition:transform .14s ease, box-shadow .16s ease, border-color .14s ease;
 }
 
 .ai-global-card:hover{
   transform:translateY(-2px);
-  border-color:rgba(231,110,166,.50);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.8), 0 18px 40px rgba(214,77,143,.20), 0 3px 8px rgba(159,58,105,.08);
+  border-color:rgba(231,110,166,.42);
+  box-shadow:0 16px 34px rgba(159,58,105,.09);
 }
 
 .ai-global-icon{
@@ -2745,8 +2741,8 @@ body{
 #chatPanel .chat-log,
 .chat-log#chatLog{
   position:relative;
-  min-height:360px;
-  max-height:420px;
+  min-height:480px;
+  max-height:680px;
   padding:22px 18px;
   border-radius:24px;
   overflow-y:auto;

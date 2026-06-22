@@ -822,9 +822,12 @@ function renderCategory(name){
     return score;
   }
 
+  var STOPWORDS={'문의':1,'문의요':1,'관련':1,'방법':1,'안내':1,'어떻게':1,'알려줘':1,'알려주세요':1,'되나요':1,'하나요':1,'있나요':1,'궁금':1,'궁금해요':1,'싶어요':1,'해줘':1,'해주세요':1,'요청':1,'질문':1,'할까요':1,'인가요':1,'할때':1,'경우':1,'확인':1};
   function topMatches(q){
     var nq=norm(q);
-    var tokens=(q||'').toLowerCase().split(/[\s,./|#]+/).map(norm).filter(function(t){return t.length>=2;});
+    var rawTokens=(q||'').toLowerCase().split(/[\s,./|#]+/).map(norm).filter(function(t){return t.length>=2;});
+    var tokens=rawTokens.filter(function(t){return !STOPWORDS[t];});
+    if(!tokens.length) tokens=rawTokens; /* 불용어만 입력했을 땐 원래 토큰 사용 */
     var ranked=[];
     FAQ.forEach(function(f){
       var s=matchScore(f,nq,tokens);
@@ -846,6 +849,10 @@ function renderCategory(name){
       if(s>0) ranked.push({source:'general',f:f,score:s});
     });
     ranked.sort(function(a,b){return b.score-a.score;});
+    if(ranked.length){
+      var top=ranked[0].score;
+      ranked=ranked.filter(function(r){return r.score>=Math.max(top*0.45,2);}); /* 1위 점수의 45% 미만·2점 미만은 제외 */
+    }
     return ranked.slice(0,5);
   }
 
