@@ -807,9 +807,10 @@ function renderCategory(name){
 
   function matchScore(f,nq,tokens){
     var score=0;
-    /* AI 추천 매칭 대상: 제목(C)·요약(E)·분류(A)·소분류(B)만. STEP 본문(ment/next/note 등)은 제외해 오검색 방지 */
+    /* 기술상담 매칭: 제목·요약·태그 + STEP 본문(ment/next/note)까지 포함 — 증상·조치가 본문에 있어 본문 용어로도 찾아야 함 */
     var fields=[
-      {v:f.q,w:5},{v:f.says,w:4},{v:f.cat,w:2},{v:f.sub,w:2}
+      {v:f.q,w:5},{v:f.says,w:4},{v:(f.tags||[]).join(' '),w:5},
+      {v:f.ment,w:3},{v:f.next,w:2},{v:f.note,w:1},{v:f.cat,w:2},{v:f.sub,w:2}
     ];
     fields.forEach(function(field){
       var nv=norm(field.v);
@@ -835,8 +836,9 @@ function renderCategory(name){
     });
     generalData().forEach(function(f){
       var s=0;
+      /* 일반상담 매칭: 본문(reply/process/criteria/caution) 제외 — 안내문이 비슷해 본문까지 보면 결과가 잡다해짐. 본문에만 있는 키워드는 검색태그로 노출 */
       [
-        {v:f.q,w:5},{v:f.says,w:4},{v:f.cat,w:2},{v:f.sub,w:2}
+        {v:f.q,w:5},{v:f.says,w:4},{v:(f.tags||[]).join(' '),w:5},{v:f.cat,w:2},{v:f.sub,w:2}
       ].forEach(function(field){
         var nv=norm(field.v);
         if(!nv) return;
@@ -1045,7 +1047,7 @@ function renderCategory(name){
         iCriteria=idx('처리기준','기준','criteria'),
         iProcess=idx('진행절차','처리절차','절차','process'),
         iCaution=idx('주의사항','비고','note','caution'),
-        iTags=idx('태그','키워드','tags');
+        iTags=idx('검색태그','태그','키워드','tags');
     return rows.slice(1).map(function(r){
       function val(i){return i>=0?(r[i]||'').trim():'';}
       var tags=val(iTags).replace(/#/g,'').split(/[,\s]+/).map(function(x){return x.trim();}).filter(Boolean);
