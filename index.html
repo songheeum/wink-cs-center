@@ -187,25 +187,43 @@
 </div>
 <script src="assets/app.js"></script>
 <script>
-/* 검색·챗봇 진입 시 결과/챗봇을 카테고리 위로 올리는 전환 (app.js 비수정) */
+/* 전환: 검색·챗봇일 때만 결과를 카테고리 위로. 첫 입장·새로고침·홈·카테고리 탐색은 카테고리 우선 (app.js 비수정) */
 (function(){
   var wrap=document.querySelector('.wrap');
   if(!wrap)return;
   var chat=document.getElementById('chatPanel');
   var faq=document.getElementById('faqView');
   function visible(el){return el && getComputedStyle(el).display!=='none';}
-  var prev=false;
-  function sync(){
-    var on=visible(chat)||visible(faq);
+  var mode='home', prevOn=false;   /* home | search | chat | browse */
+  function applyFlip(){
+    var on = (mode==='search' && visible(faq)) || visible(chat);
     wrap.classList.toggle('flip', on);
-    if(on && !prev){ window.scrollTo({top:0, behavior:'smooth'}); }
-    prev=on;
+    if(on && !prevOn){ window.scrollTo({top:0, behavior:'smooth'}); }
+    prevOn=on;
   }
-  var mo=new MutationObserver(sync);
-  [chat,faq].forEach(function(el){ if(el) mo.observe(el,{attributes:true,attributeFilter:['style']}); });
-  sync();
+  function refresh(){ setTimeout(applyFlip,0); }
 
-  /* 플로팅: 맨 위로 / 홈으로 / 검색 / 맨 아래로 */
+  /* 검색 → 결과를 위로 */
+  ['searchInput','searchInput2'].forEach(function(id){
+    var inp=document.getElementById(id);
+    if(inp) inp.addEventListener('input',function(){ mode = inp.value.trim() ? 'search' : 'browse'; refresh(); });
+  });
+  document.querySelectorAll('.hero-chips-v3 button').forEach(function(b){
+    b.addEventListener('click',function(){ mode='search'; refresh(); });
+  });
+  /* 챗봇 → 챗봇을 위로 */
+  var ai=document.getElementById('globalAiBtn');
+  if(ai) ai.addEventListener('click',function(){ mode='chat'; refresh(); });
+  /* 카테고리 탐색 → 전환하지 않고 카테고리 우선 유지 */
+  document.querySelectorAll('.guide-entry-card[data-guide="tech"], .guide-entry-card[data-guide="general"], #featureCard, #catGrid .cat').forEach(function(el){
+    el.addEventListener('click',function(){ mode='browse'; refresh(); });
+  });
+
+  var mo=new MutationObserver(applyFlip);
+  [chat,faq].forEach(function(el){ if(el) mo.observe(el,{attributes:true,attributeFilter:['style']}); });
+  applyFlip();
+
+  /* 플로팅: 홈 / 검색 / 맨 위로 / 맨 아래로 */
   var topBtn=document.getElementById('topBtn');
   var homeBtn=document.getElementById('homeBtn');
   var searchBtn=document.getElementById('searchBtn');
