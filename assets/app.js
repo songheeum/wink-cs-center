@@ -1,5 +1,7 @@
 (function(){
   var PASSWORD = "1234";  /* 입장 비밀번호 */
+  var GEMINI_MODEL = 'gemini-2.5-flash';             /* 사용할 Gemini 모델 */
+  var GEMINI_API_KEY = '';                            /* app.js에 직접 입력하거나 챗봇에서 설정 */
 
   var gate=document.getElementById('gate'),
       pwInput=document.getElementById('pwInput'),
@@ -775,6 +777,54 @@ function renderCategory(name){
     });
   });
 
+
+  /* ===== Gemini AI 연동 ===== */
+  async function callGemini(query, contextItems){
+    var key = sessionStorage.getItem('danbi_gemini_key') || GEMINI_API_KEY;
+    if(!key) return null;
+
+    /* 관련 FAQ 항목을 컨텍스트로 변환 (최대 8개) */
+    var ctx = (contextItems||[]).slice(0,8).map(function(item){
+      var f = item.f || item;
+      var src = item.source || 'tech';
+      var steps = normalizedSteps(f);
+      var body = steps.map(function(s,i){ return (s.step||(i+1))+'. '+(s.content||''); }).filter(Boolean).join('\n');
+      if(!body && f.ment) body = f.ment;
+      return '['+(src==='general'?'일반상담':'기술상담')+' · '+(f.cat||'')+(f.sub?' · '+f.sub:'')+']\n'
+        +'제목: '+(f.q||'')+'\n'
+        +(f.says?'고객 문의: '+f.says+'\n':'')
+        +(body?'조치/안내:\n'+body+'\n':'')
+        +(f.next?'추가 조치: '+f.next+'\n':'')
+        +(f.reply?'응대 멘트: '+f.reply+'\n':'')
+        +(f.criteria?'처리 기준: '+f.criteria+'\n':'');
+    }).join('\n---\n');
+
+    var sys = '당신은 단비 공감팀 상담 도우미 "윙크"입니다.\n'
+      +'아래 상담 가이드를 기반으로 상담사 질문에 한국어로 간결하게 답하세요.\n'
+      +'가이드에 없는 내용이면 "가이드에서 찾지 못했어요. 다른 키워드로 검색해보세요."라고 안내하세요.\n'
+      +'답변은 핵심만 5문장 이내로 작성하세요.\n\n'
+      +'=== 상담 가이드 ===\n'+(ctx||'관련 가이드를 찾지 못했습니다. 더 구체적인 키워드를 사용해 주세요.');
+
+    var res = await fetch(
+      'https://generativelanguage.googleapis.com/v1beta/models/'+GEMINI_MODEL+':generateContent?key='+key,
+      { method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({
+          systemInstruction:{ parts:[{text:sys}] },
+          contents:[{ role:'user', parts:[{text:query}] }],
+          generationConfig:{ maxOutputTokens:800, temperature:0.2 }
+        })
+      }
+    );
+    if(!res.ok){
+      var err = await res.json().catch(function(){return {};});
+      throw new Error(err.error ? err.error.message : 'API 오류 '+res.status);
+    }
+    var data = await res.json();
+    return data.candidates&&data.candidates[0]&&data.candidates[0].content&&
+           data.candidates[0].content.parts&&data.candidates[0].content.parts[0]&&
+           data.candidates[0].content.parts[0].text || null;
+  }
+
   /* ===== AI도움말 챗봇 (같은 FAQ 사용) ===== */
   var SUGGEST=["와이파이 연결","지인추천","카드 변경","해지 문의","배송 조회","학부모앱 로그인"];
   var chatLog=document.getElementById('chatLog'),chatSuggest=document.getElementById('chatSuggest'),
@@ -910,20 +960,80 @@ function renderCategory(name){
   function ask(q){
     q=(q||'').trim(); if(!q)return;
     addMsg(q,'user');
-    var matches=topMatches(q);
-    setTimeout(function(){
-      if(matches.length){
-        addRecommendationMsg(matches,q);
-      }else{
-        addMsg("가까운 추천 답변 키워드를 찾지 못했어요. 예: 와이파이, 지인추천, 카드 변경, 해지, 배송처럼 짧은 키워드로 다시 입력해 주세요.",'bot');
-      }
-    },180);
     chatText.value='';
+    var key = sessionStorage.getItem('danbi_gemini_key') || GEMINI_API_KEY;
+
+    if(key){
+      /* ── Gemini AI 모드 ── */
+      var matches = topMatches(q);
+      var thinkRow = document.createElement('div');
+      thinkRow.className = 'msg-row bot grouped';
+      thinkRow.innerHTML = '<div class="bubble-wrap"><div class="brow">'
+        +'<div class="bubble" style="color:#98A2B3;font-style:italic;">답변 생성 중...</div>'
+        +'</div></div>';
+      chatLog.appendChild(thinkRow);
+      chatLog.scrollTop = chatLog.scrollHeight;
+
+      callGemini(q, matches).then(function(answer){
+        if(chatLog.contains(thinkRow)) chatLog.removeChild(thinkRow);
+        if(answer){
+          addMsg(answer,'bot');
+        } else {
+          if(matches.length){ addRecommendationMsg(matches,q); }
+          else { addMsg('관련 가이드를 찾지 못했어요. 다른 키워드로 시도해주세요.','bot'); }
+        }
+      }).catch(function(err){
+        if(chatLog.contains(thinkRow)) chatLog.removeChild(thinkRow);
+        addMsg('AI 오류: '+(err.message||'API 키를 확인해 주세요.'),'bot');
+      });
+
+    } else {
+      /* ── 키워드 매칭 모드 (기존) ── */
+      var matches=topMatches(q);
+      setTimeout(function(){
+        if(matches.length){
+          addRecommendationMsg(matches,q);
+        }else{
+          addMsg("가까운 추천 답변 키워드를 찾지 못했어요. 예: 와이파이, 지인추천, 카드 변경, 해지, 배송처럼 짧은 키워드로 다시 입력해 주세요.",'bot');
+        }
+      },180);
+    }
   }
 
   function initChat(){
     chatText.focus(); if(chatReady)return; chatReady=true;
-    addMsg("프로님 안녕하세요!\n실제 AI 생성 답변이 아니라, 메뉴얼에서 만들어진 추천 답변 키워드를 먼저 찾아드려요.",'bot');
+    var key = sessionStorage.getItem('danbi_gemini_key') || GEMINI_API_KEY;
+
+    if(key){
+      addMsg('안녕하세요! 🤖 Gemini AI 모드입니다.\n기술상담·일반상담 가이드 전체를 분석해서 답변드릴게요.\n증상이나 상황을 자유롭게 설명해 주세요.','bot');
+    } else {
+      addMsg('안녕하세요! 현재 키워드 검색 모드입니다.\nGemini API 키를 설정하면 AI 답변 모드로 전환됩니다.','bot');
+      /* API 키 입력 UI */
+      var keyRow = document.createElement('div');
+      keyRow.className='msg-row bot grouped';
+      keyRow.innerHTML='<div class="bubble-wrap"><div class="brow"><div class="bubble" style="padding:10px 12px;">'
+        +'<div style="font-size:12px;color:#667085;margin-bottom:6px;">🔑 Gemini API 키 설정</div>'
+        +'<div style="display:flex;gap:6px;align-items:center;">'
+        +'<input id="geminiKeyInput" type="password" placeholder="AIza..." style="flex:1;font-size:12px;padding:5px 8px;border:1px solid #D0D5DD;border-radius:6px;outline:none;">'
+        +'<button id="geminiKeySet" style="font-size:12px;padding:5px 12px;background:#7F56D9;color:#fff;border:none;border-radius:6px;cursor:pointer;white-space:nowrap;">설정</button>'
+        +'</div>'
+        +'<div style="font-size:11px;color:#98A2B3;margin-top:5px;">키는 현재 세션에만 저장되며 페이지 닫으면 사라집니다.</div>'
+        +'</div></div></div>';
+      chatLog.appendChild(keyRow);
+      chatLog.scrollTop=chatLog.scrollHeight;
+      lastWho='bot';
+
+      function applyKey(){
+        var k=(document.getElementById('geminiKeyInput').value||'').trim();
+        if(!k) return;
+        sessionStorage.setItem('danbi_gemini_key',k);
+        if(chatLog.contains(keyRow)) chatLog.removeChild(keyRow);
+        addMsg('API 키가 설정되었습니다. 🎉 이제 AI 답변 모드로 동작합니다.\n질문을 자유롭게 입력해 주세요.','bot');
+      }
+      document.getElementById('geminiKeySet').addEventListener('click',applyKey);
+      document.getElementById('geminiKeyInput').addEventListener('keydown',function(e){ if(e.key==='Enter') applyKey(); });
+    }
+
     SUGGEST.forEach(function(s){
       var c=document.createElement('button'); c.className='chip'; c.textContent=s;
       c.addEventListener('click',function(){ask(s);}); chatSuggest.appendChild(c);
