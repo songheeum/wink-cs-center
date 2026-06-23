@@ -1,6 +1,6 @@
 (function(){
   var PASSWORD = "1234";  /* 입장 비밀번호 */
-  var GEMINI_MODEL = 'gemini-2.5-flash';             /* 사용할 Gemini 모델 */
+  var GEMINI_MODEL = 'gemini-2.0-flash';             /* 사용할 Gemini 모델 */
   var GEMINI_API_KEY = '';                            /* app.js에 직접 입력하거나 챗봇에서 설정 */
 
   var gate=document.getElementById('gate'),
