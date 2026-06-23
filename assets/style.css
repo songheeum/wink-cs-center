@@ -3059,3 +3059,27 @@ body{
   }
 }
 
+
+/* ===== PATCH: 챗봇 단축 칩 숨김 + 검색/챗봇 진입 시 레이아웃 전환 ===== */
+#chatSuggest{display:none !important;}
+
+.wrap{display:flex;flex-direction:column;}
+.wrap > .hero{order:1;}
+.wrap > .guide-entry{order:2;}
+.wrap > .cat-head{order:3;}
+.wrap > #featureCard{order:4;}
+.wrap > #catGrid{order:5;}
+.wrap > #tipBox{order:6;}
+.wrap > #stub{order:7;}
+.wrap > #faqView{order:8;}
+.wrap > #chatPanel{order:9;}
+.wrap > footer{order:20;}
+
+/* 검색·챗봇 활성: 안내+결과/챗봇이 카드 바로 아래로, 카테고리 블록은 아래로 */
+.wrap.flip > #tipBox{order:3;}
+.wrap.flip > #faqView{order:4;}
+.wrap.flip > #chatPanel{order:4;}
+.wrap.flip > .cat-head{order:10;}
+.wrap.flip > #featureCard{order:11;}
+.wrap.flip > #catGrid{order:12;}
+.wrap.flip > #stub{order:13;}
