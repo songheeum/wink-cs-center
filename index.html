@@ -104,7 +104,7 @@
     </section>
 
     <div class="cat-head">
-      <span class="sec-label"><span class="admin-badge">🔧 관리자 모드</span></span>
+      <span class="sec-label"><span class="admin-badge">🔧 관리자 모드</span><button class="restrict-toggle" id="restrictToggle" type="button">🔒 점검 메뉴</button></span>
       <div class="cat-tools">
         <div id="adminLock">
           <input id="adminPin" type="password" inputmode="numeric" maxlength="8" placeholder="관리자 PIN" autocomplete="off">
@@ -135,8 +135,8 @@
       <div class="cat" data-cat="삼성탭"><div class="emoji" data-edit="icon">📱</div><div class="name" data-edit="name">삼성탭</div><div class="desc" data-edit="desc">T583</div></div>
       <div class="cat" data-cat="레노버"><div class="emoji" data-edit="icon">🐱</div><div class="name" data-edit="name">레노버</div><div class="desc" data-edit="desc">캐츠잉글리시</div></div>
       <div class="cat" data-cat="학부모앱"><div class="emoji" data-edit="icon">👪</div><div class="name" data-edit="name">학부모앱</div><div class="desc" data-edit="desc">보호자용</div></div>
-      <div class="cat" data-cat="점검현황"><div class="emoji">💻</div><div class="name">레노버·업무폰 점검</div><div class="desc">레노버 · 교사PC · 업무폰</div></div>
-      <div class="cat" data-cat="단비폰"><div class="emoji">📱</div><div class="name">단비폰 점검 가이드</div><div class="desc">원격지원 · 2차 점검</div></div>
+      <div class="cat cat-restricted" data-cat="점검현황"><div class="emoji">💻</div><div class="name">레노버·업무폰 점검</div><div class="desc">레노버 · 교사PC · 업무폰</div></div>
+      <div class="cat cat-restricted" data-cat="단비폰"><div class="emoji">📱</div><div class="name">단비폰 점검 가이드</div><div class="desc">원격지원 · 2차 점검</div></div>
     </div>
 
     <div class="tip" id="tipBox">💡 <span><b>기술상담</b> — 카테고리를 선택하거나 검색창에 키워드를 입력해 가이드를 확인하세요.</span></div>
@@ -235,6 +235,25 @@
     window.scrollTo({top:0,behavior:'smooth'});
     var si=document.getElementById('searchInput');
     if(si) setTimeout(function(){ si.focus(); },420);
+  });
+
+  /* 제한 메뉴(점검현황·단비폰) PIN 토글 — 관리자 PIN 0000 */
+  var RESTRICT_PIN='0000';
+  var rt=document.getElementById('restrictToggle');
+  function setRestrict(on){
+    document.body.classList.toggle('show-restricted', on);
+    if(rt){ rt.classList.toggle('on', on); rt.textContent = on ? '🔓 점검 메뉴 표시중' : '🔒 점검 메뉴'; }
+  }
+  if(sessionStorage.getItem('danbi_restrict')==='1') setRestrict(true);
+  if(rt) rt.addEventListener('click',function(){
+    if(document.body.classList.contains('show-restricted')){
+      setRestrict(false); sessionStorage.removeItem('danbi_restrict');
+    }else{
+      var p=prompt('관리자 비밀번호를 입력하세요');
+      if(p===null) return;
+      if(p===RESTRICT_PIN){ setRestrict(true); sessionStorage.setItem('danbi_restrict','1'); }
+      else alert('비밀번호가 올바르지 않습니다.');
+    }
   });
 })();
 </script>
