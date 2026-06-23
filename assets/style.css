@@ -3107,3 +3107,18 @@ body{
   #floatNav{right:14px; gap:10px;}
   #floatNav button{width:44px; height:44px;}
 }
+
+/* ===== PATCH: 제한 카테고리(점검현황·단비폰) PIN 토글 노출 ===== */
+.cat-restricted{display:none;}
+body.show-restricted .cat-restricted{display:block;}
+
+.restrict-toggle{
+  margin-left:10px;
+  border:1px solid rgba(231,110,166,.20);
+  background:#fff; color:#9aa1ab;
+  border-radius:8px; padding:5px 11px;
+  font-size:12.5px; font-weight:600; cursor:pointer;
+  transition:.14s; vertical-align:middle;
+}
+.restrict-toggle:hover{ border-color:#e76ea6; color:#c93f83; background:#fff4f9; }
+.restrict-toggle.on{ background:#e76ea6; color:#fff; border-color:#e76ea6; }
