@@ -2607,95 +2607,81 @@ body{
   position:relative;
   width:100%;
   max-width:var(--content-width);
-  margin:0 auto 26px;
+  margin:0 auto 22px;
   padding:0;
   overflow:hidden;
-  border-radius:28px;
-  border:1px solid rgba(231,110,166,.18);
+  border-radius:20px;
+  border:1px solid var(--border);
   background:
-    radial-gradient(120% 130% at 100% 14%, rgba(255,214,233,.95) 0%, rgba(255,228,240,.55) 32%, rgba(255,238,246,0) 60%),
-    radial-gradient(90% 120% at 86% 96%, rgba(255,199,225,.55) 0%, rgba(255,199,225,0) 46%),
-    radial-gradient(85% 130% at 2% 0%, rgba(255,231,242,.92) 0%, rgba(255,238,246,0) 56%),
-    linear-gradient(150deg,#FFF0F6 0%,#FFE8F1 56%,#FFE0ED 100%);
-  box-shadow:0 1px 0 rgba(255,255,255,.9) inset, 0 18px 44px rgba(159,58,105,.07), 0 2px 8px rgba(159,58,105,.04);
+    radial-gradient(140% 180% at 100% 0%, rgba(255,224,238,.5) 0%, rgba(255,238,246,0) 50%),
+    linear-gradient(180deg,#FFFFFF 0%,#FFFBFD 100%);
+  box-shadow:0 1px 2px rgba(159,58,105,.04);
 }
 .hero-inner{
   display:grid;
-  grid-template-columns:minmax(340px,1fr) minmax(420px,.92fr);
+  grid-template-columns:minmax(0,1fr) 190px;
   align-items:center;
-  gap:28px;
+  gap:24px;
   width:100%;
   max-width:none;
-  min-height:280px;
+  min-height:0;
   margin:0;
-  padding:40px 48px 38px;
+  padding:22px 30px;
 }
 .hero.hero-v3::before,
 .hero.hero-v3::after{display:none;}
 
-/* ── 좌측: 텍스트 + 검색 + 추천 칩 ── */
-.hero-left-v3{position:relative;z-index:3;min-width:0;max-width:520px;}
+/* ── 좌측: 텍스트 + 검색 + 추천 칩 (검색이 주인공) ── */
+.hero-left-v3{position:relative;z-index:3;min-width:0;max-width:none;}
 .hero-eyebrow{
   display:inline-flex;align-items:center;gap:7px;
-  font-size:12px;font-weight:800;letter-spacing:-.01em;color:#A8447A;
-  background:#FFF1F7;border:1px solid rgba(231,110,166,.20);
-  box-shadow:none;padding:6px 12px 6px 10px;border-radius:999px;margin-bottom:16px;
+  font-size:11.5px;font-weight:800;letter-spacing:-.01em;color:#A8447A;
+  background:#FFF1F7;border:1px solid rgba(231,110,166,.18);
+  box-shadow:none;padding:5px 11px 5px 9px;border-radius:999px;margin-bottom:11px;
 }
 .eyebrow-dot{width:6px;height:6px;border-radius:50%;background:#E76EA6;box-shadow:0 0 0 3px rgba(231,110,166,.18);}
-.hero-title-v3{margin:0 0 14px;font-size:clamp(33px,3.6vw,46px);font-weight:880;line-height:1.04;letter-spacing:-.04em;color:#15171D;}
-.hero-title-v3 span{display:inline-block;background:linear-gradient(96deg,#E76EA6 0%,#D24A8D 52%,#B23A72 100%);-webkit-background-clip:text;background-clip:text;color:transparent;}
-.hero-sub-v3{margin:0 0 22px;color:#67707E;font-size:15px;font-weight:550;line-height:1.62;letter-spacing:-.01em;}
+.hero-title-v3{margin:0 0 12px;font-size:clamp(21px,2.3vw,27px);font-weight:840;line-height:1.12;letter-spacing:-.035em;color:#15171D;}
+.hero-title-v3 br{display:none;}
+.hero-title-v3 span{display:inline;background:linear-gradient(96deg,#E76EA6 0%,#D24A8D 62%);-webkit-background-clip:text;background-clip:text;color:transparent;}
+.hero-sub-v3{display:none;}
 
-.hero-search-v3{position:relative;max-width:500px;height:54px;margin:0;border-radius:15px;background:#FFFFFF;border:1px solid rgba(231,110,166,.22);box-shadow:0 8px 22px rgba(159,58,105,.06),0 1px 2px rgba(159,58,105,.05);transition:border-color .15s ease, box-shadow .15s ease;}
-.hero-search-v3:focus-within{border-color:rgba(231,110,166,.55);box-shadow:0 10px 28px rgba(231,110,166,.14),0 0 0 4px rgba(231,110,166,.10);}
-.hero-search-v3 svg{position:absolute;left:18px;top:50%;width:20px;height:20px;transform:translateY(-50%);fill:#D24A8D;}
-.hero-search-v3 input{width:100%;height:100%;border:0;outline:none;background:transparent;padding:0 18px 0 50px;border-radius:15px;font-family:inherit;font-size:15px;font-weight:600;color:#3A3340;}
+.hero-search-v3{position:relative;max-width:none;height:56px;margin:0;border-radius:14px;background:#FFFFFF;border:1.5px solid rgba(231,110,166,.3);box-shadow:0 2px 8px rgba(159,58,105,.05);transition:border-color .15s ease, box-shadow .15s ease;}
+.hero-search-v3:focus-within{border-color:rgba(231,110,166,.62);box-shadow:0 0 0 4px rgba(231,110,166,.12);}
+.hero-search-v3 svg{position:absolute;left:18px;top:50%;width:21px;height:21px;transform:translateY(-50%);fill:#D24A8D;}
+.hero-search-v3 input{width:100%;height:100%;border:0;outline:none;background:transparent;padding:0 18px 0 50px;border-radius:14px;font-family:inherit;font-size:16px;font-weight:600;color:#3A3340;}
 .hero-search-v3 input::placeholder{color:#A9B0BC;font-weight:500;}
 
-.hero-chips-v3{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:14px;}
-.hero-chips-label{font-size:12px;font-weight:700;color:#9AA3AF;letter-spacing:-.01em;margin-right:2px;}
-.hero-chips-v3 button{font-family:inherit;border:1px solid rgba(231,110,166,.20);background:#FFFFFF;color:#9A3E6E;border-radius:999px;font-weight:650;font-size:12.5px;padding:6px 13px;cursor:pointer;transition:transform .12s ease, background .15s ease, border-color .15s ease, color .15s ease;box-shadow:0 1px 2px rgba(159,58,105,.04);}
-.hero-chips-v3 button:hover{transform:translateY(-1px);background:#FFF1F7;border-color:rgba(231,110,166,.42);color:#C13F82;}
+.hero-chips-v3{display:flex;flex-wrap:wrap;align-items:center;gap:7px;margin-top:11px;}
+.hero-chips-label{font-size:11.5px;font-weight:700;color:#9AA3AF;letter-spacing:-.01em;margin-right:2px;}
+.hero-chips-v3 button{font-family:inherit;border:1px solid rgba(231,110,166,.18);background:#FFFFFF;color:#9A3E6E;border-radius:999px;font-weight:650;font-size:12px;padding:5px 12px;cursor:pointer;transition:transform .12s ease, background .15s ease, border-color .15s ease, color .15s ease;}
+.hero-chips-v3 button:hover{transform:translateY(-1px);background:#FFF1F7;border-color:rgba(231,110,166,.4);color:#C13F82;}
 
-/* ── 우측: 캐릭터 글래스 스테이지 ── */
-.hero-right-v3{position:relative;z-index:2;display:flex;align-items:center;justify-content:center;min-height:232px;overflow:visible;isolation:isolate;}
-/* 은은한 핑크 글로우 */
-.hero-right-v3::before{content:"";position:absolute;z-index:0;width:380px;height:380px;right:50%;top:48%;transform:translate(50%,-50%);border-radius:50%;background:radial-gradient(circle, rgba(255,255,255,.9) 0%, rgba(255,228,241,.6) 34%, rgba(255,199,224,.28) 60%, transparent 80%);filter:blur(10px);}
-/* 캐릭터 발밑 그림자 → 배너에 '얹힌' 느낌 */
-.hero-right-v3::after{content:"";position:absolute;z-index:1;width:296px;height:38px;left:50%;bottom:30px;transform:translateX(-50%);border-radius:50%;background:radial-gradient(ellipse at center, rgba(159,58,105,.22) 0%, rgba(159,58,105,.10) 45%, transparent 75%);filter:blur(9px);}
+/* ── 우측: 캐릭터를 작은 액센트로 (글래스 무대·과한 글로우 제거) ── */
+.hero-right-v3{position:relative;z-index:2;display:flex;align-items:center;justify-content:center;min-height:0;overflow:visible;}
+.hero-right-v3::before{content:"";position:absolute;z-index:0;width:160px;height:160px;left:50%;top:50%;transform:translate(-50%,-52%);border-radius:50%;background:radial-gradient(circle, rgba(255,228,241,.55) 0%, rgba(255,199,224,0) 66%);filter:blur(8px);}
+.hero-right-v3::after{display:none;}
+.hero-stage{display:none;}
 
-/* 글래스 무대 패널 */
-.hero-stage{position:absolute;z-index:1;width:344px;height:178px;left:50%;top:50%;transform:translate(-50%,-34%);border-radius:34px;background:linear-gradient(180deg, rgba(255,255,255,.42) 0%, rgba(255,247,251,.26) 100%);border:1px solid rgba(255,255,255,.6);box-shadow:inset 0 1px 0 rgba(255,255,255,.85), 0 16px 36px rgba(159,58,105,.08);-webkit-backdrop-filter:blur(9px) saturate(140%);backdrop-filter:blur(9px) saturate(140%);}
-
-/* 실시간 연동 상태 칩 (엔터프라이즈 디테일) */
-
-.mascot-v3,.hero-right-v3 .mascot-v3{position:relative;z-index:5;width:clamp(330px,30vw,420px);height:clamp(228px,22vw,300px);display:flex;align-items:center;justify-content:center;overflow:visible;background:transparent !important;border-radius:0;transform:translateY(2px);filter:drop-shadow(0 14px 22px rgba(159,58,105,.16));}
+.mascot-v3,.hero-right-v3 .mascot-v3{position:relative;z-index:5;width:172px;height:128px;display:flex;align-items:center;justify-content:center;overflow:visible;background:transparent !important;border-radius:0;transform:none;filter:drop-shadow(0 7px 13px rgba(159,58,105,.14));}
 .mascot-v3::before,.mascot-v3::after{display:none !important;}
-.mascot-v3 img,.hero-right-v3 .mascot-v3 img{width:100%;height:100%;display:block;object-fit:contain;object-position:center bottom;background:transparent !important;border-radius:0 !important;box-shadow:none !important;-webkit-mask-image:none !important;mask-image:none !important;mix-blend-mode:normal !important;}
+.mascot-v3 img,.hero-right-v3 .mascot-v3 img{width:100%;height:100%;display:block;object-fit:contain;object-position:center;background:transparent !important;border-radius:0 !important;box-shadow:none !important;-webkit-mask-image:none !important;mask-image:none !important;mix-blend-mode:normal !important;}
 #heroMascotImg{background:transparent !important;}
-#heroMascotImg.is-cleaned{background:transparent !important;filter:saturate(1.03) contrast(1.01) drop-shadow(0 12px 20px rgba(159,58,105,.12));}
+#heroMascotImg.is-cleaned{background:transparent !important;filter:saturate(1.03) contrast(1.01) drop-shadow(0 7px 13px rgba(159,58,105,.12));}
 
-/* 말풍선: 글래스, 캐릭터에 또렷이 앵커링 */
-
-/* 이전 파티클(별/먼지/구름/링)은 제거됨 — DOM 없음 */
-.pc-only{display:block;}
+.pc-only{display:none;}
 
 @media (max-width:1024px){
-  .hero-inner{grid-template-columns:1fr;min-height:auto;gap:18px;padding:32px 30px 30px;}
+  .hero-inner{grid-template-columns:1fr;min-height:auto;gap:14px;padding:20px 22px;}
   .hero-left-v3{max-width:none;}
   .hero-search-v3{max-width:none;}
-  .hero-right-v3{min-height:250px;}
-  .hero-stage{width:300px;height:182px;}
-  .mascot-v3,.hero-right-v3 .mascot-v3{width:min(380px,80vw);height:min(272px,58vw);transform:translateY(2px);}
+  .hero-right-v3{display:none;}
 }
 @media (max-width:640px){
-  .hero.hero-v3{border-radius:22px;}
-  .hero-inner{padding:26px 20px 24px;}
-  .hero-title-v3{font-size:32px;}
-  .hero-sub-v3{font-size:14px;line-height:1.6;margin-bottom:18px;}
-  .hero-right-v3{min-height:210px;}
-  .hero-stage{width:248px;height:152px;}
-  .mascot-v3,.hero-right-v3 .mascot-v3{width:min(290px,86vw);height:min(208px,62vw);}
+  .hero.hero-v3{border-radius:16px;}
+  .hero-inner{padding:18px 16px;}
+  .hero-title-v3{font-size:20px;}
+  .hero-search-v3{height:52px;}
+  .hero-right-v3{display:none;}
   .pc-only{display:none;}
 }
 
