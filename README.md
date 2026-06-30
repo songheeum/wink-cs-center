@@ -138,3 +138,10 @@ QUERY('레노버 점검'!A2:M, "select A,B,C,E,G,H,I,J,K,L where A is not null",
 무단 사용, 무단 배포, 무단 복제, 외부 공유로 인해 발생하는 문제에 대해서는 사용자가 책임을 질 수 있습니다.
 
 © Danbi Empathy Team. Internal Use Only.
+
+
+## 최신 UI 기준
+
+- 좌측 메뉴는 상담 동선 기준으로 `증상 선택 → 기기 선택` Depth 구조를 사용합니다.
+- 라이트/다크 모드에서 텍스트 대비가 유지되도록 색상 변수 기준으로 관리합니다.
+- CSV/GViz fallback 데이터 로직은 유지합니다.

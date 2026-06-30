@@ -4,6 +4,8 @@ const state = {
   filtered: [],
   view: 'home',
   guideMode: 'all',
+  selectedDevice: null,
+  openMenu: null,
   search: '',
   filters: { month: 'all', type: 'all', category: 'all', handler: 'all' }
 };
@@ -15,33 +17,42 @@ const pct = (value, total) => total ? `${((value / total) * 100).toFixed(1)}%` :
 const clean = (v) => String(v ?? '').replace(/\r/g, '').trim();
 
 
-const TOSS_CHART_COLORS = ['#3182f6', '#5da2ff', '#8bc0ff', '#b9d7ff'];
-const GOOGLE_CHART_OPTIONS = {
-  animation: { startup: true, duration: 1000, easing: 'out' },
-  backgroundColor: 'transparent',
-  colors: TOSS_CHART_COLORS,
-  fontName: 'Pretendard',
-  legend: { position: 'none', textStyle: { color: '#6b7684', fontSize: 12 } },
-  chartArea: { left: 40, top: 24, right: 24, bottom: 42, width: '84%', height: '72%' },
-  hAxis: {
-    textStyle: { color: '#6b7684', fontSize: 12 },
-    gridlines: { color: '#edf1f5' },
-    baselineColor: '#e5e8eb'
-  },
-  vAxis: {
-    textStyle: { color: '#6b7684', fontSize: 12 },
-    gridlines: { color: '#edf1f5' },
-    baselineColor: '#e5e8eb'
-  }
-};
-window.DANBI_GOOGLE_CHART_OPTIONS = GOOGLE_CHART_OPTIONS;
-
 const ICONS = {
-  home: '🏠', chart: '📊', tech: '🛠️', general: '💬',
   sync: '↻', wifi: '◉', app: '⌘', video: '▣', keyboard: '⌨', shield: '◇',
-  payment: '₩', delivery: '⇢', book: '✦', service: '⚙', calendar: '◫',
+  power: '⏻', screen: '□', payment: '₩', delivery: '⇢', general: '💬', book: '✦', service: '⚙', calendar: '◫',
   default: '•'
 };
+
+const NAV_CATEGORIES = [
+  {
+    id: 'wifi',
+    label: '와이파이 / 네트워크',
+    desc: '연결 · 저장됨 · 인증',
+    icon: 'wifi3d',
+    devices: ['윙크봇', '윙크스쿨', '학부모앱', '기타 패드']
+  },
+  {
+    id: 'power',
+    label: '전원 / 충전 / 화면',
+    desc: '전원 · 충전 · 표시',
+    icon: 'power3d',
+    devices: ['윙크봇', '윙크스쿨', '학부모앱', '기타 패드']
+  },
+  {
+    id: 'app',
+    label: '앱 작동 / 업데이트 / 초기화',
+    desc: '실행 · 업데이트 · 재설정',
+    icon: 'app3d',
+    devices: ['윙크봇', '윙크스쿨', '학부모앱']
+  },
+  {
+    id: 'work',
+    label: '일반 업무 가이드',
+    desc: '무료체험 · 결제 · 배송',
+    icon: 'work3d',
+    devices: ['무료체험', '결제관리', '배송조회', '해지/환불']
+  }
+];
 
 init();
 
@@ -394,56 +405,174 @@ function diffMinutes(start, end) {
   return e >= s ? e - s : e + 1440 - s;
 }
 
-function renderNav() {
-  const sections = [
-    {
-      label: '메인',
-      items: [
-        { id: 'home', label: '홈', icon: 'home', desc: '상담가이드 메인' },
-        { id: 'dashboard', label: '점검 현황', icon: 'chart', desc: '점검 데이터 분석' }
-      ]
-    },
-    {
-      label: '상담 카테고리',
-      items: [
-        { id: 'guide-tech', label: '기술상담', icon: 'tech', desc: '기기 · 앱 · 네트워크' },
-        { id: 'guide-general', label: '일반상담', icon: 'general', desc: '결제 · 배송 · 교재' }
-      ]
-    }
-  ];
 
-  $('#mainNav').innerHTML = sections.map(section => `
-    <div class="nav-section">
-      <p class="nav-section-label">${section.label}</p>
-      <div class="nav-stack">${section.items.map(item => {
-        const active = (item.id === 'home' && state.view === 'home' && state.guideMode === 'all')
-          || (item.id === 'dashboard' && state.view === 'detail')
-          || (item.id === 'guide-tech' && state.view === 'home' && state.guideMode === 'tech')
-          || (item.id === 'guide-general' && state.view === 'home' && state.guideMode === 'general');
-        return `
-          <button class="nav-item ${active ? 'active' : ''}" data-view="${item.id}">
-            <span class="nav-icon-orb" aria-hidden="true"><span class="nav-glyph">${ICONS[item.icon] || ICONS.default}</span></span>
-            <span class="nav-copy"><strong>${item.label}</strong><small>${item.desc}</small></span>
-          </button>`;
-      }).join('')}</div>
-    </div>`).join('');
+function navIconSvg(icon) {
+  const icons = {
+    home3d: `
+      <span class="nav-icon-orb home" aria-hidden="true">
+        <svg class="nav-svg" viewBox="0 0 48 48" role="img">
+          <defs>
+            <linearGradient id="home3dA" x1="8" y1="5" x2="42" y2="43" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#BFE0FF"/><stop offset=".52" stop-color="#3182F6"/><stop offset="1" stop-color="#155EEF"/></linearGradient>
+            <linearGradient id="home3dB" x1="17" y1="25" x2="32" y2="42" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#FFFFFF" stop-opacity=".95"/><stop offset="1" stop-color="#D8EBFF" stop-opacity=".72"/></linearGradient>
+            <filter id="home3dS" x="-40%" y="-40%" width="180%" height="180%"><feDropShadow dx="0" dy="8" stdDeviation="5" flood-color="#3182F6" flood-opacity=".32"/></filter>
+          </defs>
+          <path filter="url(#home3dS)" d="M9.7 22.8 24 10.4l14.3 12.4v14.1a3.4 3.4 0 0 1-3.4 3.4h-7.1V29.5h-7.6v10.8h-7.1a3.4 3.4 0 0 1-3.4-3.4V22.8Z" fill="url(#home3dA)"/>
+          <path d="M15 24.8 24 17l9 7.8" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity=".86"/>
+          <path d="M20.2 40.3V29.5h7.6v10.8" fill="url(#home3dB)"/>
+        </svg>
+      </span>`,
+    dashboard3d: `
+      <span class="nav-icon-orb dashboard" aria-hidden="true">
+        <svg class="nav-svg" viewBox="0 0 48 48" role="img">
+          <defs>
+            <linearGradient id="dash3dA" x1="9" y1="7" x2="40" y2="42" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#CDE4FF"/><stop offset=".48" stop-color="#3182F6"/><stop offset="1" stop-color="#1B64DA"/></linearGradient>
+            <filter id="dash3dS" x="-40%" y="-40%" width="180%" height="180%"><feDropShadow dx="0" dy="8" stdDeviation="5" flood-color="#3182F6" flood-opacity=".28"/></filter>
+          </defs>
+          <rect x="9" y="8" width="30" height="31" rx="9" fill="url(#dash3dA)" filter="url(#dash3dS)"/>
+          <rect x="15" y="26" width="4.8" height="7.5" rx="2.4" fill="#fff" opacity=".92"/>
+          <rect x="22" y="19" width="4.8" height="14.5" rx="2.4" fill="#fff" opacity=".98"/>
+          <rect x="29" y="13" width="4.8" height="20.5" rx="2.4" fill="#fff" opacity=".76"/>
+          <path d="M15 36h18" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity=".42"/>
+        </svg>
+      </span>`,
+    wifi3d: `
+      <span class="nav-icon-orb wifi" aria-hidden="true">
+        <svg class="nav-svg" viewBox="0 0 48 48" role="img">
+          <defs>
+            <linearGradient id="wifi3dA" x1="7" y1="9" x2="41" y2="41" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#BDEBFF"/><stop offset=".52" stop-color="#00A9C7"/><stop offset="1" stop-color="#007FA3"/></linearGradient>
+            <filter id="wifi3dS" x="-40%" y="-40%" width="180%" height="180%"><feDropShadow dx="0" dy="8" stdDeviation="5" flood-color="#00A9C7" flood-opacity=".28"/></filter>
+          </defs>
+          <circle cx="24" cy="24" r="17" fill="url(#wifi3dA)" filter="url(#wifi3dS)"/>
+          <path d="M14.5 21.6a15.2 15.2 0 0 1 19 0" fill="none" stroke="#fff" stroke-width="3.3" stroke-linecap="round" opacity=".86"/>
+          <path d="M18.8 26.3a8.3 8.3 0 0 1 10.4 0" fill="none" stroke="#fff" stroke-width="3.3" stroke-linecap="round" opacity=".92"/>
+          <circle cx="24" cy="31.2" r="2.8" fill="#fff"/>
+        </svg>
+      </span>`,
+    power3d: `
+      <span class="nav-icon-orb power" aria-hidden="true">
+        <svg class="nav-svg" viewBox="0 0 48 48" role="img">
+          <defs>
+            <linearGradient id="power3dA" x1="8" y1="7" x2="40" y2="42" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#FFE1B2"/><stop offset=".5" stop-color="#F59F00"/><stop offset="1" stop-color="#E67700"/></linearGradient>
+            <filter id="power3dS" x="-40%" y="-40%" width="180%" height="180%"><feDropShadow dx="0" dy="8" stdDeviation="5" flood-color="#F59F00" flood-opacity=".30"/></filter>
+          </defs>
+          <circle cx="24" cy="24" r="17" fill="url(#power3dA)" filter="url(#power3dS)"/>
+          <path d="M24 13v12" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
+          <path d="M17.4 18.5a10 10 0 1 0 13.2 0" fill="none" stroke="#fff" stroke-width="3.4" stroke-linecap="round" opacity=".88"/>
+        </svg>
+      </span>`,
+    app3d: `
+      <span class="nav-icon-orb app" aria-hidden="true">
+        <svg class="nav-svg" viewBox="0 0 48 48" role="img">
+          <defs>
+            <linearGradient id="app3dA" x1="7" y1="7" x2="41" y2="42" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#D6C6FF"/><stop offset=".5" stop-color="#8B5CF6"/><stop offset="1" stop-color="#6D28D9"/></linearGradient>
+            <filter id="app3dS" x="-40%" y="-40%" width="180%" height="180%"><feDropShadow dx="0" dy="8" stdDeviation="5" flood-color="#8B5CF6" flood-opacity=".30"/></filter>
+          </defs>
+          <rect x="10" y="9" width="28" height="30" rx="9" fill="url(#app3dA)" filter="url(#app3dS)"/>
+          <rect x="16" y="15" width="7" height="7" rx="2.4" fill="#fff" opacity=".92"/>
+          <rect x="25" y="15" width="7" height="7" rx="2.4" fill="#fff" opacity=".74"/>
+          <rect x="16" y="25" width="7" height="7" rx="2.4" fill="#fff" opacity=".74"/>
+          <rect x="25" y="25" width="7" height="7" rx="2.4" fill="#fff" opacity=".92"/>
+        </svg>
+      </span>`,
+    work3d: `
+      <span class="nav-icon-orb work" aria-hidden="true">
+        <svg class="nav-svg" viewBox="0 0 48 48" role="img">
+          <defs>
+            <linearGradient id="work3dA" x1="8" y1="8" x2="40" y2="42" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#C6F6E7"/><stop offset=".52" stop-color="#00A882"/><stop offset="1" stop-color="#087A63"/></linearGradient>
+            <filter id="work3dS" x="-40%" y="-40%" width="180%" height="180%"><feDropShadow dx="0" dy="8" stdDeviation="5" flood-color="#00A882" flood-opacity=".28"/></filter>
+          </defs>
+          <rect x="9" y="12" width="30" height="25" rx="8" fill="url(#work3dA)" filter="url(#work3dS)"/>
+          <path d="M18 12v-1.5a3 3 0 0 1 3-3h6a3 3 0 0 1 3 3V12" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" opacity=".88"/>
+          <path d="M15.5 22h17M15.5 28h11" stroke="#fff" stroke-width="2.5" stroke-linecap="round" opacity=".88"/>
+        </svg>
+      </span>`
+  };
+  return icons[icon] || `<span class="nav-icon-orb" aria-hidden="true"><span class="nav-glyph">${ICONS.default}</span></span>`;
+}
+
+function renderNav() {
+  const isHome = state.view === 'home' && state.guideMode === 'all';
+  const isDashboard = state.view === 'detail';
+
+  $('#mainNav').innerHTML = `
+    <div class="nav-section nav-section-main">
+      <button class="nav-item ${isHome ? 'active' : ''}" data-view="home">
+        ${navIconSvg('home3d')}
+        <span class="nav-copy"><strong>홈</strong><small>상담가이드 메인</small></span>
+      </button>
+      <button class="nav-item ${isDashboard ? 'active' : ''}" data-view="dashboard">
+        ${navIconSvg('dashboard3d')}
+        <span class="nav-copy"><strong>점검 운영 현황</strong><small>대시보드</small></span>
+      </button>
+    </div>
+
+    <div class="nav-divider" aria-hidden="true"></div>
+
+    <div class="nav-section nav-section-symptom">
+      <p class="nav-section-label">증상 선택 → 기기 선택</p>
+      <div class="nav-stack">
+        ${NAV_CATEGORIES.map(category => {
+          const open = state.openMenu === category.id || state.guideMode === category.id;
+          const active = state.view === 'home' && state.guideMode === category.id;
+          return `
+            <div class="nav-group ${open ? 'open' : ''} ${active ? 'active' : ''}">
+              <button class="nav-item nav-parent ${active ? 'active' : ''}" data-menu="${category.id}" aria-expanded="${open}">
+                ${navIconSvg(category.icon)}
+                <span class="nav-copy"><strong>${category.label}</strong><small>${category.desc}</small></span>
+                <span class="nav-caret" aria-hidden="true">⌄</span>
+              </button>
+              <div class="nav-submenu">
+                ${category.devices.map(device => `
+                  <button class="sub-nav-item ${state.guideMode === category.id && state.selectedDevice === device ? 'active' : ''}" data-guide-mode="${category.id}" data-device="${escapeAttr(device)}">
+                    <span>${device}</span>
+                  </button>`).join('')}
+              </div>
+            </div>`;
+        }).join('')}
+      </div>
+    </div>`;
 }
 
 function bindChrome() {
   $('#mainNav').addEventListener('click', (e) => {
-    const btn = e.target.closest('[data-view]');
-    if (!btn) return;
-    const view = btn.dataset.view;
+    const direct = e.target.closest('[data-view]');
+    const parent = e.target.closest('[data-menu]');
+    const child = e.target.closest('[data-guide-mode]');
 
-    if (view === 'dashboard') {
-      state.view = 'detail';
-    } else {
-      state.view = 'home';
-      state.guideMode = view === 'guide-tech' ? 'tech' : view === 'guide-general' ? 'general' : 'all';
+    if (direct) {
+      const view = direct.dataset.view;
+      if (view === 'dashboard') {
+        state.view = 'detail';
+      } else {
+        state.view = 'home';
+        state.guideMode = 'all';
+        state.selectedDevice = null;
+        state.openMenu = null;
+      }
+      renderNav();
+      render();
+      return;
     }
 
-    renderNav();
-    render();
+    if (parent) {
+      const mode = parent.dataset.menu;
+      state.view = 'home';
+      state.guideMode = mode;
+      state.selectedDevice = null;
+      state.openMenu = mode;
+      renderNav();
+      render();
+      return;
+    }
+
+    if (child) {
+      state.view = 'home';
+      state.guideMode = child.dataset.guideMode;
+      state.selectedDevice = child.dataset.device;
+      state.openMenu = child.dataset.guideMode;
+      renderNav();
+      render();
+    }
   });
 
   $('#globalSearch').addEventListener('input', (e) => {
@@ -457,6 +586,31 @@ function bindChrome() {
     const next = html.dataset.theme === 'dark' ? 'light' : 'dark';
     html.dataset.theme = next;
     $('#themeLabel').textContent = next === 'dark' ? 'Dark' : 'Light';
+  });
+
+  $('#pageRoot').addEventListener('click', (e) => {
+    const selectButton = e.target.closest('.select-button');
+    if (selectButton) {
+      const select = selectButton.closest('[data-custom-select]');
+      const isOpen = select.classList.contains('open');
+      closeCustomSelects(select);
+      select.classList.toggle('open', !isOpen);
+      selectButton.setAttribute('aria-expanded', String(!isOpen));
+      return;
+    }
+
+    const option = e.target.closest('.select-option');
+    if (option) {
+      const select = option.closest('[data-custom-select]');
+      state.filters[select.dataset.filter] = option.dataset.value;
+      closeCustomSelects();
+      applyFilters();
+      render();
+    }
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('[data-custom-select]')) closeCustomSelects();
   });
 }
 
@@ -587,6 +741,7 @@ function renderHome() {
 
 function heroTemplate() {
   const home = state.config.home;
+  const category = NAV_CATEGORIES.find(item => item.id === state.guideMode);
   const heroPresets = {
     all: {
       title: home.heroTitle,
@@ -594,26 +749,40 @@ function heroTemplate() {
       placeholder: home.searchPlaceholder,
       keywords: home.keywords
     },
-    tech: {
-      title: '기술상담 가이드를 더 빠르게 찾으세요',
-      description: '기기, 앱, 네트워크, 교사 PC 이슈 중심으로 필요한 가이드를 바로 찾을 수 있어요.',
-      placeholder: '예: 동기화, 앱작동, 저장됨, 네트워크, 키보드',
-      keywords: ['동기화', '앱작동', '네트워크', '저장됨', '키보드', '교사 PC']
+    wifi: {
+      title: '와이파이 / 네트워크 증상부터 확인하세요',
+      description: '고객이 말한 연결 오류를 먼저 고르고, 해당 기기별 점검 가이드로 좁혀볼 수 있어요.',
+      placeholder: '예: 저장됨, 인증 실패, 연결 끊김, 네트워크 오류',
+      keywords: ['저장됨', '네트워크 끊김', '접속/인증', 'Wi-Fi 6', 'Wi-Fi 7']
     },
-    general: {
-      title: '일반상담 가이드를 더 빠르게 찾으세요',
-      description: '결제, 배송, 회수, 교재, 무료체험 같은 일반 문의를 빠르게 찾아볼 수 있어요.',
-      placeholder: '예: 결제, 환불, 배송, 회수, 무료체험, 교재',
-      keywords: ['결제', '환불', '배송', '회수', '무료체험', '교재']
+    power: {
+      title: '전원 / 충전 / 화면 증상을 확인하세요',
+      description: '전원 불량, 충전 불가, 화면 무반응처럼 기기 상태 중심으로 빠르게 분류합니다.',
+      placeholder: '예: 충전 안 됨, 전원 꺼짐, 화면 멈춤, 과열',
+      keywords: ['충전', '전원', '화면', '과열', '교체']
+    },
+    app: {
+      title: '앱 작동 / 업데이트 / 초기화 흐름으로 확인하세요',
+      description: '앱 실행 오류, 업데이트 실패, 초기화 요청을 기기별로 분리해 대응합니다.',
+      placeholder: '예: 앱작동, 업데이트, 초기화, 로그인, 튕김',
+      keywords: ['앱작동', '업데이트', '초기화', '로그인', '튕김']
+    },
+    work: {
+      title: '일반 업무 가이드를 바로 확인하세요',
+      description: '무료체험, 결제관리, 배송조회, 해지/환불처럼 상담 빈도가 높은 업무를 모았습니다.',
+      placeholder: '예: 무료체험, 결제, 배송, 회수, 환불',
+      keywords: ['무료체험', '결제관리', '배송조회', '해지/환불', '회수']
     }
   };
   const current = heroPresets[state.guideMode] || heroPresets.all;
+  const title = state.selectedDevice && category ? `${state.selectedDevice} · ${current.title}` : current.title;
+  const description = state.selectedDevice && category ? `${category.label} 중 ${state.selectedDevice} 기준으로 관련 가이드를 좁혀 보여줍니다.` : current.description;
 
   return `
     <section class="hero">
       <div class="hero-copy">
-        <h1>${current.title}</h1>
-        <p>${current.description}</p>
+        <h1>${title}</h1>
+        <p>${description}</p>
         <label class="hero-search">
           <input id="heroSearch" type="search" placeholder="${current.placeholder}" value="${escapeAttr(state.search)}" />
           <button class="primary-btn" type="button" id="heroSearchButton">검색</button>
@@ -704,7 +873,6 @@ function renderDetail() {
     renderNav();
     render();
   });
-  bindFilters();
 }
 
 function filterBarTemplate() {
@@ -719,15 +887,38 @@ function filterBarTemplate() {
 }
 
 function selectTemplate(key, label, values, selected) {
-  return `<label class="filter-control"><span class="keyword-label">${label}</span><div class="select-wrap"><select data-filter="${key}">${values.map(v => `<option value="${escapeAttr(v)}" ${v === selected ? 'selected' : ''}>${v === 'all' ? '전체' : v}</option>`).join('')}</select></div></label>`;
+  const selectedText = selected === 'all' ? '전체' : selected;
+  return `
+    <div class="filter-control" data-custom-select data-filter="${key}">
+      <span class="keyword-label">${label}</span>
+      <button class="select-button" type="button" aria-haspopup="listbox" aria-expanded="false">
+        <span class="select-value">${selectedText}</span>
+        <svg class="select-chevron" viewBox="0 0 16 16" aria-hidden="true">
+          <path d="M4.2 6.2 8 10l3.8-3.8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <div class="select-menu" role="listbox">
+        ${values.map(v => {
+          const labelText = v === 'all' ? '전체' : v;
+          const isSelected = v === selected;
+          return `<button class="select-option ${isSelected ? 'selected' : ''}" type="button" role="option" aria-selected="${isSelected}" data-value="${escapeAttr(v)}">
+            <span class="option-label">${labelText}</span>
+            <span class="option-check" aria-hidden="true">
+              <svg viewBox="0 0 16 16"><path d="M3.5 8.2 6.6 11.3 12.8 4.7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+          </button>`;
+        }).join('')}
+      </div>
+    </div>`;
 }
 
-function bindFilters() {
-  $$('[data-filter]').forEach(select => select.addEventListener('change', () => {
-    state.filters[select.dataset.filter] = select.value;
-    applyFilters();
-    render();
-  }));
+
+function closeCustomSelects(except = null) {
+  $$('[data-custom-select].open').forEach(select => {
+    if (select === except) return;
+    select.classList.remove('open');
+    $('.select-button', select)?.setAttribute('aria-expanded', 'false');
+  });
 }
 
 function kpi(label, value, sub, type) {
@@ -767,37 +958,43 @@ function barCard(title, entries, total) {
 }
 
 function guideSectionTemplate() {
-  const modeMap = { all: null, tech: '기술상담', general: '일반상담' };
-  const filterKey = modeMap[state.guideMode] || null;
-  const cards = filterKey
-    ? state.config.guideCards.filter(card => card.category.startsWith(filterKey))
-    : state.config.guideCards;
-  const title = state.guideMode === 'tech' ? '자주 찾는 기술상담 가이드' : state.guideMode === 'general' ? '자주 찾는 일반상담 가이드' : '자주 찾는 가이드';
+  const category = NAV_CATEGORIES.find(item => item.id === state.guideMode);
+  const cards = state.config.guideCards.filter(card => {
+    if (state.guideMode === 'all') return true;
+    if (card.group !== state.guideMode) return false;
+    if (state.selectedDevice && card.device !== state.selectedDevice) return false;
+    return true;
+  });
+  const title = state.guideMode === 'all'
+    ? '자주 찾는 가이드'
+    : `${state.selectedDevice ? `${state.selectedDevice} · ` : ''}${category?.label || '상담'} 가이드`;
+  const empty = `<div class="empty-mini">선택한 조건에 맞는 가이드가 아직 없습니다.</div>`;
 
   return `<section class="card pad"><div class="card-title"><h2>${title}</h2><button class="link-btn">전체 보기 ›</button></div>
-    <div class="three-col">${cards.map(card => `
-      <div class="guide-card"><span class="tile-icon">${ICONS[card.icon] || ICONS.default}</span><div><strong>${card.title}</strong><small>${card.category}</small></div><span class="arrow">›</span></div>`).join('')}</div></section>`;
+    <div class="three-col">${cards.length ? cards.map(card => `
+      <div class="guide-card"><span class="tile-icon">${ICONS[card.icon] || ICONS.default}</span><div><strong>${card.title}</strong><small>${card.category}</small></div><span class="arrow">›</span></div>`).join('') : empty}</div></section>`;
 }
 
 function rightRailTemplate(rows) {
   const recent = rows.slice(0, 5);
-  const favoritesSource = state.guideMode === 'tech'
-    ? state.config.guideCards.filter(card => card.category.startsWith('기술상담'))
-    : state.guideMode === 'general'
-      ? state.config.guideCards.filter(card => card.category.startsWith('일반상담'))
-      : state.config.guideCards;
+  const favoritesSource = state.config.guideCards.filter(card => {
+    if (state.guideMode === 'all') return true;
+    if (card.group !== state.guideMode) return false;
+    if (state.selectedDevice && card.device !== state.selectedDevice) return false;
+    return true;
+  });
   const favorites = favoritesSource.slice(0, 5);
   return `<aside class="right-rail">
     <article class="card rail-card"><div class="card-title"><h3>최근 본 항목</h3><button class="link-btn">전체 보기 ›</button></div><div class="rail-list">
       ${recent.map(row => `<div class="rail-item"><span class="rail-icon">◷</span><strong>${row.symptom}</strong><span class="time">${row.receivedAt || '-'}</span></div>`).join('')}
     </div></article>
     <article class="card rail-card"><div class="card-title"><h3>즐겨찾기</h3><button class="link-btn">전체 보기 ›</button></div><div class="rail-list">
-      ${favorites.map(card => `<div class="rail-item"><span class="rail-icon">☆</span><strong>${card.title}</strong><span class="time">${card.category.split('·')[0].trim()}</span></div>`).join('')}
+      ${favorites.map(card => `<div class="rail-item"><span class="rail-icon">☆</span><strong>${card.title}</strong><span class="time">${card.device || card.category.split('·')[0].trim()}</span></div>`).join('')}
     </div></article>
     <article class="card rail-card"><div class="card-title"><h3>최근 업데이트</h3><button class="link-btn">전체 보기 ›</button></div><div class="rail-list">
+      <div class="rail-item"><span class="new-badge">NEW</span><strong>증상 → 기기 상담 동선 적용</strong><span class="time">오늘</span></div>
       <div class="rail-item"><span class="new-badge">NEW</span><strong>점검 현황 상세 분석 추가</strong><span class="time">오늘</span></div>
-      <div class="rail-item"><span class="new-badge">NEW</span><strong>D/F/M열 미노출 기준 적용</strong><span class="time">오늘</span></div>
-      <div class="rail-item"><span class="new-badge">NEW</span><strong>교사용 점검 투입시간 안내 추가</strong><span class="time">오늘</span></div>
+      <div class="rail-item"><span class="new-badge">NEW</span><strong>보안 컬럼 미노출 기준 적용</strong><span class="time">오늘</span></div>
     </div></article>
   </aside>`;
 }

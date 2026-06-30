@@ -43,64 +43,109 @@
   ],
   "guideCards": [
     {
-      "title": "교사 _ 동기화",
-      "category": "기술상담 · 교사",
-      "icon": "sync"
-    },
-    {
-      "title": "네트워크 _ 끊김",
-      "category": "기술상담 · 네트워크",
+      "title": "Wi-Fi 저장됨 / 연결 실패",
+      "category": "와이파이 / 네트워크 · 윙크봇",
+      "group": "wifi",
+      "device": "윙크봇",
       "icon": "wifi"
     },
     {
-      "title": "교사 _ 앱작동",
-      "category": "기술상담 · 앱",
-      "icon": "app"
+      "title": "Wi-Fi 저장됨 / 다음 화면 미진입",
+      "category": "와이파이 / 네트워크 · 윙크스쿨",
+      "group": "wifi",
+      "device": "윙크스쿨",
+      "icon": "wifi"
     },
     {
-      "title": "콘텐츠 _ 라이브클래스",
-      "category": "기술상담 · 콘텐츠",
-      "icon": "video"
+      "title": "학부모앱 네트워크 오류",
+      "category": "와이파이 / 네트워크 · 학부모앱",
+      "group": "wifi",
+      "device": "학부모앱",
+      "icon": "wifi"
     },
     {
-      "title": "하드웨어 _ 키보드",
-      "category": "기술상담 · 하드웨어",
-      "icon": "keyboard"
-    },
-    {
-      "title": "네트워크 _ 접속/인증",
-      "category": "기술상담 · 네트워크",
+      "title": "일반 패드 네트워크 점검",
+      "category": "와이파이 / 네트워크 · 기타 패드",
+      "group": "wifi",
+      "device": "기타 패드",
       "icon": "shield"
     },
     {
-      "title": "결제 · 청구 · 환불",
-      "category": "일반상담 · 결제",
-      "icon": "payment"
+      "title": "전원 불량 / 충전 미진행",
+      "category": "전원 / 충전 / 화면 · 윙크봇",
+      "group": "power",
+      "device": "윙크봇",
+      "icon": "power"
     },
     {
-      "title": "배송 · 회수 일정",
-      "category": "일반상담 · 물류",
-      "icon": "delivery"
+      "title": "충전 중 꺼짐 / 화면 무반응",
+      "category": "전원 / 충전 / 화면 · 윙크스쿨",
+      "group": "power",
+      "device": "윙크스쿨",
+      "icon": "power"
     },
     {
-      "title": "무료체험 · 해지 문의",
-      "category": "일반상담 · 이용문의",
+      "title": "앱 화면 멈춤 / 검은 화면",
+      "category": "전원 / 충전 / 화면 · 학부모앱",
+      "group": "power",
+      "device": "학부모앱",
+      "icon": "screen"
+    },
+    {
+      "title": "기타 패드 화면/충전 점검",
+      "category": "전원 / 충전 / 화면 · 기타 패드",
+      "group": "power",
+      "device": "기타 패드",
+      "icon": "screen"
+    },
+    {
+      "title": "앱 실행 오류 / 강제 종료",
+      "category": "앱 작동 / 업데이트 / 초기화 · 윙크봇",
+      "group": "app",
+      "device": "윙크봇",
+      "icon": "app"
+    },
+    {
+      "title": "업데이트 실패 / 초기화 필요",
+      "category": "앱 작동 / 업데이트 / 초기화 · 윙크스쿨",
+      "group": "app",
+      "device": "윙크스쿨",
+      "icon": "sync"
+    },
+    {
+      "title": "학부모앱 로그인 / 실행 오류",
+      "category": "앱 작동 / 업데이트 / 초기화 · 학부모앱",
+      "group": "app",
+      "device": "학부모앱",
+      "icon": "app"
+    },
+    {
+      "title": "무료체험 접수 / 회수 안내",
+      "category": "일반 업무 가이드 · 무료체험",
+      "group": "work",
+      "device": "무료체험",
       "icon": "general"
     },
     {
-      "title": "교재 · 구성품 문의",
-      "category": "일반상담 · 교재",
-      "icon": "book"
+      "title": "결제관리 / 카드 변경",
+      "category": "일반 업무 가이드 · 결제관리",
+      "group": "work",
+      "device": "결제관리",
+      "icon": "payment"
     },
     {
-      "title": "A/S · 파손 비용",
-      "category": "일반상담 · A/S",
+      "title": "배송조회 / 출고 일정",
+      "category": "일반 업무 가이드 · 배송조회",
+      "group": "work",
+      "device": "배송조회",
+      "icon": "delivery"
+    },
+    {
+      "title": "해지 / 환불 문의 대응",
+      "category": "일반 업무 가이드 · 해지/환불",
+      "group": "work",
+      "device": "해지/환불",
       "icon": "service"
-    },
-    {
-      "title": "출고 · 일정 확인",
-      "category": "일반상담 · 일정",
-      "icon": "calendar"
     }
   ]
 }
