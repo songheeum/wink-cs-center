@@ -2,105 +2,150 @@
   "csvUrl": "https://docs.google.com/spreadsheets/d/e/2PACX-1vTGdaw55jIrzBzL_Mg9Q-MbCgyqK-8oPrEsk32q8gT218vd6YHTJDPtep7vCPfFABzjGmuxokXI7f0t/pub?gid=1805165617&single=true&output=csv",
   "privacy": {
     "privateColumnIndexes": [],
-    "privateColumnNames": ["자마드 주소", "메모", "특이사항"]
+    "privateColumnNames": [
+      "자마드 주소",
+      "메모",
+      "특이사항"
+    ]
   },
   "statusRules": {
-    "completeIncludes": ["처리완료"],
-    "cancelIncludes": ["취소"]
+    "completeIncludes": [
+      "처리완료"
+    ],
+    "cancelIncludes": [
+      "취소"
+    ]
   },
-  "technicalGroups": [
-    {"id":"wifi","label":"와이파이 / 네트워크","desc":"연결 · 저장됨 · 속도","icon":"wifi"},
-    {"id":"power","label":"전원 / 충전 / 화면","desc":"전원 · 충전 · 터치","icon":"power"},
-    {"id":"app","label":"앱 작동 / 업데이트 / 초기화","desc":"앱중지 · 초기화 · 로그인","icon":"app"},
-    {"id":"escape","label":"앱탈출 / 접근제한","desc":"앱탈출 · 화면고정 · 외부접속","icon":"lock"},
-    {"id":"remote","label":"원격점검 / 기능검사","desc":"RemoteCall · Wink Test","icon":"monitor"},
-    {"id":"device","label":"기기 설정 / 기본정보","desc":"모델 · 설정 · 권한","icon":"settings"},
-    {"id":"admin","label":"업무툴 / 관리자","desc":"CRM · 공감센터 · 관리자","icon":"user"},
-    {"id":"etc-tech","label":"기타","desc":"파손 · 예외 · 기타","icon":"more"}
-  ],
-  "generalGroups": [
-    {"id":"trial","label":"체험신청 / 체험운영","desc":"무료체험 · 재체험 · 연장","icon":"chat"},
-    {"id":"product","label":"유료학습 / 상품안내","desc":"상품 · 비용 · 해외학습","icon":"book"},
-    {"id":"payment","label":"결제 / 할인 / 위약금","desc":"결제수단 · 할인 · 위약금","icon":"payment"},
-    {"id":"cancel","label":"해지 / 환불 / 청약철회","desc":"해지상담 · 환불 · 청약철회","icon":"return"},
-    {"id":"shipping","label":"배송 / 회수","desc":"배송상태 · 회수 · 주소변경","icon":"delivery"},
-    {"id":"parts","label":"교재 / 구성품 / 추가구매","desc":"교재 · 부수기재 · 비용","icon":"box"},
-    {"id":"study","label":"학습운영 / 수업 / 단계","desc":"수업 · 단계 · 휴지 · 수료","icon":"calendar"},
-    {"id":"benefit","label":"혜택 / 이벤트 / 리워드","desc":"하트적립금 · 지인추천 · 사은품","icon":"star"},
-    {"id":"system","label":"시스템 / 이관 / 응대","desc":"이관 · 접수 · 응대기준","icon":"settings"}
-  ],
-  "guideItems": [
+  "home": {
+    "heroTitle": "상담 가이드를 빠르게 찾아보세요",
+    "heroDescription": "증상, 키워드, 고객 표현으로 검색하면 관련 가이드를 즉시 확인할 수 있습니다.",
+    "searchPlaceholder": "예: 동기화, 네트워크 끊김, 앱작동, 키보드, 단비폰",
+    "keywords": [
+      "동기화",
+      "네트워크",
+      "앱작동",
+      "키보드",
+      "단비폰",
+      "교사 PC"
+    ]
+  },
+  "navigation": [
     {
-      "id":"wifi-001","type":"technical","group":"wifi","title":"인터넷 연결이 자주 끊겨요","device":"공통","action":"점검","icon":"wifi","tone":"primary","customer":"와이파이가 연결이 안 돼요, 연결은 되는데 인터넷이 안 돼요","summary":["모뎀과 공유기의 전원 및 케이블 연결 상태를 확인합니다.","공유기 재부팅 후 5분간 상태를 확인합니다.","동일 문제 발생 시 회선 측정 후 장애 이력 확인 및 기사 접수를 진행합니다."],"tags":["와이파이","저장됨","공유기","2.4GHz","통신사점검"]
+      "id": "home",
+      "label": "홈",
+      "icon": "home"
     },
     {
-      "id":"wifi-002","type":"technical","group":"wifi","title":"속도 / 버퍼링 / 로딩지연 / 학습 멈춤","device":"공통","action":"점검","icon":"speed","tone":"primary","customer":"강의가 자꾸 끊겨요, 로딩이 너무 오래 걸려요","summary":["인터넷 속도와 지연시간을 확인하고 공유기 위치를 점검합니다.","5GHz/2.4GHz 연결 상태와 신호 간섭 여부를 확인합니다.","지속 발생 시 통신사 회선 점검 또는 방문점검 안내가 필요합니다."],"tags":["버퍼링","로딩지연","속도측정","방문점검","네트워크"]
-    },
-    {
-      "id":"wifi-003","type":"technical","group":"wifi","title":"공유기 대여 / 방문점검","device":"공통","action":"기타","icon":"router","tone":"green","customer":"공유기 대여 가능한가요? 기사님 방문 요청합니다","summary":["정회원 여부와 공유기 보유 상태를 먼저 확인합니다.","체험회원은 기본 대여 불가하며 핫스팟 체험을 우선 안내합니다.","강성 또는 예외 건은 담당부서 전달 후 추가 확인합니다."],"tags":["공유기대여","ipTIME","방문점검","물류2팀","핫스팟"]
-    },
-    {
-      "id":"power-001","type":"technical","group":"power","title":"전원불량 / 충전 불가","device":"윙크스쿨","action":"교체","icon":"power","tone":"red","customer":"전원이 안 켜져요, 충전해도 반응이 없어요","summary":["충전기, 케이블, 콘센트를 교차 확인합니다.","충전 표시와 발열, 단자 파손 여부를 확인합니다.","명확한 전원/단자 불량은 교체 기준에 따라 안내합니다."],"tags":["전원불량","충전불가","배터리","충전단자","교체"]
-    },
-    {
-      "id":"power-002","type":"technical","group":"power","title":"고스트터치 / 자동터치","device":"윙크스쿨","action":"점검","icon":"touch","tone":"purple","customer":"화면을 안 눌렀는데 혼자 눌려요","summary":["보호필름, 이물질, 충전 중 발생 여부를 확인합니다.","재부팅 후 동일 증상 재현 여부를 확인합니다.","반복 발생 시 영상 확보 후 점검 또는 교체 기준을 검토합니다."],"tags":["고스트터치","자동터치","터치오류","화면오작동","충전중발생"]
-    },
-    {
-      "id":"app-001","type":"technical","group":"app","title":"앱중지 [윙크가 중지되었습니다]","device":"윙크봇","action":"점검","icon":"app","tone":"purple","customer":"윙크가 중지되었습니다 문구가 떠요","summary":["발생 경로와 반복 재현 여부를 확인합니다.","앱 재실행, 데이터 삭제, 재부팅을 순서대로 진행합니다.","특정 경로에서 재현되면 영상과 발생 시간을 정리해 전달합니다."],"tags":["앱중지","강제종료","데이터삭제","재현필요","QA전달"]
-    },
-    {
-      "id":"app-002","type":"technical","group":"app","title":"공장초기화 진행 방법","device":"레노버","action":"점검","icon":"reset","tone":"orange","customer":"초기화해서 다시 설정해야 하나요?","summary":["초기화 필요 사유와 고객 동의 여부를 확인합니다.","배터리 잔량과 네트워크 연결 가능 여부를 확인합니다.","초기화 후 재설정 및 로그인 절차까지 안내합니다."],"tags":["공장초기화","초기화","Recovery","재설정","데이터삭제"]
-    },
-    {
-      "id":"escape-001","type":"technical","group":"escape","title":"앱탈출 발생 시 확인 절차","device":"공통","action":"점검","icon":"lock","tone":"purple","customer":"아이가 학습앱 밖으로 나가서 인터넷을 해요","summary":["기기 모델, OS버전, 앱 이탈 경로를 확인합니다.","화면 고정 상태와 런처 제한 상태를 점검합니다.","앱탈출 경로는 고객에게 상세 안내하지 않도록 주의합니다."],"tags":["앱탈출","접근제한","외부인터넷","화면고정","런처"]
-    },
-    {
-      "id":"remote-001","type":"technical","group":"remote","title":"원격 연결 (RemoteCall)","device":"공통","action":"점검","icon":"monitor","tone":"green","customer":"원격으로 봐주실 수 있나요?","summary":["고객 동의 후 리모트콜 접속 가능 상태를 확인합니다.","접속번호와 권한 허용 절차를 안내합니다.","개인정보 화면 노출에 주의하며 기능검사를 진행합니다."],"tags":["RemoteCall","원격점검","원격접속","권한","고객동의"]
-    },
-    {
-      "id":"remote-002","type":"technical","group":"remote","title":"Wink Test 기능 검사","device":"윙크봇","action":"점검","icon":"test","tone":"green","customer":"카메라, 마이크, 스피커 기능 확인이 필요해요","summary":["카메라, 마이크, 스피커, 터치 테스트 항목을 순서대로 확인합니다.","오류 메시지 발생 시 재부팅 후 재현 여부를 봅니다.","불량 의심 시 증상 영상과 검사 결과를 이력에 남깁니다."],"tags":["WinkTest","기능검사","카메라","마이크","터치테스트"]
-    },
-    {
-      "id":"device-001","type":"technical","group":"device","title":"레노버 기본 참고사항","device":"레노버","action":"기타","icon":"settings","tone":"primary","customer":"레노버 기기 기본 정보를 확인하고 싶어요","summary":["모델명, OS버전, 사용 환경을 먼저 확인합니다.","캐츠잉글리시 또는 학습기 명칭 기준으로 안내합니다.","스탠딩 커버, 터치펜 등 구성품 확인이 필요한 경우 별도 안내합니다."],"tags":["레노버","모델명","OS버전","기본정보","구성품"]
-    },
-    {
-      "id":"admin-001","type":"technical","group":"admin","title":"공감센터 학습기 제어 기능","device":"교사PC","action":"기타","icon":"user","tone":"orange","customer":"공감센터에서 학습기 상태를 어떻게 확인하나요?","summary":["학습기 연결상태와 배터리 잔량을 확인합니다.","프리 다운로드, 메모리정리, 앱 고정해제 기능을 구분합니다.","원격지원앱, Wink Test, 속도측정 실행 기능을 업무용으로 활용합니다."],"tags":["공감센터","학습기제어","학생앱고정해제","메모리정리","관리자"]
-    },
-    {
-      "id":"trial-001","type":"general","group":"trial","title":"무료체험 신청 방법 및 프로세스","device":"공통","action":"안내","icon":"chat","tone":"primary","customer":"무료체험 어떻게 신청하나요?","summary":["홈페이지, 앱, 문자 링크 등 신청 경로를 확인합니다.","연령 기준과 기존 체험 이력 여부를 확인합니다.","체험 신청 후 해피콜, 배송, 로그인 기준 7일 체험 흐름을 안내합니다."],"tags":["무료체험","체험신청","연령기준","해피콜","7일체험"]
-    },
-    {
-      "id":"product-001","type":"general","group":"product","title":"윙크 학습 종류 및 비용","device":"공통","action":"안내","icon":"book","tone":"green","customer":"상품 종류랑 비용이 궁금해요","summary":["종합반, 엄마표, 베이직, 단과 등 상품 구분을 확인합니다.","상세 금액과 프로모션은 최신 기준 확인 후 안내합니다.","상담이 필요한 경우 담당 선생님께 연결합니다."],"tags":["상품안내","학습비용","종합반","엄마표","베이직"]
-    },
-    {
-      "id":"payment-001","type":"general","group":"payment","title":"결제 카드 변경 / ARS 결제","device":"공통","action":"기준","icon":"payment","tone":"orange","customer":"카드를 바꾸고 싶어요, 결제가 안 돼요","summary":["학부모앱 또는 홈페이지 결제 가능 여부를 먼저 확인합니다.","카드 명의자와 휴대폰 명의자 일치 여부를 확인합니다.","불일치 또는 앱카드 이슈는 ARS/가상계좌 결제 가능 여부를 안내합니다."],"tags":["결제관리","카드변경","ARS결제","가상계좌","명의자"]
-    },
-    {
-      "id":"cancel-001","type":"general","group":"cancel","title":"유료학습 해지 상담요청","device":"공통","action":"이관","icon":"return","tone":"red","customer":"해지하고 싶어요","summary":["해지 사유를 탐색하고 상담이력을 작성합니다.","위약금 확답은 하지 않고 정확한 해지 상담을 받을 수 있도록 안내합니다.","해지 상담요청으로 담당 선생님 또는 유지부서에 이관합니다."],"tags":["해지","환불","청약철회","위약금","이관"]
-    },
-    {
-      "id":"shipping-001","type":"general","group":"shipping","title":"배송 상태 / 배송지 변경","device":"공통","action":"접수","icon":"delivery","tone":"primary","customer":"배송 언제 오나요? 주소를 바꾸고 싶어요","summary":["배송전, 배송중, 배송완료 상태를 먼저 확인합니다.","운송장 출력 전이면 시스템에서 주소 변경 가능 여부를 확인합니다.","운송장 출력 이후에는 택배사 연락 또는 수취거부 후 재배송을 안내합니다."],"tags":["배송조회","주소변경","운송장","출고","택배"]
-    },
-    {
-      "id":"parts-001","type":"general","group":"parts","title":"교재 / 구성품 추가구매","device":"공통","action":"접수","icon":"box","tone":"green","customer":"교재나 충전기 추가 구매 가능한가요?","summary":["정회원/체험회원 여부와 구매 가능 품목을 확인합니다.","등록 카드 결제 또는 대표계좌 입금 방식을 안내합니다.","입금 확인 또는 결제 후 추가배송 이슈를 생성합니다."],"tags":["교재","구성품","추가구매","충전기","터치펜"]
-    },
-    {
-      "id":"study-001","type":"general","group":"study","title":"단계 및 회차 변경","device":"공통","action":"이관","icon":"calendar","tone":"purple","customer":"단계를 바꾸고 싶어요, 진도가 안 맞아요","summary":["단계/회차 변경 요청 사유를 확인합니다.","직접 변경 권한이 없음을 안내하고 담당교사 상담으로 이관합니다.","변경 가능 시점과 재변경 제한 기준을 확인하도록 안내합니다."],"tags":["단계변경","회차변경","진도","담당교사","이관"]
-    },
-    {
-      "id":"benefit-001","type":"general","group":"benefit","title":"하트적립금 지급 기준","device":"공통","action":"기준","icon":"star","tone":"orange","customer":"하트 모으면 어디로 적립돼요? 기프티콘 받을 수 있나요?","summary":["하트 획득 기준과 월 최대 적립 기준을 확인합니다.","아이 명의 계좌 등록 여부와 적립일을 안내합니다.","기프티콘/사은품 방식과 현금 적립 방식의 적용 시점을 구분합니다."],"tags":["하트적립금","하트스티커","아이계좌","기프티콘","리워드"]
-    },
-    {
-      "id":"benefit-002","type":"general","group":"benefit","title":"지인추천 이벤트 혜택 기준","device":"공통","action":"기준","icon":"star","tone":"orange","customer":"지인추천하면 혜택 있나요?","summary":["추천인과 피추천인의 가입 상태 및 신청 경로를 확인합니다.","사은품과 결제 2회차 할인 적용 조건을 구분합니다.","월별 이벤트 변경 사항은 그룹웨어/담당부서 기준으로 확인합니다."],"tags":["지인추천","추천인","피추천인","사은품","2만원할인"]
-    },
-    {
-      "id":"system-001","type":"general","group":"system","title":"상담요청 이관 기본 절차","device":"교사PC","action":"이관","icon":"settings","tone":"purple","customer":"담당 선생님께 연결해주세요","summary":["상담유형과 이관 사유를 정확히 선택합니다.","고객 요청사항과 확인한 내용을 짧고 명확하게 이력에 남깁니다.","급건/강성/부서 확인 필요 건은 지정 채널 기준에 맞춰 전달합니다."],"tags":["상담요청","이관","공감센터","자마드","상담이력"]
+      "id": "dashboard",
+      "label": "점검 현황",
+      "icon": "chart"
     }
   ],
-  "quickMessages": [
-    {"title":"담당부서 확인 안내","text":"확인 후 담당부서 답변이 오는 대로 안내드리겠습니다."},
-    {"title":"원격점검 안내","text":"정확한 확인을 위해 원격점검으로 기기 상태를 함께 확인해보겠습니다."},
-    {"title":"배송 확인 안내","text":"출고 및 배송 상태 확인 후 안내드리겠습니다."},
-    {"title":"상담 이관 안내","text":"자세한 상담을 받아보실 수 있도록 담당 선생님께 전달드리겠습니다."}
+  "guideCards": [
+    {
+      "title": "Wi-Fi 저장됨 / 연결 실패",
+      "category": "와이파이 / 네트워크 · 윙크봇",
+      "group": "wifi",
+      "device": "윙크봇",
+      "icon": "wifi"
+    },
+    {
+      "title": "Wi-Fi 저장됨 / 다음 화면 미진입",
+      "category": "와이파이 / 네트워크 · 윙크스쿨",
+      "group": "wifi",
+      "device": "윙크스쿨",
+      "icon": "wifi"
+    },
+    {
+      "title": "학부모앱 네트워크 오류",
+      "category": "와이파이 / 네트워크 · 학부모앱",
+      "group": "wifi",
+      "device": "학부모앱",
+      "icon": "wifi"
+    },
+    {
+      "title": "일반 패드 네트워크 점검",
+      "category": "와이파이 / 네트워크 · 기타 패드",
+      "group": "wifi",
+      "device": "기타 패드",
+      "icon": "shield"
+    },
+    {
+      "title": "전원 불량 / 충전 미진행",
+      "category": "전원 / 충전 / 화면 · 윙크봇",
+      "group": "power",
+      "device": "윙크봇",
+      "icon": "power"
+    },
+    {
+      "title": "충전 중 꺼짐 / 화면 무반응",
+      "category": "전원 / 충전 / 화면 · 윙크스쿨",
+      "group": "power",
+      "device": "윙크스쿨",
+      "icon": "power"
+    },
+    {
+      "title": "앱 화면 멈춤 / 검은 화면",
+      "category": "전원 / 충전 / 화면 · 학부모앱",
+      "group": "power",
+      "device": "학부모앱",
+      "icon": "screen"
+    },
+    {
+      "title": "기타 패드 화면/충전 점검",
+      "category": "전원 / 충전 / 화면 · 기타 패드",
+      "group": "power",
+      "device": "기타 패드",
+      "icon": "screen"
+    },
+    {
+      "title": "앱 실행 오류 / 강제 종료",
+      "category": "앱 작동 / 업데이트 / 초기화 · 윙크봇",
+      "group": "app",
+      "device": "윙크봇",
+      "icon": "app"
+    },
+    {
+      "title": "업데이트 실패 / 초기화 필요",
+      "category": "앱 작동 / 업데이트 / 초기화 · 윙크스쿨",
+      "group": "app",
+      "device": "윙크스쿨",
+      "icon": "sync"
+    },
+    {
+      "title": "학부모앱 로그인 / 실행 오류",
+      "category": "앱 작동 / 업데이트 / 초기화 · 학부모앱",
+      "group": "app",
+      "device": "학부모앱",
+      "icon": "app"
+    },
+    {
+      "title": "무료체험 접수 / 회수 안내",
+      "category": "일반 업무 가이드 · 무료체험",
+      "group": "work",
+      "device": "무료체험",
+      "icon": "general"
+    },
+    {
+      "title": "결제관리 / 카드 변경",
+      "category": "일반 업무 가이드 · 결제관리",
+      "group": "work",
+      "device": "결제관리",
+      "icon": "payment"
+    },
+    {
+      "title": "배송조회 / 출고 일정",
+      "category": "일반 업무 가이드 · 배송조회",
+      "group": "work",
+      "device": "배송조회",
+      "icon": "delivery"
+    },
+    {
+      "title": "해지 / 환불 문의 대응",
+      "category": "일반 업무 가이드 · 해지/환불",
+      "group": "work",
+      "device": "해지/환불",
+      "icon": "service"
+    }
   ]
 }

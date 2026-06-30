@@ -7,37 +7,25 @@
   <title>단비공감팀 상담가이드</title>
   <link rel="stylesheet" href="./style.css" />
 </head>
-<body class="sidebar-collapsed">
+<body>
   <div class="app-shell">
-    <aside class="sidebar" id="sidebar" aria-label="상담 카테고리 메뉴">
-      <div class="brand-row">
-        <button class="brand-button" id="brandHome" type="button" aria-label="홈으로 이동">
-          <span class="brand-mark" aria-hidden="true"></span>
-          <span class="brand-text">단비공감팀 상담가이드</span>
-        </button>
-        <button class="sidebar-toggle" id="sidebarToggle" type="button" aria-label="사이드바 펼치기">
-          <span aria-hidden="true">›</span>
-        </button>
+    <aside class="sidebar" aria-label="상담 카테고리 메뉴">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true"></div>
+        <strong>단비공감팀 상담가이드</strong>
       </div>
 
-      <label class="sidebar-search" aria-label="좌측 가이드 검색">
-        <span aria-hidden="true">⌕</span>
-        <input id="sideSearch" type="search" placeholder="가이드 검색" autocomplete="off" />
-      </label>
+      <nav class="nav" id="mainNav" aria-label="증상 및 기기별 상담 메뉴"></nav>
 
-      <div class="menu-tools" aria-label="메뉴 펼치기 접기">
-        <button id="expandAll" type="button">펼치기</button>
-        <span aria-hidden="true">·</span>
-        <button id="collapseAll" type="button">접기</button>
-      </div>
-
-      <nav class="nav" id="mainNav" aria-label="상담 메뉴"></nav>
-
-      <div class="sidebar-bottom">
-        <button class="icon-only-button" id="sidebarSettings" type="button" aria-label="설정">
-          <span aria-hidden="true">⚙</span>
-          <span class="nav-text">설정</span>
-        </button>
+      <div class="sidebar-footer">
+        <div class="update-card">
+          <span class="update-icon" aria-hidden="true">↻</span>
+          <div>
+            <strong>가이드 업데이트</strong>
+            <small id="lastUpdateText">CSV 연결 대기</small>
+          </div>
+          <span class="update-arrow" aria-hidden="true">›</span>
+        </div>
       </div>
     </aside>
 
@@ -45,17 +33,12 @@
       <header class="topbar">
         <label class="top-search" aria-label="통합 검색">
           <span aria-hidden="true">⌕</span>
-          <input id="globalSearch" type="search" placeholder="검색: 증상, 기기, 점검 항목, 처리 방법" autocomplete="off" />
-          <kbd aria-hidden="true">⌘K</kbd>
+          <input id="globalSearch" type="search" placeholder="검색: 증상, 기기, 점검 종류, 처리자" autocomplete="off" />
+          <kbd>⌘ K</kbd>
         </label>
-
         <div class="top-actions">
-          <button class="theme-switch" id="themeToggle" type="button" aria-label="라이트/다크 모드 전환">
-            <span class="theme-option sun" aria-hidden="true">☀</span>
-            <span class="theme-label light">라이트</span>
-            <span class="switch-track"><span class="switch-knob"></span></span>
-            <span class="theme-option moon" aria-hidden="true">☾</span>
-            <span class="theme-label dark">다크</span>
+          <button class="theme-toggle" id="themeToggle" type="button" aria-label="라이트/다크 모드 전환">
+            <span class="sun" aria-hidden="true">☀</span><span id="themeLabel">Light</span>
           </button>
         </div>
       </header>
@@ -63,7 +46,7 @@
       <section class="page" id="pageRoot">
         <div class="loading-card">
           <span class="spinner" aria-hidden="true"></span>
-          <p>상담 가이드를 불러오는 중입니다.</p>
+          <p>점검 데이터를 불러오는 중입니다.</p>
         </div>
       </section>
     </main>
