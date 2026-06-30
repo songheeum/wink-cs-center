@@ -3,55 +3,63 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="color-scheme" content="light dark" />
   <title>단비공감팀 상담가이드</title>
   <link rel="stylesheet" href="./style.css" />
 </head>
 <body>
   <div class="app-shell">
-    <aside class="sidebar" aria-label="상담 카테고리 메뉴">
+    <aside class="sidebar" aria-label="좌측 메뉴">
       <div class="brand">
         <div class="brand-mark" aria-hidden="true"></div>
         <strong>단비공감팀 상담가이드</strong>
       </div>
 
-      <nav class="nav" id="mainNav" aria-label="증상 및 기기별 상담 메뉴"></nav>
+      <nav class="nav" id="mainNav"></nav>
+
+      <div class="nav-section">
+        <p class="nav-section-title">상담 유형</p>
+        <button class="nav-item sub"><span class="ico">◌</span>기술상담</button>
+        <button class="nav-item sub"><span class="ico">◌</span>일반상담</button>
+      </div>
 
       <div class="sidebar-footer">
         <div class="update-card">
-          <span class="update-icon" aria-hidden="true">↻</span>
+          <span class="ico">▣</span>
           <div>
             <strong>가이드 업데이트</strong>
             <small id="lastUpdateText">CSV 연결 대기</small>
           </div>
-          <span class="update-arrow" aria-hidden="true">›</span>
+          <span>›</span>
         </div>
       </div>
     </aside>
 
     <main class="workspace">
       <header class="topbar">
-        <label class="top-search" aria-label="통합 검색">
-          <span aria-hidden="true">⌕</span>
-          <input id="globalSearch" type="search" placeholder="검색: 증상, 기기, 점검 종류, 처리자" autocomplete="off" />
+        <div class="top-search">
+          <span>⌕</span>
+          <input id="globalSearch" type="search" placeholder="검색: 상담 주제, 증상, 점검 종류, 처리자" autocomplete="off" />
           <kbd>⌘ K</kbd>
-        </label>
+        </div>
         <div class="top-actions">
-          <button class="theme-toggle" id="themeToggle" type="button" aria-label="라이트/다크 모드 전환">
-            <span class="sun" aria-hidden="true">☀</span><span id="themeLabel">Light</span>
+          <button class="theme-toggle" id="themeToggle" type="button" aria-label="라이트/다크 전환">
+            <span class="sun">☀</span><span id="themeLabel">Light</span>
           </button>
+          <button class="icon-btn" type="button" title="알림">♢</button>
+          <button class="profile-btn" type="button">단비</button>
         </div>
       </header>
 
       <section class="page" id="pageRoot">
         <div class="loading-card">
-          <span class="spinner" aria-hidden="true"></span>
+          <span class="spinner"></span>
           <p>점검 데이터를 불러오는 중입니다.</p>
         </div>
       </section>
     </main>
   </div>
 
+  <template id="iconTemplate"></template>
   <script src="./app.js" defer></script>
 </body>
 </html>
