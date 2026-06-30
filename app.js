@@ -13,10 +13,32 @@ const fmt = (n) => Number(n || 0).toLocaleString('ko-KR');
 const pct = (value, total) => total ? `${((value / total) * 100).toFixed(1)}%` : '0.0%';
 const clean = (v) => String(v ?? '').replace(/\r/g, '').trim();
 
+
+const TOSS_CHART_COLORS = ['#3182f6', '#5da2ff', '#8bc0ff', '#b9d7ff'];
+const GOOGLE_CHART_OPTIONS = {
+  animation: { startup: true, duration: 1000, easing: 'out' },
+  backgroundColor: 'transparent',
+  colors: TOSS_CHART_COLORS,
+  fontName: 'Pretendard',
+  legend: { position: 'none', textStyle: { color: '#6b7684', fontSize: 12 } },
+  chartArea: { left: 40, top: 24, right: 24, bottom: 42, width: '84%', height: '72%' },
+  hAxis: {
+    textStyle: { color: '#6b7684', fontSize: 12 },
+    gridlines: { color: '#edf1f5' },
+    baselineColor: '#e5e8eb'
+  },
+  vAxis: {
+    textStyle: { color: '#6b7684', fontSize: 12 },
+    gridlines: { color: '#edf1f5' },
+    baselineColor: '#e5e8eb'
+  }
+};
+window.DANBI_GOOGLE_CHART_OPTIONS = GOOGLE_CHART_OPTIONS;
+
 const ICONS = {
-  home: '⌂', book: '▤', chart: '▥', note: '▧', star: '☆',
+  home: '⌂', chart: '▥',
   sync: '↻', wifi: '◉', app: '⌘', video: '▣', keyboard: '⌨', shield: '◇',
-  message: '☷', image: '▧', file: '▦', default: '•'
+  default: '•'
 };
 
 init();
@@ -31,10 +53,12 @@ async function init() {
     render();
   } catch (error) {
     console.error(error);
+    const detail = error?.message ? escapeAttr(error.message) : '알 수 없는 오류';
     $('#pageRoot').innerHTML = `
       <div class="empty-state">
         <h2>데이터를 불러오지 못했습니다.</h2>
-        <p>app.json의 CSV 주소와 구글시트 공개 설정을 확인해주세요.</p>
+        <p>app.json 경로, CSV 공개 설정, GitHub 업로드 위치를 확인해주세요.</p>
+        <p class="safe-note"><strong>오류 상세:</strong> ${detail}</p>
       </div>`;
   }
 }
@@ -46,24 +70,36 @@ async function fetchJson(url) {
 }
 
 async function loadData() {
-  let table;
-  let firstError = null;
+  const errors = [];
+  let table = null;
 
+  // GitHub Pages에서 Google Sheets CSV fetch는 CORS 정책 때문에 실패할 수 있습니다.
+  // 그래서 Google Visualization JSONP 방식을 먼저 사용하고, 실패 시 CSV fetch를 보조로 시도합니다.
   try {
-    table = await loadCsvViaFetch(state.config.csvUrl);
-  } catch (error) {
-    firstError = error;
-    console.warn('CSV fetch failed. Trying Google Visualization JSONP fallback.', error);
     table = await loadCsvViaGvizJsonp(state.config.csvUrl);
+  } catch (error) {
+    errors.push(`GViz: ${error.message}`);
+    console.warn('Google Visualization JSONP failed. Trying direct CSV fetch.', error);
+  }
+
+  if (!table) {
+    try {
+      table = await loadCsvViaFetch(state.config.csvUrl);
+    } catch (error) {
+      errors.push(`CSV fetch: ${error.message}`);
+      console.warn('Direct CSV fetch failed.', error);
+    }
+  }
+
+  if (!table) {
+    throw new Error(errors.join(' / ') || 'CSV table load failed');
   }
 
   try {
     hydrateRowsFromTable(table);
   } catch (error) {
-    if (firstError) {
-      console.warn('Original CSV fetch error was:', firstError);
-    }
-    throw error;
+    errors.push(`Data parse: ${error.message}`);
+    throw new Error(errors.join(' / '));
   }
 }
 
@@ -75,28 +111,44 @@ async function loadCsvViaFetch(csvUrl) {
 }
 
 function hydrateRowsFromTable(table) {
-  const headerIndex = table.findIndex(row =>
+  if (!Array.isArray(table) || !table.length) {
+    throw new Error('CSV/GViz table is empty');
+  }
+
+  const publicHeaders = getPublicHeaders();
+  let headerIndex = table.findIndex(row =>
     row.some(cell => clean(cell).includes('접수일')) &&
     row.some(cell => clean(cell).includes('상태'))
   );
 
-  if (headerIndex < 0) {
-    console.error('CSV/GViz table preview:', table.slice(0, 5));
-    throw new Error('CSV header row not found');
+  let headers;
+  let rawRows;
+
+  if (headerIndex >= 0) {
+    headers = table[headerIndex].map(clean);
+    rawRows = table.slice(headerIndex + 1);
+  } else {
+    // Google Visualization이 헤더를 label로 넘기지 못하는 경우를 대비해
+    // 공개용 CSV의 확정 컬럼 순서를 기준으로 해석합니다.
+    console.warn('CSV header row not found. Using public sheet column order fallback.', table.slice(0, 5));
+    headers = publicHeaders;
+    rawRows = table;
   }
 
-  const headers = table[headerIndex].map(clean);
-  const dataRows = table
-    .slice(headerIndex + 1)
-    .filter(row => clean(row[0]) || clean(row[4]) || clean(row[9]) || clean(row[11]));
-
   const col = buildColumnMap(headers);
+  const requiredIndexes = [col.receivedAt, col.type, col.symptom, col.handler, col.status].filter(index => index >= 0);
+  const dataRows = rawRows.filter(row => requiredIndexes.some(index => clean(row[index])));
+
   const privateIndexes = new Set(state.config.privacy.privateColumnIndexes || []);
   const privateNames = state.config.privacy.privateColumnNames || [];
 
   state.rows = dataRows
     .map(row => normalizeRow(row, headers, col, privateIndexes, privateNames))
     .filter(Boolean);
+
+  if (!state.rows.length) {
+    throw new Error('No usable dashboard rows found');
+  }
 
   const latestDate = maxDate(state.rows.map(r => r.receivedAt));
   $('#lastUpdateText').textContent = latestDate ? `${formatDate(latestDate)} 기준` : 'CSV 연결 완료';
@@ -108,13 +160,11 @@ function loadCsvViaGvizJsonp(csvUrl) {
     const script = document.createElement('script');
     let settled = false;
 
-    const cleanup = () => {
-      settled = true;
-      delete window[callbackName];
-      script.remove();
-    };
+    const previousGoogle = window.google;
+    const previousCallback = window[callbackName];
 
-    window[callbackName] = (payload) => {
+    const finish = (payload) => {
+      if (settled) return;
       try {
         if (!payload || payload.status === 'error') {
           const message = payload?.errors?.map(err => err.detailed_message || err.message).join(' / ') || 'Google Visualization response error';
@@ -128,6 +178,24 @@ function loadCsvViaGvizJsonp(csvUrl) {
         reject(error);
       }
     };
+
+    const cleanup = () => {
+      settled = true;
+      if (previousCallback) window[callbackName] = previousCallback;
+      else delete window[callbackName];
+      if (previousGoogle) window.google = previousGoogle;
+      else delete window.google;
+      script.remove();
+    };
+
+    window[callbackName] = finish;
+
+    // Google이 responseHandler 대신 기본 google.visualization.Query.setResponse로
+    // 응답하는 경우도 있어 둘 다 받도록 방어합니다.
+    window.google = window.google || {};
+    window.google.visualization = window.google.visualization || {};
+    window.google.visualization.Query = window.google.visualization.Query || {};
+    window.google.visualization.Query.setResponse = finish;
 
     script.onerror = () => {
       if (!settled) {
@@ -165,7 +233,11 @@ function gvizPayloadToTable(payload) {
     throw new Error('Google Visualization table format is invalid');
   }
 
-  const headers = table.cols.map((col, index) => clean(col.label || col.id || `col${index + 1}`));
+  const expected = getPublicHeaders();
+  const labels = table.cols.map((col, index) => clean(col.label || col.id || ''));
+  const hasUsableLabels = labels.some(label => label.includes('접수일')) && labels.some(label => label.includes('상태'));
+  const headers = hasUsableLabels ? labels : expected.slice(0, Math.max(expected.length, table.cols.length));
+
   const rows = table.rows.map(row => headers.map((_, index) => {
     const cell = row.c?.[index];
     if (!cell) return '';
@@ -218,12 +290,27 @@ function parseCSV(text) {
   return rows;
 }
 
+function getPublicHeaders() {
+  return ['접수일', '접수 출처', '점검 종류', '증상', '처리자', '처리일', '시작시간', '종료시간', '소요시간', '상태'];
+}
+
 function buildColumnMap(headers) {
-  const find = (keyword) => headers.findIndex(h => h.includes(keyword));
+  const find = (keyword, fallbackIndex) => {
+    const index = headers.findIndex(h => clean(h).includes(keyword));
+    return index >= 0 ? index : fallbackIndex;
+  };
+
   return {
-    receivedAt: find('접수일'), source: find('접수 출처'), type: find('점검 종류'), symptom: find('증상'),
-    handler: find('처리자'), processedAt: find('처리일'), start: find('시작시간'), end: find('종료시간'),
-    duration: find('소요시간'), status: find('상태')
+    receivedAt: find('접수일', 0),
+    source: find('접수 출처', 1),
+    type: find('점검 종류', 2),
+    symptom: find('증상', 3),
+    handler: find('처리자', 4),
+    processedAt: find('처리일', 5),
+    start: find('시작시간', 6),
+    end: find('종료시간', 7),
+    duration: find('소요시간', 8),
+    status: find('상태', 9)
   };
 }
 
@@ -353,6 +440,31 @@ function applyFilters() {
 function render() {
   if (state.view === 'detail') renderDetail();
   else renderHome();
+  bindHeroSearch();
+  animateMountedContent();
+}
+
+function animateMountedContent() {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const items = $$('#pageRoot .hero, #pageRoot .card, #pageRoot .detail-header, #pageRoot .notice');
+  requestAnimationFrame(() => {
+    items.forEach((item, index) => {
+      item.classList.remove('motion-item');
+      item.style.setProperty('--motion-delay', `${Math.min(index * 55, 660)}ms`);
+      void item.offsetWidth;
+      item.classList.add('motion-item');
+    });
+  });
+}
+
+function cssPct(value, total, min = 0) {
+  if (!total) return `${min}%`;
+  const number = Math.max(min, Math.min(100, (value / total) * 100));
+  return `${number.toFixed(2)}%`;
+}
+
+function barDelay(index) {
+  return `${Math.min(index * 70, 560)}ms`;
 }
 
 function getStats(rows) {
@@ -400,7 +512,7 @@ function renderHome() {
               <h2 style="color:var(--primary)">${pct(stats.completed, stats.total)}</h2>
             </div>
           </div>
-          <div class="progress"><span style="width:${pct(stats.completed, stats.total)}"></span></div>
+          <div class="progress"><span style="--value:${cssPct(stats.completed, stats.total)}"></span></div>
           <div class="kpi-grid">
             ${kpi('완료', stats.completed, pct(stats.completed, stats.total), 'done')}
             ${kpi('취소', stats.canceled, pct(stats.canceled, stats.total), 'cancel')}
@@ -422,7 +534,6 @@ function renderHome() {
         ${miniInsight('처리자 현황', topHandlers)}
       </section>
       ${guideSectionTemplate()}
-      ${quickSectionTemplate()}
       <div class="notice">✓ 가이드는 지속적으로 업데이트됩니다. 최신 정보 확인으로 정확한 상담을 지원해주세요.</div>
     </section>
     ${rightRailTemplate(rows)}
@@ -494,7 +605,7 @@ function renderDetail() {
         </div>
         <button class="primary-btn" id="backHome">홈으로</button>
       </div>
-      ${filterBarTemplate(rows)}
+      ${filterBarTemplate()}
       <section class="kpi-grid">
         ${kpi('총 점검', stats.total, '건', 'total')}
         ${kpi('완료', stats.completed, pct(stats.completed, stats.total), 'done')}
@@ -522,7 +633,7 @@ function renderDetail() {
       </section>
       <section class="analysis-grid">
         ${recentTableCard(rows.slice(0, 12))}
-        ${guideSectionTemplate(true)}
+        ${guideSectionTemplate()}
       </section>
       <div class="notice">보안 기준: D열 자마드 주소, F열 메모, M열 특이사항은 화면/검색/상세 테이블에서 제외됩니다.</div>
     </section>
@@ -536,7 +647,7 @@ function renderDetail() {
   bindFilters();
 }
 
-function filterBarTemplate(rows) {
+function filterBarTemplate() {
   const allRows = state.rows;
   return `
     <div class="filter-bar card pad">
@@ -570,7 +681,6 @@ function statusDot(type) {
 function donutTemplate(done, canceled, etc, total) {
   const donePct = total ? done / total * 100 : 0;
   const cancelPct = total ? canceled / total * 100 : 0;
-  const etcPct = 100 - donePct - cancelPct;
   return `
     <div class="donut-wrap">
       <div class="donut" style="background:conic-gradient(var(--primary) 0 ${donePct}%, var(--red) ${donePct}% ${donePct + cancelPct}%, var(--faint) ${donePct + cancelPct}% 100%)">
@@ -592,20 +702,14 @@ function miniInsight(title, entries) {
 function barCard(title, entries, total) {
   const max = Math.max(...entries.map(e => e[1]), 1);
   return `<article class="card pad"><div class="card-title"><h2>${title}</h2><small>총 ${fmt(total)}건</small></div>
-    <div class="bar-list">${entries.map(([name, count]) => `
-      <div class="bar-row"><strong>${name}</strong><div class="bar-track"><div class="bar-fill" style="width:${count / max * 100}%"></div></div><span class="bar-value">${fmt(count)}</span></div>`).join('')}</div></article>`;
+    <div class="bar-list">${entries.map(([name, count], index) => `
+      <div class="bar-row"><strong>${name}</strong><div class="bar-track"><div class="bar-fill" style="--value:${cssPct(count, max)};--bar-delay:${barDelay(index)}"></div></div><span class="bar-value">${fmt(count)}</span></div>`).join('')}</div></article>`;
 }
 
-function guideSectionTemplate(compact = false) {
+function guideSectionTemplate() {
   return `<section class="card pad"><div class="card-title"><h2>자주 찾는 가이드</h2><button class="link-btn">전체 보기 ›</button></div>
     <div class="three-col">${state.config.guideCards.map(card => `
       <div class="guide-card"><span class="tile-icon">${ICONS[card.icon] || ICONS.default}</span><div><strong>${card.title}</strong><small>${card.category}</small></div><span class="arrow">›</span></div>`).join('')}</div></section>`;
-}
-
-function quickSectionTemplate() {
-  return `<section class="card pad"><div class="card-title"><h2>빠른 실행</h2><button class="link-btn">전체 보기 ›</button></div>
-    <div class="three-col" style="grid-template-columns:repeat(4,1fr)">${state.config.quickActions.map(action => `
-      <div class="quick-card"><span class="tile-icon">${ICONS[action.icon] || ICONS.default}</span><div><strong>${action.title}</strong><small>${action.description}</small></div><span class="arrow">›</span></div>`).join('')}</div></section>`;
 }
 
 function rightRailTemplate(rows) {
@@ -647,7 +751,7 @@ function buildMonthly(rows) {
 function monthlyChartCard(monthly) {
   const max = Math.max(...monthly.map(m => m.total), 1);
   return `<article class="card pad"><div class="card-title"><h2>월별 점검 추이</h2><small>접수일 기준</small></div>
-    <div class="month-chart">${monthly.map(m => `<div class="month-bar"><i style="height:${Math.max(4, m.total / max * 100)}%"></i><span>${m.month.slice(5)}</span></div>`).join('')}</div></article>`;
+    <div class="month-chart">${monthly.map((m, index) => `<div class="month-bar"><i style="--value:${cssPct(m.total, max, 4)};--bar-delay:${barDelay(index)}"></i><span>${m.month.slice(5)}</span></div>`).join('')}</div></article>`;
 }
 
 function monthlyStackedCard(monthly) {
@@ -655,7 +759,7 @@ function monthlyStackedCard(monthly) {
   const colors = ['var(--primary)', 'var(--green)', 'var(--orange)', 'var(--purple)'];
   return `<article class="card pad"><div class="card-title"><h2>월별 카테고리 추이</h2><small>주요 4개</small></div>
     ${monthly.map(m => `<div class="stacked-month"><strong>${m.month}</strong><div class="stacked-track">
-      ${categoryNames.map((cat, i) => `<span class="seg" style="width:${pct(m.categories[cat] || 0, m.total)};background:${colors[i]}"></span>`).join('')}
+      ${categoryNames.map((cat, i) => `<span class="seg" style="--value:${cssPct(m.categories[cat] || 0, m.total)};background:${colors[i]};--bar-delay:${barDelay(i)}"></span>`).join('')}
     </div><span class="bar-value">${fmt(m.total)}</span></div>`).join('')}
     <p class="safe-note">교사 / 네트워크 / 하드웨어 / 콘텐츠 중심으로 비교합니다.</p>
   </article>`;
@@ -685,12 +789,7 @@ function buildDurationStats(rows) {
     const sum = list.reduce((acc, r) => acc + r.durationMin, 0);
     return { name: handler, count: list.length, total: sum, avg: list.length ? sum / list.length : 0 };
   }).sort((a,b) => b.total - a.total);
-  const byType = sortedKeys(countBy(valid, r => r.type)).map(type => {
-    const list = valid.filter(r => r.type === type);
-    const sum = list.reduce((acc, r) => acc + r.durationMin, 0);
-    return { name: type, count: list.length, total: sum, avg: list.length ? sum / list.length : 0 };
-  }).sort((a,b) => b.count - a.count);
-  return { valid, byHandler, byType };
+  return { valid, byHandler };
 }
 
 function durationCard(durationStats, stats) {
@@ -728,8 +827,3 @@ function maxDate(dates) { const valid = dates.filter(d => /^\d{4}-\d{2}-\d{2}$/.
 function formatDate(date) { return date.replaceAll('-', '.'); }
 function escapeAttr(value) { return String(value ?? '').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
-const originalRender = render;
-render = function patchedRender() {
-  originalRender();
-  bindHeroSearch();
-};
