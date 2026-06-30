@@ -1,0 +1,131 @@
+{
+  "appName": "단비공감팀 상담가이드",
+  "csvUrl": "https://docs.google.com/spreadsheets/d/e/2PACX-1vTGdaw55jIrzBzL_Mg9Q-MbCgyqK-8oPrEsk32q8gT218vd6YHTJDPtep7vCPfFABzjGmuxokXI7f0t/pub?gid=1805165617&single=true&output=csv",
+  "privacy": {
+    "privateColumnIndexes": [],
+    "privateColumnNames": [
+      "자마드 주소",
+      "메모",
+      "특이사항"
+    ],
+    "visibleTableColumns": [
+      "접수일",
+      "접수 출처",
+      "점검 종류",
+      "증상",
+      "처리자",
+      "처리일",
+      "소요시간",
+      "상태"
+    ]
+  },
+  "statusRules": {
+    "completeIncludes": [
+      "처리완료"
+    ],
+    "cancelIncludes": [
+      "취소"
+    ],
+    "absenceIncludes": [
+      "부재"
+    ],
+    "blockedIncludes": [
+      "처리불가",
+      "종결"
+    ]
+  },
+  "home": {
+    "heroTitle": "상담 가이드를 빠르게 찾아보세요",
+    "heroDescription": "증상, 키워드, 고객 표현으로 검색하면 관련 가이드를 즉시 확인할 수 있습니다.",
+    "searchPlaceholder": "예: 동기화, 네트워크 끊김, 앱작동, 키보드, 단비폰",
+    "keywords": [
+      "동기화",
+      "네트워크",
+      "앱작동",
+      "키보드",
+      "단비폰",
+      "교사 PC"
+    ]
+  },
+  "navigation": [
+    {
+      "id": "home",
+      "label": "홈",
+      "icon": "home"
+    },
+    {
+      "id": "guide",
+      "label": "상담가이드",
+      "icon": "book"
+    },
+    {
+      "id": "dashboard",
+      "label": "점검 현황",
+      "icon": "chart"
+    },
+    {
+      "id": "note",
+      "label": "상담 정리",
+      "icon": "note"
+    },
+    {
+      "id": "favorite",
+      "label": "즐겨찾기",
+      "icon": "star"
+    }
+  ],
+  "guideCards": [
+    {
+      "title": "교사 _ 동기화",
+      "category": "기술상담 · 교사",
+      "icon": "sync"
+    },
+    {
+      "title": "네트워크 _ 끊김",
+      "category": "기술상담 · 네트워크",
+      "icon": "wifi"
+    },
+    {
+      "title": "교사 _ 앱작동",
+      "category": "기술상담 · 앱",
+      "icon": "app"
+    },
+    {
+      "title": "콘텐츠 _ 라이브클래스",
+      "category": "기술상담 · 콘텐츠",
+      "icon": "video"
+    },
+    {
+      "title": "하드웨어 _ 키보드",
+      "category": "기술상담 · 하드웨어",
+      "icon": "keyboard"
+    },
+    {
+      "title": "네트워크 _ 접속/인증",
+      "category": "기술상담 · 네트워크",
+      "icon": "shield"
+    }
+  ],
+  "quickActions": [
+    {
+      "title": "상담 정리 열기",
+      "description": "상담 내용을 정리하고 요약할 수 있어요.",
+      "icon": "message"
+    },
+    {
+      "title": "사진 요청 템플릿",
+      "description": "상황에 맞는 요청 멘트를 바로 사용해요.",
+      "icon": "image"
+    },
+    {
+      "title": "상담이력 템플릿",
+      "description": "자주 쓰는 템플릿을 빠르게 불러와요.",
+      "icon": "file"
+    },
+    {
+      "title": "점검 현황 보기",
+      "description": "인입 유형과 처리 현황을 확인해요.",
+      "icon": "chart"
+    }
+  ]
+}
