@@ -14,9 +14,17 @@ const pct = (value, total) => total ? `${((value / total) * 100).toFixed(1)}%` :
 const clean = (v) => String(v ?? '').replace(/\r/g, '').trim();
 
 const ICONS = {
-  home: '⌂', book: '▤', chart: '▥', note: '▧', star: '☆',
-  sync: '↻', wifi: '◉', app: '⌘', video: '▣', keyboard: '⌨', shield: '◇',
-  message: '☷', image: '▧', file: '▦', default: '•'
+  home: '⌂', book: '▤', chart: '◔', note: '✎', star: '☆',
+  sync: '↻', wifi: '◉', app: '⌘', video: '▷', keyboard: '⌨', shield: '⛉',
+  message: '✉', image: '▨', file: '▦', default: '•'
+};
+
+/* 카테고리별 고정 색상 (좌측 카테고리 · 도넛 보조 팔레트와 통일) */
+const CAT_COLORS = ['#5b5bd6', '#0fae7a', '#f59e0b', '#06b6d4', '#f43f5e', '#8b5cf6', '#ec4899', '#14b8a6', '#6366f1', '#84cc16'];
+const catColor = (name) => {
+  let h = 0;
+  for (let i = 0; i < String(name).length; i++) h = (h * 31 + name.charCodeAt(i)) >>> 0;
+  return CAT_COLORS[h % CAT_COLORS.length];
 };
 
 init();
@@ -351,8 +359,44 @@ function applyFilters() {
 }
 
 function render() {
+  renderSideCategories();
   if (state.view === 'detail') renderDetail();
   else renderHome();
+}
+
+/* 좌측 카테고리 — 전체 데이터 기준 상위 카테고리를 라이브로 표시.
+   클릭 시 기존 검색 경로를 그대로 사용한다(검색 로직 변경 없음). */
+function renderSideCategories() {
+  const host = $('#sideCategories');
+  if (!host) return;
+  const entries = topN(countBy(state.rows, r => r.category), 12).filter(([name]) => name && name !== '미분류');
+  const countEl = $('#sideCatCount');
+  if (countEl) countEl.textContent = entries.length ? `${entries.length}` : '';
+
+  if (!entries.length) {
+    host.innerHTML = '<p class="cat-empty">표시할 카테고리가 없습니다</p>';
+    return;
+  }
+  const max = Math.max(...entries.map(e => e[1]), 1);
+  host.innerHTML = entries.map(([name, count]) => {
+    const color = catColor(name);
+    const active = state.search && name.includes(state.search) ? ' aria-current="true"' : '';
+    return `<button class="cat-row" data-cat="${escapeAttr(name)}"${active}>
+        <span class="cat-dot" style="background:${color}"></span>
+        <span class="cat-name">${name}</span>
+        <span class="cat-count">${fmt(count)}</span>
+        <span class="cat-meter"><i style="width:${Math.max(6, count / max * 100)}%;background:${color}"></i></span>
+      </button>`;
+  }).join('');
+
+  $$('.cat-row', host).forEach(btn => btn.addEventListener('click', () => {
+    const term = btn.dataset.cat;
+    state.search = state.search === term ? '' : term;
+    const gs = $('#globalSearch');
+    if (gs) gs.value = state.search;
+    applyFilters();
+    render();
+  }));
 }
 
 function getStats(rows) {
@@ -367,10 +411,9 @@ function getStats(rows) {
   const validDurations = rows.map(r => r.durationMin).filter(v => Number.isFinite(v) && v > 0);
   const avgDuration = validDurations.length ? validDurations.reduce((a,b) => a + b, 0) / validDurations.length : 0;
   const sortedDur = [...validDurations].sort((a,b) => a - b);
-  const medianDuration = sortedDur.length ? sortedDur[Math.floor(sortedDur.length / 2)] : 0;
   const maxDuration = sortedDur.length ? Math.max(...sortedDur) : 0;
 
-  return { total, completed, canceled, etc, latestMonth, thisMonthCount, validDurations, avgDuration, medianDuration, maxDuration };
+  return { total, completed, canceled, etc, latestMonth, thisMonthCount, validDurations, avgDuration, maxDuration };
 }
 
 function renderHome() {
@@ -384,35 +427,38 @@ function renderHome() {
     <section class="main-column">
       ${heroTemplate()}
       <section class="dashboard-overview">
-        <article class="card pad">
+        <article class="card pad summary-card">
           <div class="card-title">
             <div><h2>점검 운영 현황</h2><small>${stats.latestMonth ? `${stats.latestMonth} 기준 · ` : ''}D/F/M열 미노출 적용</small></div>
             <button class="link-btn" data-open-detail>전체 보기 ›</button>
           </div>
           <div class="summary-main">
             <div class="summary-icon">✓</div>
-            <div>
+            <div class="summary-text">
               <p>총 누적 점검</p>
-              <h2>${fmt(stats.total)}</h2>
+              <div class="summary-figure">${fmt(stats.total)}</div>
             </div>
-            <div style="margin-left:auto;text-align:right">
+            <div class="summary-rate">
               <p>완료율</p>
-              <h2 style="color:var(--primary)">${pct(stats.completed, stats.total)}</h2>
+              <div class="big">${pct(stats.completed, stats.total)}</div>
             </div>
           </div>
-          <div class="progress"><span style="width:${pct(stats.completed, stats.total)}"></span></div>
-          <div class="kpi-grid">
-            ${kpi('완료', stats.completed, pct(stats.completed, stats.total), 'done')}
-            ${kpi('취소', stats.canceled, pct(stats.canceled, stats.total), 'cancel')}
-            ${kpi('기타', stats.etc, pct(stats.etc, stats.total), 'etc')}
-            ${kpi('최근 월', stats.thisMonthCount, stats.latestMonth || '-', 'month')}
-            ${kpi('시간기록', stats.validDurations.length, '교사용 중심', 'time')}
-            ${kpi('평균소요', Math.round(stats.avgDuration), '분', 'avg')}
+          <div class="progress">
+            <span class="pg-done" style="width:${pct(stats.completed, stats.total)}"></span>
+            <span class="pg-cancel" style="width:${pct(stats.canceled, stats.total)}"></span>
+            <span class="pg-etc" style="width:${pct(stats.etc, stats.total)}"></span>
+          </div>
+          <div class="stat-pills">
+            <span class="stat-pill"><i style="background:var(--c-done)"></i>완료 <b>${fmt(stats.completed)}</b></span>
+            <span class="stat-pill"><i style="background:var(--c-cancel)"></i>취소 <b>${fmt(stats.canceled)}</b></span>
+            <span class="stat-pill"><i style="background:var(--c-etc)"></i>기타 <b>${fmt(stats.etc)}</b></span>
+            <span class="stat-pill"><i style="background:var(--c-time)"></i>시간기록 <b>${fmt(stats.validDurations.length)}</b></span>
+            <span class="stat-pill"><i style="background:var(--c-avg)"></i>평균 <b>${Math.round(stats.avgDuration)}분</b></span>
           </div>
           <p class="safe-note">※ 소요시간은 <strong>교사용 업무폰 및 PC 점검 건 중심</strong>으로 기록된 값입니다. 전체 점검 건 평균 처리시간으로 해석하지 않습니다.</p>
         </article>
-        <article class="card pad">
-          <div class="card-title"><h2>처리 상태 분포</h2><small>완료 / 취소 / 기타</small></div>
+        <article class="card pad donut-card">
+          <div class="card-title"><div><h3>처리 상태 분포</h3><small>완료 / 취소 / 기타</small></div></div>
           ${donutTemplate(stats.completed, stats.canceled, stats.etc, stats.total)}
         </article>
       </section>
@@ -423,11 +469,12 @@ function renderHome() {
       </section>
       ${guideSectionTemplate()}
       ${quickSectionTemplate()}
-      <div class="notice">✓ 가이드는 지속적으로 업데이트됩니다. 최신 정보 확인으로 정확한 상담을 지원해주세요.</div>
+      <div class="notice">가이드는 지속적으로 업데이트됩니다. 최신 정보 확인으로 정확한 상담을 지원해주세요.</div>
     </section>
     ${rightRailTemplate(rows)}
   `;
 
+  bindHeroSearch();
   $('[data-open-detail]').addEventListener('click', () => {
     state.view = 'detail';
     renderNav();
@@ -444,7 +491,8 @@ function heroTemplate() {
         <h1>${home.heroTitle}</h1>
         <p>${home.heroDescription}</p>
         <label class="hero-search">
-          <input id="heroSearch" type="search" placeholder="${home.searchPlaceholder}" value="${escapeAttr(state.search)}" />
+          <span class="si" aria-hidden="true">⌕</span>
+          <input id="heroSearch" type="search" placeholder="${escapeAttr(home.searchPlaceholder)}" value="${escapeAttr(state.search)}" />
           <button class="primary-btn" type="button" id="heroSearchButton">검색</button>
         </label>
         <div class="keyword-row">
@@ -452,7 +500,10 @@ function heroTemplate() {
           ${home.keywords.map(keyword => `<button class="chip" data-keyword="${escapeAttr(keyword)}">${keyword}</button>`).join('')}
         </div>
       </div>
-      <div class="hero-mini-visual">⌕</div>
+      <div class="hero-visual" aria-hidden="true">
+        <span class="ring"></span><span class="ring r2"></span>
+        <span class="glyph">⌕</span>
+      </div>
     </section>`;
 }
 
@@ -522,7 +573,7 @@ function renderDetail() {
       </section>
       <section class="analysis-grid">
         ${recentTableCard(rows.slice(0, 12))}
-        ${guideSectionTemplate(true)}
+        ${guideSectionTemplate()}
       </section>
       <div class="notice">보안 기준: D열 자마드 주소, F열 메모, M열 특이사항은 화면/검색/상세 테이블에서 제외됩니다.</div>
     </section>
@@ -560,33 +611,66 @@ function bindFilters() {
 }
 
 function kpi(label, value, sub, type) {
-  return `<div class="kpi"><span>${statusDot(type)} ${label}</span><strong>${fmt(value)}</strong><em>${sub}</em></div>`;
-}
-function statusDot(type) {
-  const color = type === 'done' ? 'var(--green)' : type === 'cancel' ? 'var(--red)' : type === 'time' ? 'var(--purple)' : type === 'avg' ? 'var(--cyan)' : 'var(--primary)';
-  return `<i class="dot" style="background:${color}"></i>`;
+  const color = type === 'done' ? 'var(--c-done)' : type === 'cancel' ? 'var(--c-cancel)' : type === 'etc' ? 'var(--c-etc)'
+    : type === 'time' ? 'var(--c-time)' : type === 'avg' ? 'var(--c-avg)' : 'var(--primary)';
+  return `<div class="kpi"><span><i class="dot" style="background:${color}"></i>${label}</span><strong>${fmt(value)}</strong><em>${sub}</em></div>`;
 }
 
 function donutTemplate(done, canceled, etc, total) {
-  const donePct = total ? done / total * 100 : 0;
-  const cancelPct = total ? canceled / total * 100 : 0;
-  const etcPct = 100 - donePct - cancelPct;
+  const R = 62, SW = 18;
+  const C = 2 * Math.PI * R;
+  const segs = [
+    { label: '완료', value: done, color: 'var(--c-done)' },
+    { label: '취소', value: canceled, color: 'var(--c-cancel)' },
+    { label: '기타', value: etc, color: 'var(--c-etc)' }
+  ];
+  const visible = segs.filter(s => s.value > 0);
+  const gap = visible.length > 1 ? C * 0.012 : 0;
+  let cursor = 0, delay = 0;
+
+  const arcs = visible.map(s => {
+    const frac = total ? s.value / total : 0;
+    const len = Math.max(0, frac * C - gap);
+    const offset = -cursor * C;
+    cursor += frac;
+    const d = (delay += 0.12) - 0.12;
+    return `<circle class="donut-seg" r="${R}" cx="84" cy="84" fill="none" stroke="${s.color}"
+      stroke-width="${SW}" stroke-linecap="round"
+      stroke-dasharray="${len.toFixed(2)} ${C.toFixed(2)}" stroke-dashoffset="${offset.toFixed(2)}"
+      style="--len:${len.toFixed(2)};--c:${C.toFixed(2)};animation-delay:${d.toFixed(2)}s"></circle>`;
+  }).join('');
+
+  const legend = segs.map(s => `<div class="legend-item"><i style="background:${s.color}"></i>${s.label} <b>${fmt(s.value)}</b></div>`).join('');
+
   return `
     <div class="donut-wrap">
-      <div class="donut" style="background:conic-gradient(var(--primary) 0 ${donePct}%, var(--red) ${donePct}% ${donePct + cancelPct}%, var(--faint) ${donePct + cancelPct}% 100%)">
-        <div class="donut-center"><strong>${pct(done, total)}</strong><span>완료 ${fmt(done)} / 전체 ${fmt(total)}</span></div>
+      <div class="donut">
+        <svg viewBox="0 0 168 168" role="img" aria-label="처리 상태 분포">
+          <circle class="donut-track" r="${R}" cx="84" cy="84" fill="none" stroke-width="${SW}"></circle>
+          ${arcs}
+        </svg>
+        <div class="donut-center">
+          <em>완료율</em>
+          <strong>${pct(done, total)}</strong>
+          <span>${fmt(done)} / ${fmt(total)}건</span>
+        </div>
       </div>
-      <div class="legend">
-        <div class="legend-item"><i class="dot"></i>완료 ${fmt(done)}</div>
-        <div class="legend-item"><i class="dot" style="background:var(--red)"></i>취소 ${fmt(canceled)}</div>
-        <div class="legend-item"><i class="dot" style="background:var(--faint)"></i>기타 ${fmt(etc)}</div>
-      </div>
+      <div class="legend">${legend}</div>
     </div>`;
 }
 
 function miniInsight(title, entries) {
-  return `<article class="card pad"><div class="card-title"><h3>${title}</h3></div><div class="bar-list">${entries.map(([name, count]) => `
-    <div class="rail-item"><span class="rail-icon">${ICONS.default}</span><strong>${name}</strong><span class="time">${fmt(count)}건</span></div>`).join('')}</div></article>`;
+  const max = Math.max(...entries.map(e => e[1]), 1);
+  const rows = entries.map(([name, count], i) => `
+    <div class="rank-row">
+      <span class="rank-no">${i + 1}</span>
+      <div class="rank-body">
+        <div class="rank-name">${name}</div>
+        <div class="rank-meter"><i style="width:${Math.max(8, count / max * 100)}%"></i></div>
+      </div>
+      <span class="rank-count">${fmt(count)}</span>
+    </div>`).join('');
+  return `<article class="card pad"><div class="card-title"><h3>${title}</h3></div><div class="rank-list">${rows || '<p class="cat-empty">데이터 없음</p>'}</div></article>`;
 }
 
 function barCard(title, entries, total) {
@@ -596,7 +680,7 @@ function barCard(title, entries, total) {
       <div class="bar-row"><strong>${name}</strong><div class="bar-track"><div class="bar-fill" style="width:${count / max * 100}%"></div></div><span class="bar-value">${fmt(count)}</span></div>`).join('')}</div></article>`;
 }
 
-function guideSectionTemplate(compact = false) {
+function guideSectionTemplate() {
   return `<section class="card pad"><div class="card-title"><h2>자주 찾는 가이드</h2><button class="link-btn">전체 보기 ›</button></div>
     <div class="three-col">${state.config.guideCards.map(card => `
       <div class="guide-card"><span class="tile-icon">${ICONS[card.icon] || ICONS.default}</span><div><strong>${card.title}</strong><small>${card.category}</small></div><span class="arrow">›</span></div>`).join('')}</div></section>`;
@@ -604,7 +688,7 @@ function guideSectionTemplate(compact = false) {
 
 function quickSectionTemplate() {
   return `<section class="card pad"><div class="card-title"><h2>빠른 실행</h2><button class="link-btn">전체 보기 ›</button></div>
-    <div class="three-col" style="grid-template-columns:repeat(4,1fr)">${state.config.quickActions.map(action => `
+    <div class="three-col q4">${state.config.quickActions.map(action => `
       <div class="quick-card"><span class="tile-icon">${ICONS[action.icon] || ICONS.default}</span><div><strong>${action.title}</strong><small>${action.description}</small></div><span class="arrow">›</span></div>`).join('')}</div></section>`;
 }
 
@@ -652,7 +736,7 @@ function monthlyChartCard(monthly) {
 
 function monthlyStackedCard(monthly) {
   const categoryNames = ['교사', '네트워크', '하드웨어', '콘텐츠'];
-  const colors = ['var(--primary)', 'var(--green)', 'var(--orange)', 'var(--purple)'];
+  const colors = ['var(--primary)', 'var(--c-done)', 'var(--c-amber)', 'var(--c-time)'];
   return `<article class="card pad"><div class="card-title"><h2>월별 카테고리 추이</h2><small>주요 4개</small></div>
     ${monthly.map(m => `<div class="stacked-month"><strong>${m.month}</strong><div class="stacked-track">
       ${categoryNames.map((cat, i) => `<span class="seg" style="width:${pct(m.categories[cat] || 0, m.total)};background:${colors[i]}"></span>`).join('')}
@@ -727,9 +811,3 @@ function monthKey(date) { return /^\d{4}-\d{2}/.test(date) ? date.slice(0, 7) : 
 function maxDate(dates) { const valid = dates.filter(d => /^\d{4}-\d{2}-\d{2}$/.test(d)).sort(); return valid[valid.length - 1] || ''; }
 function formatDate(date) { return date.replaceAll('-', '.'); }
 function escapeAttr(value) { return String(value ?? '').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-
-const originalRender = render;
-render = function patchedRender() {
-  originalRender();
-  bindHeroSearch();
-};

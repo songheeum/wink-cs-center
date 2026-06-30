@@ -25,13 +25,6 @@
     ],
     "cancelIncludes": [
       "취소"
-    ],
-    "absenceIncludes": [
-      "부재"
-    ],
-    "blockedIncludes": [
-      "처리불가",
-      "종결"
     ]
   },
   "home": {

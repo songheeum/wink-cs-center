@@ -3,7 +3,10 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>단비공감팀 상담가이드</title>
+  <title>단비공감팀 상담가이드 · 점검 대시보드</title>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+  <link rel="stylesheet" as="style" crossorigin
+        href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
   <link rel="stylesheet" href="./style.css" />
 </head>
 <body>
@@ -11,41 +14,48 @@
     <aside class="sidebar" aria-label="좌측 메뉴">
       <div class="brand">
         <div class="brand-mark" aria-hidden="true"></div>
-        <strong>단비공감팀 상담가이드</strong>
+        <div>
+          단비공감팀
+          <small>상담가이드 · 점검 대시보드</small>
+        </div>
       </div>
 
       <nav class="nav" id="mainNav"></nav>
 
-      <div class="nav-section">
-        <p class="nav-section-title">상담 유형</p>
-        <button class="nav-item sub"><span class="ico">◌</span>기술상담</button>
-        <button class="nav-item sub"><span class="ico">◌</span>일반상담</button>
+      <div class="side-section">
+        <div class="side-section-head">
+          <span class="side-section-title">카테고리</span>
+          <span class="side-section-count" id="sideCatCount"></span>
+        </div>
+        <div class="side-cats" id="sideCategories">
+          <p class="cat-empty">데이터 연결 대기</p>
+        </div>
       </div>
 
       <div class="sidebar-footer">
-        <div class="update-card">
-          <span class="ico">▣</span>
+        <button class="update-card" type="button">
+          <span class="udot" aria-hidden="true">↻</span>
           <div>
             <strong>가이드 업데이트</strong>
             <small id="lastUpdateText">CSV 연결 대기</small>
           </div>
-          <span>›</span>
-        </div>
+          <span class="chev" aria-hidden="true">›</span>
+        </button>
       </div>
     </aside>
 
     <main class="workspace">
       <header class="topbar">
         <div class="top-search">
-          <span>⌕</span>
+          <span class="si" aria-hidden="true">⌕</span>
           <input id="globalSearch" type="search" placeholder="검색: 상담 주제, 증상, 점검 종류, 처리자" autocomplete="off" />
           <kbd>⌘ K</kbd>
         </div>
         <div class="top-actions">
           <button class="theme-toggle" id="themeToggle" type="button" aria-label="라이트/다크 전환">
-            <span class="sun">☀</span><span id="themeLabel">Light</span>
+            <span class="sun" aria-hidden="true">☀</span><span id="themeLabel">Light</span>
           </button>
-          <button class="icon-btn" type="button" title="알림">♢</button>
+          <button class="icon-btn" type="button" title="알림" aria-label="알림">◔</button>
           <button class="profile-btn" type="button">단비</button>
         </div>
       </header>
@@ -59,7 +69,6 @@
     </main>
   </div>
 
-  <template id="iconTemplate"></template>
   <script src="./app.js" defer></script>
 </body>
 </html>
