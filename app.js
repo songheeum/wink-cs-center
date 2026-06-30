@@ -164,8 +164,7 @@ function hydrateRowsFromTable(table) {
   }
 
   const latestDate = maxDate(state.rows.map(r => r.receivedAt));
-  const lastUpdateText = $('#lastUpdateText');
-  if (lastUpdateText) lastUpdateText.textContent = latestDate ? `${formatDate(latestDate)} 기준` : 'CSV 연결 완료';
+  $('#lastUpdateText').textContent = latestDate ? `${formatDate(latestDate)} 기준` : 'CSV 연결 완료';
 }
 
 function loadCsvViaGvizJsonp(csvUrl) {
@@ -791,6 +790,7 @@ function heroTemplate() {
           ${current.keywords.map(keyword => `<button class="chip" data-keyword="${escapeAttr(keyword)}">${keyword}</button>`).join('')}
         </div>
       </div>
+      <div class="hero-mini-visual">⌕</div>
     </section>`;
 }
 
