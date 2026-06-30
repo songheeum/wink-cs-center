@@ -46,27 +46,135 @@ async function fetchJson(url) {
 }
 
 async function loadData() {
-  const res = await fetch(state.config.csvUrl, { cache: 'no-store' });
-  if (!res.ok) throw new Error(`csv load failed: ${res.status}`);
-  let csvText = await res.text();
-  const table = parseCSV(csvText);
-  csvText = '';
+  let table;
+  let firstError = null;
 
-  const headerIndex = table.findIndex(row => row.some(cell => clean(cell).includes('접수일')) && row.some(cell => clean(cell).includes('상태')));
-  if (headerIndex < 0) throw new Error('CSV header row not found');
+  try {
+    table = await loadCsvViaFetch(state.config.csvUrl);
+  } catch (error) {
+    firstError = error;
+    console.warn('CSV fetch failed. Trying Google Visualization JSONP fallback.', error);
+    table = await loadCsvViaGvizJsonp(state.config.csvUrl);
+  }
+
+  try {
+    hydrateRowsFromTable(table);
+  } catch (error) {
+    if (firstError) {
+      console.warn('Original CSV fetch error was:', firstError);
+    }
+    throw error;
+  }
+}
+
+async function loadCsvViaFetch(csvUrl) {
+  const res = await fetch(csvUrl, { cache: 'no-store' });
+  if (!res.ok) throw new Error(`csv load failed: ${res.status}`);
+  const csvText = await res.text();
+  return parseCSV(csvText);
+}
+
+function hydrateRowsFromTable(table) {
+  const headerIndex = table.findIndex(row =>
+    row.some(cell => clean(cell).includes('접수일')) &&
+    row.some(cell => clean(cell).includes('상태'))
+  );
+
+  if (headerIndex < 0) {
+    console.error('CSV/GViz table preview:', table.slice(0, 5));
+    throw new Error('CSV header row not found');
+  }
 
   const headers = table[headerIndex].map(clean);
-  const dataRows = table.slice(headerIndex + 1).filter(row => clean(row[0]) || clean(row[4]) || clean(row[11]));
+  const dataRows = table
+    .slice(headerIndex + 1)
+    .filter(row => clean(row[0]) || clean(row[4]) || clean(row[9]) || clean(row[11]));
 
   const col = buildColumnMap(headers);
   const privateIndexes = new Set(state.config.privacy.privateColumnIndexes || []);
   const privateNames = state.config.privacy.privateColumnNames || [];
 
-  state.rows = dataRows.map(row => normalizeRow(row, headers, col, privateIndexes, privateNames)).filter(Boolean);
-  table.length = 0;
+  state.rows = dataRows
+    .map(row => normalizeRow(row, headers, col, privateIndexes, privateNames))
+    .filter(Boolean);
 
   const latestDate = maxDate(state.rows.map(r => r.receivedAt));
   $('#lastUpdateText').textContent = latestDate ? `${formatDate(latestDate)} 기준` : 'CSV 연결 완료';
+}
+
+function loadCsvViaGvizJsonp(csvUrl) {
+  return new Promise((resolve, reject) => {
+    const callbackName = `__danbiSheetCallback_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+    const script = document.createElement('script');
+    let settled = false;
+
+    const cleanup = () => {
+      settled = true;
+      delete window[callbackName];
+      script.remove();
+    };
+
+    window[callbackName] = (payload) => {
+      try {
+        if (!payload || payload.status === 'error') {
+          const message = payload?.errors?.map(err => err.detailed_message || err.message).join(' / ') || 'Google Visualization response error';
+          throw new Error(message);
+        }
+        const table = gvizPayloadToTable(payload);
+        cleanup();
+        resolve(table);
+      } catch (error) {
+        cleanup();
+        reject(error);
+      }
+    };
+
+    script.onerror = () => {
+      if (!settled) {
+        cleanup();
+        reject(new Error('Google Visualization JSONP script load failed'));
+      }
+    };
+
+    script.src = csvUrlToGvizJsonpUrl(csvUrl, callbackName);
+    document.head.appendChild(script);
+
+    setTimeout(() => {
+      if (!settled) {
+        cleanup();
+        reject(new Error('Google Visualization JSONP timeout'));
+      }
+    }, 15000);
+  });
+}
+
+function csvUrlToGvizJsonpUrl(csvUrl, callbackName) {
+  const url = new URL(csvUrl);
+  const gid = url.searchParams.get('gid') || '0';
+  const path = url.pathname.replace(/\/pub$/, '/gviz/tq');
+  const gviz = new URL(`${url.origin}${path}`);
+  gviz.searchParams.set('gid', gid);
+  gviz.searchParams.set('headers', '1');
+  gviz.searchParams.set('tqx', `out:json;responseHandler:${callbackName}`);
+  return gviz.toString();
+}
+
+function gvizPayloadToTable(payload) {
+  const table = payload.table;
+  if (!table || !Array.isArray(table.cols) || !Array.isArray(table.rows)) {
+    throw new Error('Google Visualization table format is invalid');
+  }
+
+  const headers = table.cols.map((col, index) => clean(col.label || col.id || `col${index + 1}`));
+  const rows = table.rows.map(row => headers.map((_, index) => {
+    const cell = row.c?.[index];
+    if (!cell) return '';
+    if (cell.f != null) return String(cell.f);
+    if (cell.v == null) return '';
+    return String(cell.v);
+  }));
+
+  return [headers, ...rows];
 }
 
 function parseCSV(text) {
