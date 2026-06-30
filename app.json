@@ -44,108 +44,136 @@
   "guideCards": [
     {
       "title": "Wi-Fi 저장됨 / 연결 실패",
-      "category": "와이파이 / 네트워크 · 윙크봇",
+      "category": "기술상담 · 네트워크",
+      "icon": "wifi",
       "group": "wifi",
-      "device": "윙크봇",
-      "icon": "wifi"
+      "device": "윙크봇"
     },
     {
       "title": "Wi-Fi 저장됨 / 다음 화면 미진입",
-      "category": "와이파이 / 네트워크 · 윙크스쿨",
+      "category": "기술상담 · 네트워크",
+      "icon": "wifi",
       "group": "wifi",
-      "device": "윙크스쿨",
-      "icon": "wifi"
+      "device": "윙크스쿨"
     },
     {
       "title": "학부모앱 네트워크 오류",
-      "category": "와이파이 / 네트워크 · 학부모앱",
+      "category": "기술상담 · 네트워크",
+      "icon": "shield",
       "group": "wifi",
-      "device": "학부모앱",
-      "icon": "wifi"
+      "device": "학부모앱"
     },
     {
-      "title": "일반 패드 네트워크 점검",
-      "category": "와이파이 / 네트워크 · 기타 패드",
+      "title": "레노버 네트워크 연결 오류",
+      "category": "기술상담 · 네트워크",
+      "icon": "wifi",
       "group": "wifi",
-      "device": "기타 패드",
-      "icon": "shield"
+      "device": "레노버"
+    },
+    {
+      "title": "삼성탭 Wi-Fi 연결 / 저장됨",
+      "category": "기술상담 · 네트워크",
+      "icon": "wifi",
+      "group": "wifi",
+      "device": "삼성탭"
     },
     {
       "title": "전원 불량 / 충전 미진행",
-      "category": "전원 / 충전 / 화면 · 윙크봇",
+      "category": "기술상담 · 전원",
+      "icon": "power",
       "group": "power",
-      "device": "윙크봇",
-      "icon": "power"
+      "device": "윙크봇"
     },
     {
       "title": "충전 중 꺼짐 / 화면 무반응",
-      "category": "전원 / 충전 / 화면 · 윙크스쿨",
+      "category": "기술상담 · 전원",
+      "icon": "screen",
       "group": "power",
-      "device": "윙크스쿨",
-      "icon": "power"
+      "device": "윙크스쿨"
     },
     {
       "title": "앱 화면 멈춤 / 검은 화면",
-      "category": "전원 / 충전 / 화면 · 학부모앱",
+      "category": "기술상담 · 화면",
+      "icon": "app",
       "group": "power",
-      "device": "학부모앱",
-      "icon": "screen"
+      "device": "학부모앱"
     },
     {
-      "title": "기타 패드 화면/충전 점검",
-      "category": "전원 / 충전 / 화면 · 기타 패드",
+      "title": "레노버 전원 / 충전 / 화면 점검",
+      "category": "기술상담 · 전원",
+      "icon": "power",
       "group": "power",
-      "device": "기타 패드",
-      "icon": "screen"
+      "device": "레노버"
+    },
+    {
+      "title": "삼성탭 충전 / 화면 오류",
+      "category": "기술상담 · 전원",
+      "icon": "screen",
+      "group": "power",
+      "device": "삼성탭"
     },
     {
       "title": "앱 실행 오류 / 강제 종료",
-      "category": "앱 작동 / 업데이트 / 초기화 · 윙크봇",
+      "category": "기술상담 · 앱",
+      "icon": "app",
       "group": "app",
-      "device": "윙크봇",
-      "icon": "app"
+      "device": "윙크봇"
     },
     {
       "title": "업데이트 실패 / 초기화 필요",
-      "category": "앱 작동 / 업데이트 / 초기화 · 윙크스쿨",
+      "category": "기술상담 · 앱",
+      "icon": "sync",
       "group": "app",
-      "device": "윙크스쿨",
-      "icon": "sync"
+      "device": "윙크스쿨"
     },
     {
       "title": "학부모앱 로그인 / 실행 오류",
-      "category": "앱 작동 / 업데이트 / 초기화 · 학부모앱",
+      "category": "기술상담 · 앱",
+      "icon": "app",
       "group": "app",
-      "device": "학부모앱",
-      "icon": "app"
+      "device": "학부모앱"
+    },
+    {
+      "title": "레노버 앱 작동 / 초기화",
+      "category": "기술상담 · 앱",
+      "icon": "app",
+      "group": "app",
+      "device": "레노버"
+    },
+    {
+      "title": "삼성탭 앱 작동 / 업데이트",
+      "category": "기술상담 · 앱",
+      "icon": "sync",
+      "group": "app",
+      "device": "삼성탭"
     },
     {
       "title": "무료체험 접수 / 회수 안내",
-      "category": "일반 업무 가이드 · 무료체험",
+      "category": "일반상담 · 무료체험",
+      "icon": "general",
       "group": "work",
-      "device": "무료체험",
-      "icon": "general"
+      "device": "무료체험"
     },
     {
       "title": "결제관리 / 카드 변경",
-      "category": "일반 업무 가이드 · 결제관리",
+      "category": "일반상담 · 결제",
+      "icon": "payment",
       "group": "work",
-      "device": "결제관리",
-      "icon": "payment"
+      "device": "결제관리"
     },
     {
       "title": "배송조회 / 출고 일정",
-      "category": "일반 업무 가이드 · 배송조회",
+      "category": "일반상담 · 배송",
+      "icon": "delivery",
       "group": "work",
-      "device": "배송조회",
-      "icon": "delivery"
+      "device": "배송조회"
     },
     {
       "title": "해지 / 환불 문의 대응",
-      "category": "일반 업무 가이드 · 해지/환불",
+      "category": "일반상담 · 해지",
+      "icon": "service",
       "group": "work",
-      "device": "해지/환불",
-      "icon": "service"
+      "device": "해지/환불"
     }
   ]
 }

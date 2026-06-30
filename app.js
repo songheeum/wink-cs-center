@@ -29,21 +29,21 @@ const NAV_CATEGORIES = [
     label: '와이파이 / 네트워크',
     desc: '연결 · 저장됨 · 인증',
     icon: 'wifi3d',
-    devices: ['윙크봇', '윙크스쿨', '학부모앱', '기타 패드']
+    devices: ['윙크봇', '윙크스쿨', '학부모앱', '레노버', '삼성탭']
   },
   {
     id: 'power',
     label: '전원 / 충전 / 화면',
     desc: '전원 · 충전 · 표시',
     icon: 'power3d',
-    devices: ['윙크봇', '윙크스쿨', '학부모앱', '기타 패드']
+    devices: ['윙크봇', '윙크스쿨', '학부모앱', '레노버', '삼성탭']
   },
   {
     id: 'app',
     label: '앱 작동 / 업데이트 / 초기화',
     desc: '실행 · 업데이트 · 재설정',
     icon: 'app3d',
-    devices: ['윙크봇', '윙크스쿨', '학부모앱']
+    devices: ['윙크봇', '윙크스쿨', '학부모앱', '레노버', '삼성탭']
   },
   {
     id: 'work',
@@ -509,7 +509,6 @@ function renderNav() {
     <div class="nav-divider" aria-hidden="true"></div>
 
     <div class="nav-section nav-section-symptom">
-      <p class="nav-section-label">증상 선택 → 기기 선택</p>
       <div class="nav-stack">
         ${NAV_CATEGORIES.map(category => {
           const open = state.openMenu === category.id || state.guideMode === category.id;
@@ -638,7 +637,7 @@ function render() {
 
 function animateMountedContent() {
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  const items = $$('#pageRoot .hero, #pageRoot .card, #pageRoot .detail-header, #pageRoot .notice');
+  const items = $$('#pageRoot .hero, #pageRoot .card, #pageRoot .detail-header');
   requestAnimationFrame(() => {
     items.forEach((item, index) => {
       item.classList.remove('motion-item');
@@ -726,7 +725,6 @@ function renderHome() {
         ${miniInsight('처리자 현황', topHandlers)}
       </section>
       ${guideSectionTemplate()}
-      <div class="notice">✓ 가이드는 지속적으로 업데이트됩니다. 최신 정보 확인으로 정확한 상담을 지원해주세요.</div>
     </section>
     ${rightRailTemplate(rows)}
   `;
@@ -864,7 +862,6 @@ function renderDetail() {
         ${recentTableCard(rows.slice(0, 12))}
         ${guideSectionTemplate()}
       </section>
-      <div class="notice">보안 기준: D열 자마드 주소, F열 메모, M열 특이사항은 화면/검색/상세 테이블에서 제외됩니다.</div>
     </section>
   `;
 
@@ -946,8 +943,8 @@ function donutTemplate(done, canceled, etc, total) {
 }
 
 function miniInsight(title, entries) {
-  return `<article class="card pad"><div class="card-title"><h3>${title}</h3></div><div class="bar-list">${entries.map(([name, count]) => `
-    <div class="rail-item"><span class="rail-icon">${ICONS.default}</span><strong>${name}</strong><span class="time">${fmt(count)}건</span></div>`).join('')}</div></article>`;
+  return `<article class="card pad"><div class="card-title"><h3>${title}</h3></div><div class="insight-list">${entries.map(([name, count], index) => `
+    <div class="insight-item"><span class="insight-rank">${index + 1}</span><strong>${name}</strong><span class="time">${fmt(count)}건</span></div>`).join('')}</div></article>`;
 }
 
 function barCard(title, entries, total) {
