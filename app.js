@@ -3,6 +3,7 @@ const state = {
   rows: [],
   filtered: [],
   view: 'home',
+  guideMode: 'all',
   search: '',
   filters: { month: 'all', type: 'all', category: 'all', handler: 'all' }
 };
@@ -36,8 +37,9 @@ const GOOGLE_CHART_OPTIONS = {
 window.DANBI_GOOGLE_CHART_OPTIONS = GOOGLE_CHART_OPTIONS;
 
 const ICONS = {
-  home: '⌂', chart: '▥',
+  home: '🏠', chart: '📊', tech: '🛠️', general: '💬',
   sync: '↻', wifi: '◉', app: '⌘', video: '▣', keyboard: '⌨', shield: '◇',
+  payment: '₩', delivery: '⇢', book: '✦', service: '⚙', calendar: '◫',
   default: '•'
 };
 
@@ -393,17 +395,53 @@ function diffMinutes(start, end) {
 }
 
 function renderNav() {
-  $('#mainNav').innerHTML = state.config.navigation.map(item => `
-    <button class="nav-item ${((item.id === state.view) || (item.id === 'dashboard' && state.view === 'detail')) ? 'active' : ''}" data-view="${item.id}">
-      <span class="ico">${ICONS[item.icon] || ICONS.default}</span>${item.label}
-    </button>`).join('');
+  const sections = [
+    {
+      label: '메인',
+      items: [
+        { id: 'home', label: '홈', icon: 'home', desc: '상담가이드 메인' },
+        { id: 'dashboard', label: '점검 현황', icon: 'chart', desc: '점검 데이터 분석' }
+      ]
+    },
+    {
+      label: '상담 카테고리',
+      items: [
+        { id: 'guide-tech', label: '기술상담', icon: 'tech', desc: '기기 · 앱 · 네트워크' },
+        { id: 'guide-general', label: '일반상담', icon: 'general', desc: '결제 · 배송 · 교재' }
+      ]
+    }
+  ];
+
+  $('#mainNav').innerHTML = sections.map(section => `
+    <div class="nav-section">
+      <p class="nav-section-label">${section.label}</p>
+      <div class="nav-stack">${section.items.map(item => {
+        const active = (item.id === 'home' && state.view === 'home' && state.guideMode === 'all')
+          || (item.id === 'dashboard' && state.view === 'detail')
+          || (item.id === 'guide-tech' && state.view === 'home' && state.guideMode === 'tech')
+          || (item.id === 'guide-general' && state.view === 'home' && state.guideMode === 'general');
+        return `
+          <button class="nav-item ${active ? 'active' : ''}" data-view="${item.id}">
+            <span class="nav-icon-orb" aria-hidden="true"><span class="nav-glyph">${ICONS[item.icon] || ICONS.default}</span></span>
+            <span class="nav-copy"><strong>${item.label}</strong><small>${item.desc}</small></span>
+          </button>`;
+      }).join('')}</div>
+    </div>`).join('');
 }
 
 function bindChrome() {
   $('#mainNav').addEventListener('click', (e) => {
     const btn = e.target.closest('[data-view]');
     if (!btn) return;
-    state.view = btn.dataset.view === 'dashboard' ? 'detail' : 'home';
+    const view = btn.dataset.view;
+
+    if (view === 'dashboard') {
+      state.view = 'detail';
+    } else {
+      state.view = 'home';
+      state.guideMode = view === 'guide-tech' ? 'tech' : view === 'guide-general' ? 'general' : 'all';
+    }
+
     renderNav();
     render();
   });
@@ -549,18 +587,40 @@ function renderHome() {
 
 function heroTemplate() {
   const home = state.config.home;
+  const heroPresets = {
+    all: {
+      title: home.heroTitle,
+      description: home.heroDescription,
+      placeholder: home.searchPlaceholder,
+      keywords: home.keywords
+    },
+    tech: {
+      title: '기술상담 가이드를 더 빠르게 찾으세요',
+      description: '기기, 앱, 네트워크, 교사 PC 이슈 중심으로 필요한 가이드를 바로 찾을 수 있어요.',
+      placeholder: '예: 동기화, 앱작동, 저장됨, 네트워크, 키보드',
+      keywords: ['동기화', '앱작동', '네트워크', '저장됨', '키보드', '교사 PC']
+    },
+    general: {
+      title: '일반상담 가이드를 더 빠르게 찾으세요',
+      description: '결제, 배송, 회수, 교재, 무료체험 같은 일반 문의를 빠르게 찾아볼 수 있어요.',
+      placeholder: '예: 결제, 환불, 배송, 회수, 무료체험, 교재',
+      keywords: ['결제', '환불', '배송', '회수', '무료체험', '교재']
+    }
+  };
+  const current = heroPresets[state.guideMode] || heroPresets.all;
+
   return `
     <section class="hero">
-      <div>
-        <h1>${home.heroTitle}</h1>
-        <p>${home.heroDescription}</p>
+      <div class="hero-copy">
+        <h1>${current.title}</h1>
+        <p>${current.description}</p>
         <label class="hero-search">
-          <input id="heroSearch" type="search" placeholder="${home.searchPlaceholder}" value="${escapeAttr(state.search)}" />
+          <input id="heroSearch" type="search" placeholder="${current.placeholder}" value="${escapeAttr(state.search)}" />
           <button class="primary-btn" type="button" id="heroSearchButton">검색</button>
         </label>
         <div class="keyword-row">
           <span class="keyword-label">추천 검색어</span>
-          ${home.keywords.map(keyword => `<button class="chip" data-keyword="${escapeAttr(keyword)}">${keyword}</button>`).join('')}
+          ${current.keywords.map(keyword => `<button class="chip" data-keyword="${escapeAttr(keyword)}">${keyword}</button>`).join('')}
         </div>
       </div>
       <div class="hero-mini-visual">⌕</div>
@@ -659,7 +719,7 @@ function filterBarTemplate() {
 }
 
 function selectTemplate(key, label, values, selected) {
-  return `<label><span class="keyword-label">${label}</span><select data-filter="${key}">${values.map(v => `<option value="${escapeAttr(v)}" ${v === selected ? 'selected' : ''}>${v === 'all' ? '전체' : v}</option>`).join('')}</select></label>`;
+  return `<label class="filter-control"><span class="keyword-label">${label}</span><div class="select-wrap"><select data-filter="${key}">${values.map(v => `<option value="${escapeAttr(v)}" ${v === selected ? 'selected' : ''}>${v === 'all' ? '전체' : v}</option>`).join('')}</select></div></label>`;
 }
 
 function bindFilters() {
@@ -707,14 +767,26 @@ function barCard(title, entries, total) {
 }
 
 function guideSectionTemplate() {
-  return `<section class="card pad"><div class="card-title"><h2>자주 찾는 가이드</h2><button class="link-btn">전체 보기 ›</button></div>
-    <div class="three-col">${state.config.guideCards.map(card => `
+  const modeMap = { all: null, tech: '기술상담', general: '일반상담' };
+  const filterKey = modeMap[state.guideMode] || null;
+  const cards = filterKey
+    ? state.config.guideCards.filter(card => card.category.startsWith(filterKey))
+    : state.config.guideCards;
+  const title = state.guideMode === 'tech' ? '자주 찾는 기술상담 가이드' : state.guideMode === 'general' ? '자주 찾는 일반상담 가이드' : '자주 찾는 가이드';
+
+  return `<section class="card pad"><div class="card-title"><h2>${title}</h2><button class="link-btn">전체 보기 ›</button></div>
+    <div class="three-col">${cards.map(card => `
       <div class="guide-card"><span class="tile-icon">${ICONS[card.icon] || ICONS.default}</span><div><strong>${card.title}</strong><small>${card.category}</small></div><span class="arrow">›</span></div>`).join('')}</div></section>`;
 }
 
 function rightRailTemplate(rows) {
   const recent = rows.slice(0, 5);
-  const favorites = state.config.guideCards.slice(0, 5);
+  const favoritesSource = state.guideMode === 'tech'
+    ? state.config.guideCards.filter(card => card.category.startsWith('기술상담'))
+    : state.guideMode === 'general'
+      ? state.config.guideCards.filter(card => card.category.startsWith('일반상담'))
+      : state.config.guideCards;
+  const favorites = favoritesSource.slice(0, 5);
   return `<aside class="right-rail">
     <article class="card rail-card"><div class="card-title"><h3>최근 본 항목</h3><button class="link-btn">전체 보기 ›</button></div><div class="rail-list">
       ${recent.map(row => `<div class="rail-item"><span class="rail-icon">◷</span><strong>${row.symptom}</strong><span class="time">${row.receivedAt || '-'}</span></div>`).join('')}

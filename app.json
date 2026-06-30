@@ -71,6 +71,36 @@
       "title": "네트워크 _ 접속/인증",
       "category": "기술상담 · 네트워크",
       "icon": "shield"
+    },
+    {
+      "title": "결제 · 청구 · 환불",
+      "category": "일반상담 · 결제",
+      "icon": "payment"
+    },
+    {
+      "title": "배송 · 회수 일정",
+      "category": "일반상담 · 물류",
+      "icon": "delivery"
+    },
+    {
+      "title": "무료체험 · 해지 문의",
+      "category": "일반상담 · 이용문의",
+      "icon": "general"
+    },
+    {
+      "title": "교재 · 구성품 문의",
+      "category": "일반상담 · 교재",
+      "icon": "book"
+    },
+    {
+      "title": "A/S · 파손 비용",
+      "category": "일반상담 · A/S",
+      "icon": "service"
+    },
+    {
+      "title": "출고 · 일정 확인",
+      "category": "일반상담 · 일정",
+      "icon": "calendar"
     }
   ]
 }
