@@ -89,8 +89,51 @@ const ICONS = {
   bolt: SVG('<path d="M13 2 4 14h6l-1 8 9-12h-6z"/>'),
   list: SVG('<path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>'),
   camera: SVG('<path d="M4 8h3l1.5-2h7L17 8h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13" r="3"/>'),
+  wifi: SVG('<path d="M5 12.5a10 10 0 0 1 14 0"/><path d="M8.5 15.8a5 5 0 0 1 7 0"/><path d="M2 9a15 15 0 0 1 20 0"/><path d="M12 19h.01"/>'),
+  power: SVG('<rect x="2" y="7.5" width="16" height="9" rx="2.4"/><path d="M22 10.5v3"/><path d="M5.5 10.5v3"/>'),
+  monitor: SVG('<rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/>'),
+  gear: SVG('<circle cx="12" cy="12" r="3"/><path d="M12 2v2.5M12 19.5V22M4.2 4.2l1.8 1.8M18 18l1.8 1.8M2 12h2.5M19.5 12H22M4.2 19.8 6 18M18 6l1.8-1.8"/>'),
+  refresh: SVG('<path d="M21 4v6h-6"/><path d="M3 20v-6h6"/><path d="M19 10a8 8 0 0 0-14.3-3.3L3 8"/><path d="M5 14a8 8 0 0 0 14.3 3.3L21 16"/>'),
+  lock: SVG('<rect x="4.5" y="10" width="15" height="10" rx="2.2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/>'),
+  sliders: SVG('<path d="M4 6h9M17 6h3M4 12h3M11 12h9M4 18h13M20 18h0"/><circle cx="15" cy="6" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="18" cy="18" r="2"/>'),
+  grid: SVG('<rect x="3.5" y="3.5" width="7" height="7" rx="1.6"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.6"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.6"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.6"/>'),
+  clipboard: SVG('<rect x="6" y="4" width="12" height="17" rx="2"/><path d="M9 4V3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1"/><path d="M9 11h6M9 15h4"/>'),
+  refund: SVG('<path d="M3 8a9 9 0 1 1-1.5 5"/><path d="M3 4v4h4"/><path d="M12 8v4l2.5 1.5"/>'),
+  book: SVG('<path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M4 5.5V20.5"/>'),
+  card: SVG('<rect x="2.5" y="5" width="19" height="14" rx="2.4"/><path d="M2.5 9.5h19M6 15h4"/>'),
+  server: SVG('<rect x="3" y="4" width="18" height="7" rx="2"/><rect x="3" y="13" width="18" height="7" rx="2"/><path d="M7 7.5h.01M7 16.5h.01"/>'),
+  box: SVG('<path d="m12 2 8 4.5v9L12 20l-8-4.5v-9z"/><path d="m4 6.5 8 4.5 8-4.5M12 11v9"/>'),
+  truck: SVG('<path d="M2.5 6.5h11v9h-11z"/><path d="M13.5 9.5h4l3 3v3h-7z"/><circle cx="6.5" cy="17.5" r="1.8"/><circle cx="17" cy="17.5" r="1.8"/>'),
+  tag: SVG('<path d="M3 12V4a1 1 0 0 1 1-1h8l9 9-9 9z"/><circle cx="7.5" cy="7.5" r="1.4"/>'),
+  gift: SVG('<rect x="3.5" y="8.5" width="17" height="4" rx="1"/><path d="M5 12.5v8h14v-8M12 8.5v12"/><path d="M12 8.5S10 3.5 7.5 4.5 10 8.5 12 8.5zM12 8.5s2-5 4.5-4-.5 4-4.5 4z"/>'),
   default: SVG('<circle cx="12" cy="12" r="3.2"/>')
 };
+
+/* 카테고리 그룹명 → 대표 아이콘 매핑 (증상 성격에 맞춰 자동 선택) */
+function groupIcon(grp, cat) {
+  const g = String(grp || '');
+  const rules = [
+    [/와이파이|wifi|네트워크|인터넷|속도|버퍼링/i, ICONS.wifi],
+    [/전원|충전|배터리|화면|밝기/i, ICONS.power],
+    [/원격|기능검사|점검|모니터/i, ICONS.monitor],
+    [/기기\s*설정|기본정보|환경설정/i, ICONS.gear],
+    [/업데이트|초기화|리셋|재설정|앱\s*작동/i, ICONS.refresh],
+    [/탈출|접근제한|잠금|보안|권한/i, ICONS.lock],
+    [/초기화\/설정|설정/i, ICONS.sliders],
+    [/업무툴|관리자|어드민/i, ICONS.grid],
+    [/체험신청|체험운영|신청/i, ICONS.clipboard],
+    [/해지|환불|청약철회|취소/i, ICONS.refund],
+    [/학습운영|수업|단계|강의/i, ICONS.book],
+    [/결제|할인|위약금|요금/i, ICONS.card],
+    [/시스템|이관|응대|서버/i, ICONS.server],
+    [/교재|구성품|추가구매|부품/i, ICONS.box],
+    [/배송|회수|반품|택배/i, ICONS.truck],
+    [/유료학습|상품안내|상품|가격/i, ICONS.tag],
+    [/혜택|이벤트|리워드|쿠폰|사은품/i, ICONS.gift],
+  ];
+  for (const [re, ic] of rules) if (re.test(g)) return ic;
+  return cat === '기술상담' ? ICONS.tech : ICONS.general;
+}
 
 /* ---------- Init ---------- */
 init();
@@ -780,7 +823,16 @@ function renderHome() {
           <div class="keyword-row"><span class="keyword-label">추천 검색어</span>
             ${home.keywords.map(k => `<button class="chip" data-keyword="${escapeAttr(k)}">${esc(k)}</button>`).join('')}</div>
         </div>
-        <div class="hero-visual" aria-hidden="true"><span class="ring"></span><span class="ring r2"></span><span class="glyph">${ICONS.search}</span></div>
+        <div class="hero-visual" aria-hidden="true">
+          <span class="hv-glow"></span>
+          <span class="hv-panel hv-p1"></span>
+          <span class="hv-panel hv-p2"></span>
+          <span class="hv-card">
+            <span class="hv-line w1"></span>
+            <span class="hv-line w2"></span>
+            <span class="hv-spark">${ICONS.bolt}</span>
+          </span>
+        </div>
       </section>`;
 
   const resultBlock = q ? `
@@ -851,7 +903,7 @@ function categoryGridBlock() {
     <div class="card-title"><h2>카테고리 바로가기</h2><small>기술·일반상담 ${cards.length}개 분류</small></div>
     <div class="cat-grid">${cards.map(c => `
       <button class="cat-card" data-doc="${escapeAttr(c.first)}">
-        <span class="cat-card-ic ${c.cat === '기술상담' ? 'tech' : 'gen'}">${c.cat === '기술상담' ? ICONS.tech : ICONS.general}</span>
+        <span class="cat-card-ic ${c.cat === '기술상담' ? 'tech' : 'gen'}">${groupIcon(c.grp, c.cat)}</span>
         <span class="cat-card-body"><strong>${esc(c.grp)}</strong><small>${esc(c.cat)} · ${c.count}개 문서</small></span>
         <span class="result-arrow">${CHEV}</span></button>`).join('')}</div></section>`;
 }
