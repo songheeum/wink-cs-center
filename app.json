@@ -85,29 +85,7 @@
       ]
     }
   ],
-  "quickActions": [
-    {
-      "title": "상담 정리 열기",
-      "description": "상담 내용을 정리하고 요약할 수 있어요.",
-      "icon": "message"
-    },
-    {
-      "title": "사진 요청 템플릿",
-      "description": "상황에 맞는 요청 멘트를 바로 사용해요.",
-      "icon": "image"
-    },
-    {
-      "title": "상담이력 템플릿",
-      "description": "자주 쓰는 템플릿을 빠르게 불러와요.",
-      "icon": "file"
-    },
-    {
-      "title": "점검 현황 보기",
-      "description": "인입 유형과 처리 현황을 확인해요.",
-      "icon": "chart"
-    }
-  ],
-  "refreshSeconds": 60,
+  "refreshSeconds": 30,
   "guides": {
     "imageBase": "img/",
     "sources": [

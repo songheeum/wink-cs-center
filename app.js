@@ -31,6 +31,17 @@ const escapeAttr = (v) => String(v ?? '').replace(/&/g,'&amp;').replace(/"/g,'&q
 const splitMulti = (s) => clean(s).split(/\r?\n|｜|\||;/).map(x => x.trim()).filter(Boolean);
 const splitTags  = (s) => clean(s).split(/[,\n;｜|]/).map(x => x.trim()).filter(Boolean);
 const slug = (s) => String(s).toLowerCase().replace(/\s+/g, '-').replace(/[^\w가-힣-]/g, '');
+const applyTheme = (theme) => {
+  const next = theme === 'dark' ? 'dark' : 'light';
+  document.documentElement.dataset.theme = next;
+  const label = document.getElementById('themeLabel');
+  if (label) label.textContent = next === 'dark' ? 'Dark' : 'Light';
+};
+const getInitialTheme = () => {
+  const saved = localStorage.getItem('danbiTheme');
+  if (saved === 'dark' || saved === 'light') return saved;
+  return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+};
 
 /* ---------- Icons ---------- */
 const SVG = (i) => `<svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${i}</svg>`;
@@ -58,6 +69,7 @@ init();
 async function init() {
   try {
     state.config = await fetchJson('./app.json');
+    applyTheme(getInitialTheme());
     bindChrome();
     renderNav();
     render();                                   // 즉시 스켈레톤/홈 노출 (하드 새로고침 불필요)
@@ -79,14 +91,22 @@ async function fetchJson(url) {
   return res.json();
 }
 function startAutoRefresh() {
-  const sec = Number(state.config.refreshSeconds) || 60;
+  const sec = Number(state.config.refreshSeconds) || 30;
   setInterval(async () => {
     try {
-      await loadDashboard();
+      await Promise.allSettled([loadDashboard(), loadGuides()]);
       state.lastSync = Date.now();
-      if (state.view === 'detail') { applyFilters(); render(); }
+      applyFilters();
+      if (state.ui.activeDoc && !state.docById.has(state.ui.activeDoc)) {
+        state.ui.activeDoc = null;
+        state.view = 'home';
+      }
+      renderNav();
+      render();
       updateLiveLabel();
-    } catch (e) { /* keep last good data */ }
+    } catch (e) {
+      console.warn('자동 갱신 실패, 마지막 정상 데이터를 유지합니다.', e);
+    }
   }, sec * 1000);
   setInterval(updateLiveLabel, 1000);
 }
@@ -329,7 +349,6 @@ function renderBranch(cat) {
   const icon = cat === '기술상담' ? 'tech' : 'general';
   const open = state.ui.expanded.has('cat:' + cat);
   const groups = state.guides[cat];
-  const q = state.search.trim().toLowerCase();
   let body;
 
   if (!groups || !groups.size) {
@@ -339,11 +358,9 @@ function renderBranch(cat) {
       : `<div class="nav-empty">불러오는 중…</div>`;
   } else {
     body = [...groups.entries()].map(([grp, docs]) => {
-      const shown = q ? docs.filter(d => d.hay.includes(q)) : docs;
-      if (q && !shown.length && !grp.toLowerCase().includes(q)) return '';
       const gk = 'grp:' + cat + '/' + grp;
-      const gopen = state.ui.expanded.has(gk) || !!q;
-      const leaves = (q ? shown : docs).map(d =>
+      const gopen = state.ui.expanded.has(gk);
+      const leaves = docs.map(d =>
         `<button class="nav-doc ${state.ui.activeDoc === d.id ? 'active' : ''}" data-doc="${escapeAttr(d.id)}">${esc(d.title)}</button>`).join('');
       return `<div class="nav-cat2wrap ${gopen ? 'open' : ''}">
         <button class="nav-cat2" data-grp="${escapeAttr(gk)}"><span class="ng-chev sm">${CHEV}</span><span class="nav-cat2-label">${esc(grp)}</span><span class="nav-cat2-count">${docs.length}</span></button>
@@ -352,8 +369,10 @@ function renderBranch(cat) {
   }
 
   return `<div class="nav-group ${open ? 'open' : ''}">
-    <div class="nav-sep-label"><span class="ico ico-${icon}">${ICONS[icon]}</span><span>${cat}</span>
-      <button class="nav-branch-toggle" data-branch="${escapeAttr(cat)}" aria-label="${cat} 접기/펼치기"><span class="ng-chev">${CHEV}</span></button></div>
+    <button class="nav-sep-label nav-branch-row" data-branch="${escapeAttr(cat)}" aria-label="${cat} 접기/펼치기">
+      <span class="ico ico-${icon}">${ICONS[icon]}</span><span class="nav-branch-title">${cat}</span>
+      <span class="nav-branch-toggle" aria-hidden="true"><span class="ng-chev">${CHEV}</span></span>
+    </button>
     <div class="nav-group-body">${body}</div></div>`;
 }
 
@@ -373,6 +392,11 @@ function bindChrome() {
     renderNav(); render(); window.scrollTo({ top: 0 });
   });
 
+  $('#pageRoot').addEventListener('click', (e) => {
+    const doc = e.target.closest('[data-doc]');
+    if (doc) openDoc(doc.dataset.doc);
+  });
+
   $('#globalSearch').addEventListener('input', (e) => {
     state.search = e.target.value.trim();
     applyFilters();
@@ -380,11 +404,12 @@ function bindChrome() {
     render();
   });
 
+  applyTheme(document.documentElement.dataset.theme || getInitialTheme());
   $('#themeToggle').addEventListener('click', () => {
     const html = document.documentElement;
     const next = html.dataset.theme === 'dark' ? 'light' : 'dark';
-    html.dataset.theme = next;
-    $('#themeLabel').textContent = next === 'dark' ? 'Dark' : 'Light';
+    applyTheme(next);
+    localStorage.setItem('danbiTheme', next);
   });
 
   document.addEventListener('keydown', (e) => {
@@ -451,15 +476,7 @@ function renderHome() {
   const q = state.search.trim();
   const results = q ? guideMatches(q).slice(0, 12) : [];
 
-  const resultBlock = q ? `
-    <section class="card pad">
-      <div class="card-title"><h2>검색 결과</h2><small>"${esc(q)}" · ${results.length}건</small></div>
-      ${results.length ? `<div class="result-list">${results.map(resultRow).join('')}</div>`
-        : `<p class="empty-inline">일치하는 가이드가 없습니다. 다른 키워드로 검색해보세요.</p>`}
-    </section>` : categoryGridBlock();
-
-  $('#pageRoot').innerHTML = `
-    <section class="main-column">
+  const heroBlock = q ? '' : `
       <section class="hero">
         <div class="hero-body">
           <h1>${esc(home.heroTitle)}</h1>
@@ -473,9 +490,19 @@ function renderHome() {
             ${home.keywords.map(k => `<button class="chip" data-keyword="${escapeAttr(k)}">${esc(k)}</button>`).join('')}</div>
         </div>
         <div class="hero-visual" aria-hidden="true"><span class="ring"></span><span class="ring r2"></span><span class="glyph">${ICONS.search}</span></div>
-      </section>
+      </section>`;
+
+  const resultBlock = q ? `
+    <section class="card pad search-results-card">
+      <div class="card-title"><h2>검색 결과</h2><small>"${esc(q)}" · ${results.length}건</small></div>
+      ${results.length ? `<div class="result-list">${results.map(resultRow).join('')}</div>`
+        : `<p class="empty-inline">일치하는 가이드가 없습니다. 다른 키워드로 검색해보세요.</p>`}
+    </section>` : categoryGridBlock();
+
+  $('#pageRoot').innerHTML = `
+    <section class="main-column">
+      ${heroBlock}
       ${resultBlock}
-      ${quickBlock()}
     </section>`;
 
   bindHomeSearch();
@@ -503,12 +530,6 @@ function categoryGridBlock() {
         <span class="cat-card-ic ${c.cat === '기술상담' ? 'tech' : 'gen'}">${c.cat === '기술상담' ? ICONS.tech : ICONS.general}</span>
         <span class="cat-card-body"><strong>${esc(c.grp)}</strong><small>${esc(c.cat)} · ${c.count}개 문서</small></span>
         <span class="result-arrow">${CHEV}</span></button>`).join('')}</div></section>`;
-}
-function quickBlock() {
-  return `<section class="card pad">
-    <div class="card-title"><h2>빠른 실행</h2></div>
-    <div class="quick-grid">${state.config.quickActions.map(a => `
-      <div class="quick-card"><span class="tile-icon">${ICONS[a.icon] || ICONS.default}</span><div><strong>${esc(a.title)}</strong><small>${esc(a.description)}</small></div><span class="result-arrow">${CHEV}</span></div>`).join('')}</div></section>`;
 }
 function bindHomeSearch() {
   const input = $('#heroSearch');
@@ -593,11 +614,61 @@ function resolveImg(src) {
   return base + src.replace(/^\/+/, '');
 }
 function bindGuide() {
-  $$('[data-toc]').forEach(a => a.addEventListener('click', (e) => {
+  const links = $$('[data-toc]');
+  const sections = links.map(a => document.getElementById(a.dataset.toc)).filter(Boolean);
+  const setActive = (id) => {
+    links.forEach(link => link.classList.toggle('active', link.dataset.toc === id));
+  };
+
+  links.forEach(a => a.addEventListener('click', (e) => {
     e.preventDefault();
     const el = document.getElementById(a.dataset.toc);
-    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (el) {
+      setActive(a.dataset.toc);
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
   }));
+
+  if (!sections.length) return;
+  setActive(sections[0].id);
+
+  if (state._tocObserver) state._tocObserver.disconnect();
+
+  const visible = new Map();
+  const pickActive = () => {
+    const ordered = sections
+      .map((sec, idx) => ({
+        id: sec.id,
+        idx,
+        ratio: visible.get(sec.id) || 0,
+        top: Math.abs(sec.getBoundingClientRect().top)
+      }))
+      .filter(item => item.ratio > 0);
+    if (!ordered.length) return;
+    ordered.sort((a, b) => (b.ratio - a.ratio) || (a.top - b.top) || (a.idx - b.idx));
+    setActive(ordered[0].id);
+  };
+
+  if ('IntersectionObserver' in window) {
+    state._tocObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        visible.set(entry.target.id, entry.isIntersecting ? entry.intersectionRatio : 0);
+      });
+      pickActive();
+    }, { rootMargin: '-14% 0px -58% 0px', threshold: [0.05, 0.2, 0.35, 0.6, 0.85] });
+
+    sections.forEach(sec => state._tocObserver.observe(sec));
+  } else {
+    const onScroll = () => {
+      let current = sections[0].id;
+      for (const sec of sections) {
+        if (sec.getBoundingClientRect().top <= 140) current = sec.id;
+      }
+      setActive(current);
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+  }
 }
 
 /* ---------- View: Dashboard ---------- */
@@ -617,7 +688,7 @@ function renderDetail() {
         <div>
           <div class="live-inline"><span class="live-dot"></span>자마드 실시간 연동 · <span id="liveSince">방금 갱신</span></div>
           <h1>점검 운영 현황 상세</h1>
-          <p>인입 유형, 카테고리 비율, 월별 통계, 처리자별 현황, 교사용 점검 투입시간을 60초 단위로 자동 갱신합니다.</p>
+          <p>인입 유형, 카테고리 비율, 월별 통계, 처리자별 현황, 교사용 점검 투입시간을 자동 갱신합니다.</p>
         </div>
         <button class="primary-btn" id="backHome">홈으로</button>
       </div>
