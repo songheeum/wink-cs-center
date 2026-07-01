@@ -41,8 +41,16 @@
     ]
   },
   "sidebarNav": [
-    { "id": "home", "label": "홈", "icon": "home" },
-    { "id": "dashboard", "label": "점검 운영 현황", "icon": "chart" }
+    {
+      "id": "home",
+      "label": "홈",
+      "icon": "home"
+    },
+    {
+      "id": "dashboard",
+      "label": "점검 운영 현황",
+      "icon": "chart"
+    }
   ],
   "sidebarGroups": [
     {
@@ -77,38 +85,6 @@
       ]
     }
   ],
-  "guideCards": [
-    {
-      "title": "교사 _ 동기화",
-      "category": "기술상담 · 교사",
-      "icon": "sync"
-    },
-    {
-      "title": "네트워크 _ 끊김",
-      "category": "기술상담 · 네트워크",
-      "icon": "wifi"
-    },
-    {
-      "title": "교사 _ 앱작동",
-      "category": "기술상담 · 앱",
-      "icon": "app"
-    },
-    {
-      "title": "콘텐츠 _ 라이브클래스",
-      "category": "기술상담 · 콘텐츠",
-      "icon": "video"
-    },
-    {
-      "title": "하드웨어 _ 키보드",
-      "category": "기술상담 · 하드웨어",
-      "icon": "keyboard"
-    },
-    {
-      "title": "네트워크 _ 접속/인증",
-      "category": "기술상담 · 네트워크",
-      "icon": "shield"
-    }
-  ],
   "quickActions": [
     {
       "title": "상담 정리 열기",
@@ -130,5 +106,19 @@
       "description": "인입 유형과 처리 현황을 확인해요.",
       "icon": "chart"
     }
-  ]
+  ],
+  "refreshSeconds": 60,
+  "guides": {
+    "imageBase": "img/",
+    "sources": [
+      {
+        "category": "기술상담",
+        "url": "https://docs.google.com/spreadsheets/d/e/2PACX-1vTH0j2Qo_6qu0ZnSgjOoy1cWP_0pBaK9UNY-aAVvr8t5dB9fz5yLPKJqpOdXqPny8Hqp_9GaKEq2D-b/pub?gid=475812845&single=true&output=csv"
+      },
+      {
+        "category": "일반상담",
+        "url": "https://docs.google.com/spreadsheets/d/e/2PACX-1vTH0j2Qo_6qu0ZnSgjOoy1cWP_0pBaK9UNY-aAVvr8t5dB9fz5yLPKJqpOdXqPny8Hqp_9GaKEq2D-b/pub?gid=243492375&single=true&output=csv"
+      }
+    ]
+  }
 }
