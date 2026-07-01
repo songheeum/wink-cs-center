@@ -492,6 +492,22 @@ function getKeywordSuggestions(q) {
     })
     .slice(0, 6);
 }
+function positionGlobalSuggestions() {
+  const wrap = document.querySelector('.top-search');
+  const panel = $('#globalSuggest');
+  if (!wrap || !panel || panel.hidden) return;
+
+  const rect = wrap.getBoundingClientRect();
+  const gap = 10;
+  const viewportPad = 14;
+  const maxHeight = Math.max(190, window.innerHeight - rect.bottom - gap - viewportPad);
+
+  panel.style.left = `${Math.round(rect.left)}px`;
+  panel.style.top = `${Math.round(rect.bottom + gap)}px`;
+  panel.style.width = `${Math.round(rect.width)}px`;
+  panel.style.maxHeight = `${Math.round(maxHeight)}px`;
+}
+
 function renderGlobalSuggestions() {
   const input = $('#globalSearch');
   const panel = $('#globalSuggest');
@@ -504,8 +520,8 @@ function renderGlobalSuggestions() {
     return;
   }
 
-  const docs = guideMatches(q).slice(0, 8);
-  const keywords = getKeywordSuggestions(q).filter(k => !docs.some(d => normalizeSearch(d.title) === normalizeSearch(k))).slice(0, 5);
+  const docs = guideMatches(q).slice(0, 7);
+  const keywords = getKeywordSuggestions(q).filter(k => !docs.some(d => normalizeSearch(d.title) === normalizeSearch(k))).slice(0, 4);
   const total = guideMatches(q).length;
 
   if (!docs.length && !keywords.length) {
@@ -545,10 +561,14 @@ function renderGlobalSuggestions() {
 
   state.ui.acIndex = -1;
   panel.hidden = false;
+  positionGlobalSuggestions();
 }
 function hideGlobalSuggestions() {
   const panel = $('#globalSuggest');
-  if (panel) panel.hidden = true;
+  if (panel) {
+    panel.hidden = true;
+    panel.removeAttribute('style');
+  }
   state.ui.acIndex = -1;
 }
 function moveSuggestion(delta) {
@@ -615,6 +635,9 @@ function bindChrome() {
     }
     if (!e.target.closest('.top-search')) hideGlobalSuggestions();
   });
+
+  window.addEventListener('resize', () => positionGlobalSuggestions());
+  window.addEventListener('scroll', () => positionGlobalSuggestions(), { passive: true });
 
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
