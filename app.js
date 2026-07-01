@@ -20,6 +20,13 @@ const state = {
   ui: { expanded: new Set(['cat:기술상담']), activeDoc: null, device: '전체' }
 };
 
+const FILTER_LABELS = {
+  month: '기간',
+  type: '점검 종류',
+  category: '카테고리',
+  handler: '처리자'
+};
+
 /* ---------- Utils ---------- */
 const $ = (sel, root = document) => root.querySelector(sel);
 const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
@@ -30,6 +37,15 @@ const esc = (v) => String(v ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').re
 const escapeAttr = (v) => String(v ?? '').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 const splitMulti = (s) => clean(s).split(/\r?\n|｜|\||;/).map(x => x.trim()).filter(Boolean);
 const splitTags  = (s) => clean(s).split(/[,\n;｜|]/).map(x => x.trim()).filter(Boolean);
+const normalizeSearch = (v) => String(v ?? '')
+  .normalize('NFKC')
+  .toLowerCase()
+  .replace(/[\u200B-\u200D\uFEFF]/g, '')
+  .replace(/[“”"'`.,/#!$%^&*;:{}=\-_~()[\]<>?\\]/g, ' ')
+  .replace(/\s+/g, ' ')
+  .trim();
+const compactSearch = (v) => normalizeSearch(v).replace(/\s+/g, '');
+const searchTokens = (q) => normalizeSearch(q).split(' ').map(t => t.trim()).filter(Boolean);
 const slug = (s) => String(s).toLowerCase().replace(/\s+/g, '-').replace(/[^\w가-힣-]/g, '');
 const applyTheme = (theme) => {
   const next = theme === 'dark' ? 'dark' : 'light';
@@ -316,7 +332,11 @@ function hydrateGuide(table, category) {
       tags: splitTags(get(row, 'tags'))
     };
     doc.id = `${category}|${group}|${doc.title}|${idx}`;
-    doc.hay = [category, group, doc.title, doc.subclass, doc.tags.join(' '), doc.expr.join(' ')].join(' ').toLowerCase();
+    doc.searchTitle = normalizeSearch([doc.title, doc.subclass].join(' '));
+    doc.searchMeta = normalizeSearch([category, group, doc.devices.join(' '), doc.tags.join(' ')].join(' '));
+    doc.searchBody = normalizeSearch([doc.expr.join(' '), doc.check.join(' '), doc.steps.join(' '), doc.guide, doc.escal.join(' '), doc.caution, doc.images.join(' ')].join(' '));
+    doc.hay = normalizeSearch([doc.searchTitle, doc.searchMeta, doc.searchBody].join(' '));
+    doc.hayCompact = compactSearch(doc.hay);
     if (!map.has(group)) map.set(group, []);
     map.get(group).push(doc);
   });
@@ -333,23 +353,66 @@ function buildGuideIndex() {
   });
 }
 function guideMatches(query) {
-  const q = query.toLowerCase();
-  return state.guideDocs.filter(d => d.hay.includes(q));
+  const q = normalizeSearch(query);
+  const qc = compactSearch(query);
+  const tokens = searchTokens(query);
+  if (!q) return [];
+
+  return state.guideDocs
+    .map(d => {
+      const title = d.searchTitle || '';
+      const meta = d.searchMeta || '';
+      const body = d.searchBody || '';
+      const hay = d.hay || '';
+      const compact = d.hayCompact || '';
+      const titleCompact = compactSearch(title);
+      const metaCompact = compactSearch(meta);
+      const bodyCompact = compactSearch(body);
+
+      const fullHit = hay.includes(q) || compact.includes(qc);
+      const tokenHit = tokens.length && tokens.every(t => hay.includes(t) || compact.includes(t));
+      if (!fullHit && !tokenHit) return null;
+
+      let score = 0;
+      if (title.includes(q) || titleCompact.includes(qc)) score += 120;
+      if (meta.includes(q) || metaCompact.includes(qc)) score += 55;
+      if (body.includes(q) || bodyCompact.includes(qc)) score += 25;
+      tokens.forEach(t => {
+        if (title.includes(t) || titleCompact.includes(t)) score += 35;
+        if (meta.includes(t) || metaCompact.includes(t)) score += 14;
+        if (body.includes(t) || bodyCompact.includes(t)) score += 6;
+      });
+      if (d.title.length < 18) score += 3;
+      return { ...d, _score: score };
+    })
+    .filter(Boolean)
+    .sort((a, b) => b._score - a._score || a.title.localeCompare(b.title, 'ko-KR'));
 }
 
 /* ---------- Nav (좌측 트리) ---------- */
 function renderNav() {
   const item = (id, icon, label, active) =>
-    `<button class="nav-item ${active ? 'active' : ''}" data-view="${id}"><span class="ico">${ICONS[icon] || ICONS.default}</span>${label}</button>`;
+    `<button class="nav-item ${active ? 'active' : ''}" data-view="${id}"><span class="ico">${ICONS[icon] || ICONS.default}</span><span class="nav-item-label">${label}</span></button>`;
   const top = item('home', 'home', '홈', state.view === 'home') + item('dashboard', 'chart', '점검 운영 현황', state.view === 'detail');
   const branches = ['기술상담', '일반상담'].map(renderBranch).join('');
-  $('#mainNav').innerHTML = `<div class="nav-top">${top}</div><div class="nav-tree">${branches}</div>`;
+  $('#mainNav').innerHTML = `
+    <div class="nav-section-label">기본 메뉴</div>
+    <div class="nav-top nav-panel">${top}</div>
+    <div class="nav-section-head">
+      <span class="nav-section-label guide">상담 가이드</span>
+      <span class="nav-mini-actions">
+        <button type="button" data-nav-action="expand">전체 열기</button>
+        <button type="button" data-nav-action="collapse">닫기</button>
+      </span>
+    </div>
+    <div class="nav-tree nav-panel">${branches}</div>`;
 }
 function renderBranch(cat) {
   const icon = cat === '기술상담' ? 'tech' : 'general';
   const open = state.ui.expanded.has('cat:' + cat);
   const groups = state.guides[cat];
   let body;
+  let branchCurrent = false;
 
   if (!groups || !groups.size) {
     const fb = (state.config.sidebarGroups?.find(g => g.label === cat)?.items) || [];
@@ -360,15 +423,17 @@ function renderBranch(cat) {
     body = [...groups.entries()].map(([grp, docs]) => {
       const gk = 'grp:' + cat + '/' + grp;
       const gopen = state.ui.expanded.has(gk);
+      const current = docs.some(d => state.ui.activeDoc === d.id);
+      if (current) branchCurrent = true;
       const leaves = docs.map(d =>
         `<button class="nav-doc ${state.ui.activeDoc === d.id ? 'active' : ''}" data-doc="${escapeAttr(d.id)}">${esc(d.title)}</button>`).join('');
-      return `<div class="nav-cat2wrap ${gopen ? 'open' : ''}">
-        <button class="nav-cat2" data-grp="${escapeAttr(gk)}"><span class="ng-chev sm">${CHEV}</span><span class="nav-cat2-label">${esc(grp)}</span><span class="nav-cat2-count">${docs.length}</span></button>
+      return `<div class="nav-cat2wrap type-${icon} ${gopen ? 'open' : ''} ${current ? 'current' : ''}">
+        <button class="nav-cat2 type-${icon} ${current ? 'current' : ''}" data-grp="${escapeAttr(gk)}"><span class="ng-chev sm">${CHEV}</span><span class="nav-cat2-label">${esc(grp)}</span><span class="nav-cat2-count">${docs.length}</span></button>
         <div class="nav-doc-body">${leaves}</div></div>`;
     }).join('');
   }
 
-  return `<div class="nav-group ${open ? 'open' : ''}">
+  return `<div class="nav-group type-${icon} ${open ? 'open' : ''} ${branchCurrent ? 'current' : ''}">
     <button class="nav-sep-label nav-branch-row" data-branch="${escapeAttr(cat)}" aria-label="${cat} 접기/펼치기">
       <span class="ico ico-${icon}">${ICONS[icon]}</span><span class="nav-branch-title">${cat}</span>
       <span class="nav-branch-toggle" aria-hidden="true"><span class="ng-chev">${CHEV}</span></span>
@@ -379,6 +444,12 @@ function renderBranch(cat) {
 /* ---------- Bindings ---------- */
 function bindChrome() {
   $('#mainNav').addEventListener('click', (e) => {
+    const navAction = e.target.closest('[data-nav-action]');
+    if (navAction) {
+      navAction.dataset.navAction === 'expand' ? expandAllNav() : collapseAllNav();
+      renderNav();
+      return;
+    }
     const branch = e.target.closest('[data-branch]');
     if (branch) { toggleExpand('cat:' + branch.dataset.branch); renderNav(); return; }
     const grp = e.target.closest('[data-grp]');
@@ -387,7 +458,14 @@ function bindChrome() {
     if (doc) { openDoc(doc.dataset.doc); return; }
     const view = e.target.closest('[data-view]');
     if (!view) return;
-    state.view = view.dataset.view === 'dashboard' ? 'detail' : 'home';
+    const nextView = view.dataset.view === 'dashboard' ? 'detail' : 'home';
+    if (nextView === 'detail' || state.view === 'detail') resetFiltersSilently();
+    if (nextView === 'home') {
+      state.search = '';
+      const gs = $('#globalSearch');
+      if (gs) gs.value = '';
+    }
+    state.view = nextView;
     state.ui.activeDoc = null;
     renderNav(); render(); window.scrollTo({ top: 0 });
   });
@@ -397,11 +475,38 @@ function bindChrome() {
     if (doc) openDoc(doc.dataset.doc);
   });
 
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.filter-control')) {
+      $$('.filter-control.open').forEach(w => {
+        w.classList.remove('open');
+        $('[data-filter-trigger]', w)?.setAttribute('aria-expanded', 'false');
+      });
+    }
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      $$('.filter-control.open').forEach(w => {
+        w.classList.remove('open');
+        $('[data-filter-trigger]', w)?.setAttribute('aria-expanded', 'false');
+      });
+    }
+  });
+
   $('#globalSearch').addEventListener('input', (e) => {
     state.search = e.target.value.trim();
+
+    // 가이드 상세에서 검색을 시작하면 현재 좌측 선택 문서는 무시하고
+    // 기술상담·일반상담 전체 검색 결과 화면으로 전환한다.
+    if (state.search && state.view !== 'detail') {
+      state.view = 'home';
+      state.ui.activeDoc = null;
+    }
+
     applyFilters();
     renderNav();
     render();
+    if (state.search && state.view === 'home') window.scrollTo({ top: 0 });
   });
 
   applyTheme(document.documentElement.dataset.theme || getInitialTheme());
@@ -432,6 +537,18 @@ function bindChrome() {
 function toggleExpand(key) {
   if (state.ui.expanded.has(key)) state.ui.expanded.delete(key);
   else state.ui.expanded.add(key);
+}
+function expandAllNav() {
+  ['기술상담', '일반상담'].forEach(cat => {
+    state.ui.expanded.add('cat:' + cat);
+    const groups = state.guides[cat];
+    if (groups) groups.forEach((_, grp) => state.ui.expanded.add('grp:' + cat + '/' + grp));
+  });
+}
+function collapseAllNav() {
+  [...state.ui.expanded].forEach(key => {
+    if (key.startsWith('grp:') || key.startsWith('cat:')) state.ui.expanded.delete(key);
+  });
 }
 function openDoc(id) {
   const doc = state.docById.get(id);
@@ -474,7 +591,13 @@ function render() {
 function renderHome() {
   const home = state.config.home;
   const q = state.search.trim();
-  const results = q ? guideMatches(q).slice(0, 12) : [];
+  const allResults = q ? guideMatches(q) : [];
+  const results = allResults.slice(0, 18);
+  const resultCounts = {
+    total: allResults.length,
+    tech: allResults.filter(d => d.category === '기술상담').length,
+    general: allResults.filter(d => d.category === '일반상담').length
+  };
 
   const heroBlock = q ? '' : `
       <section class="hero">
@@ -494,10 +617,22 @@ function renderHome() {
 
   const resultBlock = q ? `
     <section class="card pad search-results-card">
-      <div class="card-title"><h2>검색 결과</h2><small>"${esc(q)}" · ${results.length}건</small></div>
-      ${results.length ? `<div class="result-list">${results.map(resultRow).join('')}</div>`
-        : `<p class="empty-inline">일치하는 가이드가 없습니다. 다른 키워드로 검색해보세요.</p>`}
-    </section>` : categoryGridBlock();
+      <div class="card-title search-title">
+        <div>
+          <h2>전체 상담가이드 검색 결과</h2>
+          <small>현재 선택된 좌측 문서와 무관하게 기술상담·일반상담 전체에서 찾습니다.</small>
+        </div>
+        <small class="search-count">"${esc(q)}" · ${resultCounts.total}건</small>
+      </div>
+      <div class="search-scope-row" aria-label="검색 범위">
+        <span class="scope-pill active">전체 ${resultCounts.total}</span>
+        <span class="scope-pill tech">기술상담 ${resultCounts.tech}</span>
+        <span class="scope-pill general">일반상담 ${resultCounts.general}</span>
+        <span class="scope-help">제목 · 카테고리 · 태그 · 고객표현 · 확인사항 · 조치방법 · 안내멘트까지 검색</span>
+      </div>
+      ${results.length ? `<div class="result-list">${results.map(resultRow).join('')}</div>${resultCounts.total > results.length ? `<p class="more-results-note">상위 ${results.length}건만 먼저 보여줍니다. 더 좁은 키워드를 추가하면 정확도가 올라갑니다.</p>` : ''}`
+        : `<p class="empty-inline">일치하는 가이드가 없습니다. 띄어쓰기 없이 검색하거나 고객 표현 그대로 검색해보세요.</p>`}
+    </section>` : `${categoryGridBlock()}${guideQuickListBlock()}`;
 
   $('#pageRoot').innerHTML = `
     <section class="main-column">
@@ -508,9 +643,17 @@ function renderHome() {
   bindHomeSearch();
 }
 function resultRow(d) {
-  return `<button class="result-row" data-doc="${escapeAttr(d.id)}">
-    <span class="result-ic">${d.category === '기술상담' ? ICONS.tech : ICONS.general}</span>
-    <span class="result-main"><strong>${esc(d.title)}</strong><small>${esc(d.category)} · ${esc(d.group)}</small></span>
+  const type = d.category === '기술상담' ? 'tech' : 'general';
+  const snippet = d.expr[0] || d.check[0] || d.steps[0] || d.guide || '';
+  const tags = [d.category, d.group, d.subclass, ...d.tags.slice(0, 3)].filter(Boolean);
+  return `<button class="result-row ${type}" data-doc="${escapeAttr(d.id)}">
+    <span class="result-ic ${type}">${type === 'tech' ? ICONS.tech : ICONS.general}</span>
+    <span class="result-main">
+      <strong>${esc(d.title)}</strong>
+      <small>${esc(d.category)} · ${esc(d.group)}${d.subclass ? ` · ${esc(d.subclass)}` : ''}</small>
+      ${snippet ? `<em>${esc(snippet).slice(0, 92)}</em>` : ''}
+      <span class="result-tags">${tags.map(t => `<b>${esc(t)}</b>`).join('')}</span>
+    </span>
     <span class="result-arrow">${CHEV}</span></button>`;
 }
 function categoryGridBlock() {
@@ -531,9 +674,28 @@ function categoryGridBlock() {
         <span class="cat-card-body"><strong>${esc(c.grp)}</strong><small>${esc(c.cat)} · ${c.count}개 문서</small></span>
         <span class="result-arrow">${CHEV}</span></button>`).join('')}</div></section>`;
 }
+function guideQuickListBlock() {
+  const docs = state.guideDocs.slice(0, 6);
+  if (!docs.length) return '';
+  return `<section class="card pad guide-quick-card">
+    <div class="card-title"><div><h2>가이드 빠른 목록</h2><small>시트 상단 기준 · 자주 봐야 할 문서를 위에 배치하면 메인에 먼저 노출됩니다.</small></div></div>
+    <div class="quick-doc-grid">${docs.map(d => `<button class="quick-doc ${d.category === '기술상담' ? 'tech' : 'general'}" data-doc="${escapeAttr(d.id)}">
+      <span class="quick-doc-icon">${d.category === '기술상담' ? ICONS.tech : ICONS.general}</span>
+      <span><strong>${esc(d.title)}</strong><small>${esc(d.category)} · ${esc(d.group)}</small></span>
+    </button>`).join('')}</div>
+  </section>`;
+}
 function bindHomeSearch() {
   const input = $('#heroSearch');
-  const run = () => { state.search = input.value.trim(); $('#globalSearch').value = state.search; applyFilters(); renderNav(); render(); };
+  const run = () => {
+    state.search = input.value.trim();
+    state.view = 'home';
+    state.ui.activeDoc = null;
+    $('#globalSearch').value = state.search;
+    applyFilters();
+    renderNav();
+    render();
+  };
   $('#heroBtn')?.addEventListener('click', run);
   input?.addEventListener('keydown', (e) => { if (e.key === 'Enter') run(); });
   $$('.chip[data-keyword]').forEach(b => b.addEventListener('click', () => { input.value = b.dataset.keyword; run(); }));
@@ -724,7 +886,7 @@ function renderDetail() {
       <div class="notice">보안 기준: D열 자마드 주소, F열 메모, M열 특이사항은 화면/검색/상세 테이블에서 제외됩니다.</div>
     </section>`;
 
-  $('#backHome').addEventListener('click', () => { state.view = 'home'; renderNav(); render(); window.scrollTo({ top: 0 }); });
+  $('#backHome').addEventListener('click', () => { resetFiltersSilently(); state.view = 'home'; renderNav(); render(); window.scrollTo({ top: 0 }); });
   bindFilters();
   updateLiveLabel();
 }
@@ -742,18 +904,80 @@ function getStats(rows) {
 }
 function filterBarTemplate() {
   const a = state.rows;
-  return `<div class="filter-bar card pad">
-    ${selectTemplate('month', '기간', ['all', ...sortedKeys(countBy(a, r => monthKey(r.receivedAt))).filter(Boolean)], state.filters.month)}
-    ${selectTemplate('type', '점검 종류', ['all', ...sortedKeys(countBy(a, r => r.type))], state.filters.type)}
-    ${selectTemplate('category', '카테고리', ['all', ...sortedKeys(countBy(a, r => r.category))], state.filters.category)}
-    ${selectTemplate('handler', '처리자', ['all', ...sortedKeys(countBy(a, r => r.handler))], state.filters.handler)}
+  const total = state.rows.length;
+  const current = state.filtered.length;
+  const active = activeFilterEntries();
+  return `<section class="filter-card card pad">
+    <div class="filter-card-head">
+      <div>
+        <h2>조회 조건</h2>
+        <p>${active.length ? `${active.length}개 필터 적용 중` : '전체 데이터 기준'} · ${fmt(current)} / ${fmt(total)}건 표시</p>
+      </div>
+      <button class="filter-reset-btn" id="resetFilters" type="button" ${active.length ? '' : 'disabled'}>${ICONS.sync} 필터 초기화</button>
+    </div>
+    <div class="filter-bar">
+      ${filterDropdownTemplate('month', ['all', ...sortedKeys(countBy(a, r => monthKey(r.receivedAt))).filter(Boolean)], state.filters.month)}
+      ${filterDropdownTemplate('type', ['all', ...sortedKeys(countBy(a, r => r.type))], state.filters.type)}
+      ${filterDropdownTemplate('category', ['all', ...sortedKeys(countBy(a, r => r.category))], state.filters.category)}
+      ${filterDropdownTemplate('handler', ['all', ...sortedKeys(countBy(a, r => r.handler))], state.filters.handler)}
+    </div>
+    ${active.length ? `<div class="active-filter-row">${active.map(f => `<button type="button" class="active-filter-chip" data-filter-clear="${f.key}"><span>${esc(f.label)}</span><b>${esc(f.value)}</b><i>×</i></button>`).join('')}</div>` : ''}
+  </section>`;
+}
+function filterDropdownTemplate(key, values, selected) {
+  const label = FILTER_LABELS[key] || key;
+  const selectedLabel = selected === 'all' ? '전체' : selected;
+  return `<div class="filter-control" data-filter-wrap="${key}">
+    <span class="field-label">${esc(label)}</span>
+    <button type="button" class="filter-trigger" data-filter-trigger="${key}" aria-haspopup="listbox" aria-expanded="false">
+      <span>${esc(selectedLabel)}</span><i class="filter-chevron">${CHEV}</i>
+    </button>
+    <div class="filter-menu" role="listbox">
+      ${values.map(v => `<button type="button" class="filter-option ${v === selected ? 'active' : ''}" data-filter-option="${key}" data-value="${escapeAttr(v)}" role="option" aria-selected="${v === selected ? 'true' : 'false'}"><span>${v === 'all' ? '전체' : esc(v)}</span>${v === selected ? ICONS.check : ''}</button>`).join('')}
+    </div>
   </div>`;
 }
-function selectTemplate(key, label, values, selected) {
-  return `<label><span class="field-label">${label}</span><select data-filter="${key}">${values.map(v => `<option value="${escapeAttr(v)}" ${v === selected ? 'selected' : ''}>${v === 'all' ? '전체' : esc(v)}</option>`).join('')}</select></label>`;
+function activeFilterEntries() {
+  return Object.entries(state.filters)
+    .filter(([, value]) => value !== 'all')
+    .map(([key, value]) => ({ key, label: FILTER_LABELS[key] || key, value }));
+}
+function resetFilters(key = null) {
+  if (key) state.filters[key] = 'all';
+  else Object.keys(state.filters).forEach(k => { state.filters[k] = 'all'; });
+  applyFilters();
+  render();
+}
+function resetFiltersSilently() {
+  Object.keys(state.filters).forEach(k => { state.filters[k] = 'all'; });
+  applyFilters();
 }
 function bindFilters() {
-  $$('[data-filter]').forEach(s => s.addEventListener('change', () => { state.filters[s.dataset.filter] = s.value; applyFilters(); render(); }));
+  const closeMenus = () => $$('.filter-control.open').forEach(w => {
+    w.classList.remove('open');
+    $('[data-filter-trigger]', w)?.setAttribute('aria-expanded', 'false');
+  });
+
+  $$('[data-filter-trigger]').forEach(btn => btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const wrap = btn.closest('.filter-control');
+    const wasOpen = wrap.classList.contains('open');
+    closeMenus();
+    if (!wasOpen) {
+      wrap.classList.add('open');
+      btn.setAttribute('aria-expanded', 'true');
+    }
+  }));
+
+  $$('[data-filter-option]').forEach(btn => btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    state.filters[btn.dataset.filterOption] = btn.dataset.value;
+    applyFilters();
+    render();
+  }));
+
+  $$('[data-filter-clear]').forEach(btn => btn.addEventListener('click', () => resetFilters(btn.dataset.filterClear)));
+  $('#resetFilters')?.addEventListener('click', () => resetFilters());
 }
 
 /* ---------- Components ---------- */
