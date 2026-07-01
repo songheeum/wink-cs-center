@@ -195,8 +195,16 @@ function loadTable(url) {
     return loadCsvViaGvizJsonp(url);
   });
 }
+function withCacheBuster(url) {
+  try {
+    const u = new URL(url);
+    u.searchParams.set('_', Date.now().toString(36));
+    return u.toString();
+  } catch (_) { return url + (url.includes('?') ? '&' : '?') + '_=' + Date.now().toString(36); }
+}
 async function loadCsvViaFetch(csvUrl) {
-  const res = await fetch(csvUrl, { cache: 'no-store' });
+  // 캐시버스터로 브라우저/프록시 캐시를 우회한다.
+  const res = await fetch(withCacheBuster(csvUrl), { cache: 'no-store' });
   if (!res.ok) throw new Error(`csv load failed: ${res.status}`);
   return parseCSV(await res.text());
 }
@@ -350,10 +358,49 @@ function mapGuideColumns(headers) {
 }
 async function loadGuides() {
   const sources = state.config.guides?.sources || [];
+  const report = [];
+
+  // 게시(pub) CSV는 시트의 "게시 스냅샷"이라 편집이 즉시 반영되지 않을 수 있다.
+  // GViz(gviz/tq)는 시트 원본을 직접 읽어 항상 최신이므로 이를 우선 사용한다.
+  const loadLiveFirst = async (url) => {
+    try {
+      return { table: await loadCsvViaGvizJsonp(url), method: 'gviz-live' };
+    } catch (e) {
+      console.warn('[가이드] GViz 라이브 실패 → 게시 CSV 폴백', e);
+      return { table: await loadCsvViaFetch(url), method: 'pub-csv' };
+    }
+  };
+
   await Promise.allSettled(sources.map(async (src) => {
-    const table = await loadTable(src.url);
-    hydrateGuide(table, src.category);
+    let method = '-';
+    try {
+      const r = await loadLiveFirst(src.url);
+      method = r.method;
+      hydrateGuide(r.table, src.category);
+      let count = state.guides[src.category]?.size || 0;
+
+      // 라이브가 폴백(pub)으로 떨어졌는데 0건이면, 마지막으로 라이브를 한 번 더 시도
+      if (count === 0 && method === 'pub-csv') {
+        try {
+          const live = await loadCsvViaGvizJsonp(src.url);
+          hydrateGuide(live, src.category);
+          count = state.guides[src.category]?.size || 0;
+          method = 'gviz-live(retry)';
+        } catch (e) { console.warn(`[가이드] ${src.category} 라이브 재시도 실패`, e); }
+      }
+
+      report.push({ category: src.category, method, groups: count });
+      if (count === 0) {
+        console.error(`[가이드] ${src.category} 로딩 결과 0건 — gid/게시 설정을 확인하세요.\n  URL: ${src.url}`);
+      }
+    } catch (e) {
+      report.push({ category: src.category, method, groups: 0, error: String(e) });
+      console.error(`[가이드] ${src.category} 로딩 실패`, e, '\n  URL:', src.url);
+    }
   }));
+
+  window.__danbiGuideLoad = { at: new Date().toLocaleTimeString('ko-KR'), report };
+  console.info('[가이드] 로딩 리포트', report);
   buildGuideIndex();
 }
 function hydrateGuide(table, category) {
