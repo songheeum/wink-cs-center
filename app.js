@@ -1038,10 +1038,25 @@ function renderGuide() {
       <div class="toc-inner">
         <div class="toc-title">이 문서의 목차</div>
         <nav class="toc-list">${toc.map(t => `<a href="#${t.id}" class="toc-link" data-toc="${t.id}">${t.title}</a>`).join('')}</nav>
+        ${docInfoRail(doc)}
+        ${relatedDocsRail(doc)}
       </div>
     </aside>`;
 
   bindGuide();
+}
+function docInfoRail(doc) {
+  const rows = [];
+  rows.push(`<div class="rail-info-row"><dt>분류</dt><dd>${esc(doc.category)} · ${esc(doc.group)}${doc.subclass ? ` · ${esc(doc.subclass)}` : ''}</dd></div>`);
+  if (doc.devices?.length) {
+    rows.push(`<div class="rail-info-row"><dt>적용 기기</dt><dd><div class="rail-chips">${doc.devices.map(d => `<span>${esc(d)}</span>`).join('')}</div></dd></div>`);
+  }
+  return `<div class="rail-card"><div class="rail-title">문서 정보</div><dl class="rail-info">${rows.join('')}</dl></div>`;
+}
+function relatedDocsRail(doc) {
+  const siblings = (state.guides[doc.category]?.get(doc.group) || []).filter(d => d.id !== doc.id).slice(0, 6);
+  if (!siblings.length) return '';
+  return `<div class="rail-card"><div class="rail-title">같은 분류 문서</div><div class="rail-related">${siblings.map(d => `<button class="rail-doc" data-doc="${escapeAttr(d.id)}"><span class="rail-doc-dot"></span><span>${esc(d.title)}</span></button>`).join('')}</div></div>`;
 }
 function checkBlock(items) {
   const pairs = items.map(x => {
