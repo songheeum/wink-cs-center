@@ -40,31 +40,41 @@
       "교사 PC"
     ]
   },
-  "navigation": [
+  "sidebarNav": [
+    { "id": "home", "label": "홈", "icon": "home" },
+    { "id": "dashboard", "label": "점검 운영 현황", "icon": "chart" }
+  ],
+  "sidebarGroups": [
     {
-      "id": "home",
-      "label": "홈",
-      "icon": "home"
+      "id": "tech",
+      "label": "기술상담",
+      "icon": "tech",
+      "items": [
+        "와이파이 / 네트워크",
+        "전원 / 충전 / 화면",
+        "앱 작동 / 업데이트 / 초기화",
+        "앱탈출 / 접근제어",
+        "원격점검 / 기능검사",
+        "기기 설정 / 기본정보",
+        "업무툴 / 관리자",
+        "기타"
+      ]
     },
     {
-      "id": "guide",
-      "label": "상담가이드",
-      "icon": "book"
-    },
-    {
-      "id": "dashboard",
-      "label": "점검 현황",
-      "icon": "chart"
-    },
-    {
-      "id": "note",
-      "label": "상담 정리",
-      "icon": "note"
-    },
-    {
-      "id": "favorite",
-      "label": "즐겨찾기",
-      "icon": "star"
+      "id": "general",
+      "label": "일반상담",
+      "icon": "general",
+      "items": [
+        "체험신청 / 체험운영",
+        "유료학습 / 상품안내",
+        "결제 / 할인 / 위약금",
+        "해지 / 환불 / 청약철회",
+        "배송 / 회수",
+        "교재 / 구성품 / 추가구매",
+        "학습운영 / 수업 / 단계",
+        "혜택 / 이벤트 / 리워드",
+        "시스템 / 이관 / 응대"
+      ]
     }
   ],
   "guideCards": [

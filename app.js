@@ -4,7 +4,8 @@ const state = {
   filtered: [],
   view: 'home',
   search: '',
-  filters: { month: 'all', type: 'all', category: 'all', handler: 'all' }
+  filters: { month: 'all', type: 'all', category: 'all', handler: 'all' },
+  ui: { openGroups: { tech: true, general: true }, activeCat: '' }
 };
 
 const $ = (selector, root = document) => root.querySelector(selector);
@@ -13,19 +14,35 @@ const fmt = (n) => Number(n || 0).toLocaleString('ko-KR');
 const pct = (value, total) => total ? `${((value / total) * 100).toFixed(1)}%` : '0.0%';
 const clean = (v) => String(v ?? '').replace(/\r/g, '').trim();
 
+const SVG = (inner) => `<svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${inner}</svg>`;
+
 const ICONS = {
-  home: '⌂', book: '▤', chart: '◔', note: '✎', star: '☆',
-  sync: '↻', wifi: '◉', app: '⌘', video: '▷', keyboard: '⌨', shield: '⛉',
-  message: '✉', image: '▨', file: '▦', default: '•'
+  home: SVG('<path d="M3 9.5 12 3l9 6.5"/><path d="M5 9v11h14V9"/><path d="M9.5 20v-6h5v6"/>'),
+  book: SVG('<path d="M5 4.5A1.5 1.5 0 0 1 6.5 3H19v14H6.5A1.5 1.5 0 0 0 5 18.5z"/><path d="M5 18.5A1.5 1.5 0 0 1 6.5 17H19v4H6.5A1.5 1.5 0 0 1 5 19.5z"/>'),
+  chart: SVG('<path d="M3 3v18h18"/><rect x="7" y="12" width="2.6" height="5" rx=".6"/><rect x="11.7" y="8" width="2.6" height="9" rx=".6"/><rect x="16.4" y="14" width="2.6" height="3" rx=".6"/>'),
+  note: SVG('<path d="M11 4H5a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h13a2 2 0 0 0 2-2v-6"/><path d="M18.5 2.5a2.1 2.1 0 0 1 3 3L12 15l-4 1 1-4z"/>'),
+  star: SVG('<path d="m12 3 2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9 6.8 19.1l1-5.8L3.5 9.2l5.9-.9z"/>'),
+  sync: SVG('<path d="M21 3v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 21v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/>'),
+  wifi: SVG('<path d="M2 8.6a16 16 0 0 1 20 0"/><path d="M5 12.5a11 11 0 0 1 14 0"/><path d="M8.5 16.3a6 6 0 0 1 7 0"/><path d="M12 20h.01"/>'),
+  app: SVG('<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/>'),
+  video: SVG('<rect x="2.5" y="5" width="19" height="13" rx="2.5"/><path d="M10 9.2v4.6l4-2.3z" fill="currentColor" stroke="none"/>'),
+  keyboard: SVG('<rect x="2" y="6" width="20" height="12" rx="2.5"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M7.5 14h9"/>'),
+  shield: SVG('<path d="M12 22s8-4 8-10V5.5L12 2.5 4 5.5V12c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/>'),
+  message: SVG('<path d="M21 11.5a8.4 8.4 0 0 1-8.5 8.4 8.4 8.4 0 0 1-3.7-.9L3 21l1.9-5.7A8.4 8.4 0 0 1 12.5 3 8.4 8.4 0 0 1 21 11.5z"/>'),
+  image: SVG('<rect x="3" y="3" width="18" height="18" rx="2.5"/><circle cx="8.5" cy="8.5" r="1.6"/><path d="m21 15-4.5-4.5L5 21"/>'),
+  file: SVG('<path d="M14 2.5H6.5A2 2 0 0 0 4.5 4.5v15a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V8z"/><path d="M14 2.5V8h5.5"/><path d="M8.5 13h7M8.5 17h7"/>'),
+  tech: SVG('<path d="M14.6 6.3a4 4 0 0 0-5.3 5.3l-6 6a2 2 0 1 0 2.8 2.8l6-6a4 4 0 0 0 5.3-5.3l-2.6 2.6-2.2-.5-.5-2.2z"/>'),
+  general: SVG('<path d="M21 11.5a8.4 8.4 0 0 1-8.5 8.4 8.4 8.4 0 0 1-3.7-.9L3 21l1.9-5.7A8.4 8.4 0 0 1 12.5 3 8.4 8.4 0 0 1 21 11.5z"/><path d="M9 11h.01M12 11h.01M15 11h.01"/>'),
+  default: SVG('<circle cx="12" cy="12" r="3.2"/>')
 };
 
-/* 카테고리별 고정 색상 (좌측 카테고리 · 도넛 보조 팔레트와 통일) */
-const CAT_COLORS = ['#5b5bd6', '#0fae7a', '#f59e0b', '#06b6d4', '#f43f5e', '#8b5cf6', '#ec4899', '#14b8a6', '#6366f1', '#84cc16'];
-const catColor = (name) => {
-  let h = 0;
-  for (let i = 0; i < String(name).length; i++) h = (h * 31 + name.charCodeAt(i)) >>> 0;
-  return CAT_COLORS[h % CAT_COLORS.length];
+const UI_SVG = {
+  search: SVG('<circle cx="11" cy="11" r="7"/><path d="m20 20-3.2-3.2"/>'),
+  bell: SVG('<path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/>'),
+  sun: SVG('<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>')
 };
+
+const firstToken = (s) => String(s).split('/')[0].trim();
 
 init();
 
@@ -314,24 +331,71 @@ function diffMinutes(start, end) {
 }
 
 function renderNav() {
-  $('#mainNav').innerHTML = state.config.navigation.map(item => `
-    <button class="nav-item ${((item.id === state.view) || (item.id === 'dashboard' && state.view === 'detail')) ? 'active' : ''}" data-view="${item.id}">
-      <span class="ico">${ICONS[item.icon] || ICONS.default}</span>${item.label}
-    </button>`).join('');
+  const cfg = state.config;
+  const onHome = state.view === 'home';
+  const onDash = state.view === 'detail';
+
+  const top = (cfg.sidebarNav || []).map(item => {
+    const isDash = item.id === 'dashboard';
+    const active = (isDash && onDash) || (item.id === 'home' && onHome && !state.ui.activeCat);
+    return `<button class="nav-item ${active ? 'active' : ''}" data-view="${item.id}">
+      <span class="ico">${ICONS[item.icon] || ICONS.default}</span>${item.label}</button>`;
+  }).join('');
+
+  const groups = (cfg.sidebarGroups || []).map(g => {
+    const open = state.ui.openGroups[g.id] !== false;
+    const items = (g.items || []).map(label => {
+      const active = state.ui.activeCat === label;
+      return `<button class="nav-sub ${active ? 'active' : ''}" data-cat="${escapeAttr(label)}">
+        <span class="sub-dot"></span><span class="nav-sub-label">${label}</span></button>`;
+    }).join('');
+    return `<div class="nav-group ${open ? 'open' : ''}">
+      <button class="nav-group-head" data-toggle="${g.id}">
+        <span class="ico ico-${g.id}">${ICONS[g.icon] || ICONS.default}</span>
+        <span class="ng-label">${g.label}</span><span class="ng-chev"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span>
+      </button>
+      <div class="nav-group-body">${items}</div>
+    </div>`;
+  }).join('');
+
+  $('#mainNav').innerHTML = top + groups;
 }
 
 function bindChrome() {
   $('#mainNav').addEventListener('click', (e) => {
+    const toggle = e.target.closest('[data-toggle]');
+    if (toggle) {
+      const id = toggle.dataset.toggle;
+      state.ui.openGroups[id] = state.ui.openGroups[id] === false;
+      renderNav();
+      return;
+    }
+    const sub = e.target.closest('[data-cat]');
+    if (sub) {
+      const label = sub.dataset.cat;
+      const next = state.ui.activeCat === label ? '' : label;
+      state.ui.activeCat = next;
+      state.search = next ? firstToken(next) : '';
+      state.view = 'home';
+      $('#globalSearch').value = state.search;
+      applyFilters();
+      renderNav();
+      render();
+      return;
+    }
     const btn = e.target.closest('[data-view]');
     if (!btn) return;
     state.view = btn.dataset.view === 'dashboard' ? 'detail' : 'home';
+    state.ui.activeCat = '';
     renderNav();
     render();
   });
 
   $('#globalSearch').addEventListener('input', (e) => {
     state.search = e.target.value.trim();
+    state.ui.activeCat = '';
     applyFilters();
+    renderNav();
     render();
   });
 
@@ -340,6 +404,13 @@ function bindChrome() {
     const next = html.dataset.theme === 'dark' ? 'light' : 'dark';
     html.dataset.theme = next;
     $('#themeLabel').textContent = next === 'dark' ? 'Dark' : 'Light';
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+      e.preventDefault();
+      $('#globalSearch').focus();
+    }
   });
 }
 
@@ -359,44 +430,8 @@ function applyFilters() {
 }
 
 function render() {
-  renderSideCategories();
   if (state.view === 'detail') renderDetail();
   else renderHome();
-}
-
-/* 좌측 카테고리 — 전체 데이터 기준 상위 카테고리를 라이브로 표시.
-   클릭 시 기존 검색 경로를 그대로 사용한다(검색 로직 변경 없음). */
-function renderSideCategories() {
-  const host = $('#sideCategories');
-  if (!host) return;
-  const entries = topN(countBy(state.rows, r => r.category), 12).filter(([name]) => name && name !== '미분류');
-  const countEl = $('#sideCatCount');
-  if (countEl) countEl.textContent = entries.length ? `${entries.length}` : '';
-
-  if (!entries.length) {
-    host.innerHTML = '<p class="cat-empty">표시할 카테고리가 없습니다</p>';
-    return;
-  }
-  const max = Math.max(...entries.map(e => e[1]), 1);
-  host.innerHTML = entries.map(([name, count]) => {
-    const color = catColor(name);
-    const active = state.search && name.includes(state.search) ? ' aria-current="true"' : '';
-    return `<button class="cat-row" data-cat="${escapeAttr(name)}"${active}>
-        <span class="cat-dot" style="background:${color}"></span>
-        <span class="cat-name">${name}</span>
-        <span class="cat-count">${fmt(count)}</span>
-        <span class="cat-meter"><i style="width:${Math.max(6, count / max * 100)}%;background:${color}"></i></span>
-      </button>`;
-  }).join('');
-
-  $$('.cat-row', host).forEach(btn => btn.addEventListener('click', () => {
-    const term = btn.dataset.cat;
-    state.search = state.search === term ? '' : term;
-    const gs = $('#globalSearch');
-    if (gs) gs.value = state.search;
-    applyFilters();
-    render();
-  }));
 }
 
 function getStats(rows) {
@@ -417,70 +452,21 @@ function getStats(rows) {
 }
 
 function renderHome() {
-  const rows = state.filtered;
-  const stats = getStats(rows);
-  const topSymptoms = topN(countBy(rows, r => r.symptom), 3);
-  const topCategories = topN(countBy(rows, r => r.category), 3);
-  const topHandlers = topN(countBy(rows, r => r.handler), 2);
-
+  const cat = state.ui.activeCat;
+  const intro = cat
+    ? `<div class="home-context"><span class="home-context-tag">${cat}</span><span>관련 가이드를 검색했어요.</span></div>`
+    : '';
   $('#pageRoot').innerHTML = `
     <section class="main-column">
       ${heroTemplate()}
-      <section class="dashboard-overview">
-        <article class="card pad summary-card">
-          <div class="card-title">
-            <div><h2>점검 운영 현황</h2><small>${stats.latestMonth ? `${stats.latestMonth} 기준 · ` : ''}D/F/M열 미노출 적용</small></div>
-            <button class="link-btn" data-open-detail>전체 보기 ›</button>
-          </div>
-          <div class="summary-main">
-            <div class="summary-icon">✓</div>
-            <div class="summary-text">
-              <p>총 누적 점검</p>
-              <div class="summary-figure">${fmt(stats.total)}</div>
-            </div>
-            <div class="summary-rate">
-              <p>완료율</p>
-              <div class="big">${pct(stats.completed, stats.total)}</div>
-            </div>
-          </div>
-          <div class="progress">
-            <span class="pg-done" style="width:${pct(stats.completed, stats.total)}"></span>
-            <span class="pg-cancel" style="width:${pct(stats.canceled, stats.total)}"></span>
-            <span class="pg-etc" style="width:${pct(stats.etc, stats.total)}"></span>
-          </div>
-          <div class="stat-pills">
-            <span class="stat-pill"><i style="background:var(--c-done)"></i>완료 <b>${fmt(stats.completed)}</b></span>
-            <span class="stat-pill"><i style="background:var(--c-cancel)"></i>취소 <b>${fmt(stats.canceled)}</b></span>
-            <span class="stat-pill"><i style="background:var(--c-etc)"></i>기타 <b>${fmt(stats.etc)}</b></span>
-            <span class="stat-pill"><i style="background:var(--c-time)"></i>시간기록 <b>${fmt(stats.validDurations.length)}</b></span>
-            <span class="stat-pill"><i style="background:var(--c-avg)"></i>평균 <b>${Math.round(stats.avgDuration)}분</b></span>
-          </div>
-          <p class="safe-note">※ 소요시간은 <strong>교사용 업무폰 및 PC 점검 건 중심</strong>으로 기록된 값입니다. 전체 점검 건 평균 처리시간으로 해석하지 않습니다.</p>
-        </article>
-        <article class="card pad donut-card">
-          <div class="card-title"><div><h3>처리 상태 분포</h3><small>완료 / 취소 / 기타</small></div></div>
-          ${donutTemplate(stats.completed, stats.canceled, stats.etc, stats.total)}
-        </article>
-      </section>
-      <section class="three-col">
-        ${miniInsight('많이 들어온 유형', topSymptoms)}
-        ${miniInsight('주요 카테고리', topCategories)}
-        ${miniInsight('처리자 현황', topHandlers)}
-      </section>
+      ${intro}
       ${guideSectionTemplate()}
       ${quickSectionTemplate()}
       <div class="notice">가이드는 지속적으로 업데이트됩니다. 최신 정보 확인으로 정확한 상담을 지원해주세요.</div>
     </section>
-    ${rightRailTemplate(rows)}
   `;
 
   bindHeroSearch();
-  $('[data-open-detail]').addEventListener('click', () => {
-    state.view = 'detail';
-    renderNav();
-    render();
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  });
 }
 
 function heroTemplate() {
@@ -491,7 +477,7 @@ function heroTemplate() {
         <h1>${home.heroTitle}</h1>
         <p>${home.heroDescription}</p>
         <label class="hero-search">
-          <span class="si" aria-hidden="true">⌕</span>
+          <span class="si" aria-hidden="true">${UI_SVG.search}</span>
           <input id="heroSearch" type="search" placeholder="${escapeAttr(home.searchPlaceholder)}" value="${escapeAttr(state.search)}" />
           <button class="primary-btn" type="button" id="heroSearchButton">검색</button>
         </label>
@@ -502,7 +488,7 @@ function heroTemplate() {
       </div>
       <div class="hero-visual" aria-hidden="true">
         <span class="ring"></span><span class="ring r2"></span>
-        <span class="glyph">⌕</span>
+        <span class="glyph">${UI_SVG.search}</span>
       </div>
     </section>`;
 }
@@ -659,20 +645,6 @@ function donutTemplate(done, canceled, etc, total) {
     </div>`;
 }
 
-function miniInsight(title, entries) {
-  const max = Math.max(...entries.map(e => e[1]), 1);
-  const rows = entries.map(([name, count], i) => `
-    <div class="rank-row">
-      <span class="rank-no">${i + 1}</span>
-      <div class="rank-body">
-        <div class="rank-name">${name}</div>
-        <div class="rank-meter"><i style="width:${Math.max(8, count / max * 100)}%"></i></div>
-      </div>
-      <span class="rank-count">${fmt(count)}</span>
-    </div>`).join('');
-  return `<article class="card pad"><div class="card-title"><h3>${title}</h3></div><div class="rank-list">${rows || '<p class="cat-empty">데이터 없음</p>'}</div></article>`;
-}
-
 function barCard(title, entries, total) {
   const max = Math.max(...entries.map(e => e[1]), 1);
   return `<article class="card pad"><div class="card-title"><h2>${title}</h2><small>총 ${fmt(total)}건</small></div>
@@ -690,24 +662,6 @@ function quickSectionTemplate() {
   return `<section class="card pad"><div class="card-title"><h2>빠른 실행</h2><button class="link-btn">전체 보기 ›</button></div>
     <div class="three-col q4">${state.config.quickActions.map(action => `
       <div class="quick-card"><span class="tile-icon">${ICONS[action.icon] || ICONS.default}</span><div><strong>${action.title}</strong><small>${action.description}</small></div><span class="arrow">›</span></div>`).join('')}</div></section>`;
-}
-
-function rightRailTemplate(rows) {
-  const recent = rows.slice(0, 5);
-  const favorites = state.config.guideCards.slice(0, 5);
-  return `<aside class="right-rail">
-    <article class="card rail-card"><div class="card-title"><h3>최근 본 항목</h3><button class="link-btn">전체 보기 ›</button></div><div class="rail-list">
-      ${recent.map(row => `<div class="rail-item"><span class="rail-icon">◷</span><strong>${row.symptom}</strong><span class="time">${row.receivedAt || '-'}</span></div>`).join('')}
-    </div></article>
-    <article class="card rail-card"><div class="card-title"><h3>즐겨찾기</h3><button class="link-btn">전체 보기 ›</button></div><div class="rail-list">
-      ${favorites.map(card => `<div class="rail-item"><span class="rail-icon">☆</span><strong>${card.title}</strong><span class="time">${card.category.split('·')[0].trim()}</span></div>`).join('')}
-    </div></article>
-    <article class="card rail-card"><div class="card-title"><h3>최근 업데이트</h3><button class="link-btn">전체 보기 ›</button></div><div class="rail-list">
-      <div class="rail-item"><span class="new-badge">NEW</span><strong>점검 현황 상세 분석 추가</strong><span class="time">오늘</span></div>
-      <div class="rail-item"><span class="new-badge">NEW</span><strong>D/F/M열 미노출 기준 적용</strong><span class="time">오늘</span></div>
-      <div class="rail-item"><span class="new-badge">NEW</span><strong>교사용 점검 투입시간 안내 추가</strong><span class="time">오늘</span></div>
-    </div></article>
-  </aside>`;
 }
 
 function buildMonthly(rows) {

@@ -22,19 +22,9 @@
 
       <nav class="nav" id="mainNav"></nav>
 
-      <div class="side-section">
-        <div class="side-section-head">
-          <span class="side-section-title">카테고리</span>
-          <span class="side-section-count" id="sideCatCount"></span>
-        </div>
-        <div class="side-cats" id="sideCategories">
-          <p class="cat-empty">데이터 연결 대기</p>
-        </div>
-      </div>
-
       <div class="sidebar-footer">
         <button class="update-card" type="button">
-          <span class="udot" aria-hidden="true">↻</span>
+          <span class="udot" aria-hidden="true"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 3v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 21v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg></span>
           <div>
             <strong>가이드 업데이트</strong>
             <small id="lastUpdateText">CSV 연결 대기</small>
@@ -47,15 +37,15 @@
     <main class="workspace">
       <header class="topbar">
         <div class="top-search">
-          <span class="si" aria-hidden="true">⌕</span>
+          <span class="si" aria-hidden="true"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.2-3.2"/></svg></span>
           <input id="globalSearch" type="search" placeholder="검색: 상담 주제, 증상, 점검 종류, 처리자" autocomplete="off" />
-          <kbd>⌘ K</kbd>
+          <kbd>Ctrl K</kbd>
         </div>
         <div class="top-actions">
           <button class="theme-toggle" id="themeToggle" type="button" aria-label="라이트/다크 전환">
-            <span class="sun" aria-hidden="true">☀</span><span id="themeLabel">Light</span>
+            <span class="sun" aria-hidden="true"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg></span><span id="themeLabel">Light</span>
           </button>
-          <button class="icon-btn" type="button" title="알림" aria-label="알림">◔</button>
+          <button class="icon-btn" type="button" title="알림" aria-label="알림"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg></button>
           <button class="profile-btn" type="button">단비</button>
         </div>
       </header>
