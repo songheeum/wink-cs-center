@@ -113,7 +113,7 @@ h1,h2,h3{margin:0}
 .sidebar::-webkit-scrollbar{width:8px}
 .sidebar::-webkit-scrollbar-thumb{background:var(--tree-line);border-radius:8px;border:2px solid transparent;background-clip:padding-box}
 .content{min-width:0;padding:44px clamp(28px,5vw,72px) 96px;background:var(--page)}
-.main-column,.doc-main{max-width:1040px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+.main-column,.doc-main{max-width:1040px;margin:0;display:flex;flex-direction:column;gap:20px}
 
 /* ---------- Sidebar nav ---------- */
 .nav{display:flex;flex-direction:column;gap:16px}
@@ -288,6 +288,14 @@ html[data-theme="dark"] .cat-card-ic.tech,html[data-theme="dark"] .quick-doc.tec
 .doc-images{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
 .doc-images img{width:100%;border:1px solid var(--line);border-radius:var(--r-lg);background:var(--panel-soft);object-fit:contain}
 
+/* 연관 검색어(태그) — 헤더에서 분리한 검색 품질용 키워드 */
+.doc-tagbar{display:flex;align-items:flex-start;gap:14px;flex-wrap:wrap;padding:18px 4px 4px;margin-top:2px;border-top:1px solid var(--line-soft)}
+.doc-tagbar-label{display:inline-flex;align-items:center;gap:6px;flex:none;color:var(--faint);font-size:12.5px;font-weight:600;letter-spacing:-.01em;padding-top:5px}
+.doc-tagbar-label svg{width:14px;height:14px}
+.doc-tagbar-chips{display:flex;flex-wrap:wrap;gap:8px}
+.doc-kw{border:1px solid var(--line);background:var(--panel-soft);color:var(--muted);border-radius:var(--r-pill);padding:6px 12px;font-size:12.5px;font-weight:500;transition:color .14s,border-color .14s,background .14s}
+.doc-kw:hover{color:var(--primary);border-color:var(--primary);background:var(--primary-soft)}
+
 /* TOC rail */
 .toc-rail{position:sticky;top:calc(var(--topbar-h) + 20px);align-self:start;max-width:var(--toc-w)}
 .toc-inner{padding:6px 0}
@@ -298,7 +306,7 @@ html[data-theme="dark"] .cat-card-ic.tech,html[data-theme="dark"] .quick-doc.tec
 .toc-link.active{border-left-color:var(--primary);color:var(--primary);font-weight:600}
 
 /* When guide view active, use 3-col */
-body[data-view="guide"] .page{display:grid;grid-template-columns:minmax(0,1fr) var(--toc-w);gap:44px;align-items:start;max-width:1180px;margin:0 auto}
+body[data-view="guide"] .page{display:grid;grid-template-columns:minmax(0,1fr) var(--toc-w);gap:44px;align-items:start;max-width:1180px;margin:0}
 body[data-view="guide"] .doc-main{max-width:none;margin:0}
 
 /* ---------- Dashboard ---------- */

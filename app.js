@@ -343,12 +343,27 @@ const GUIDE_FIELDS = {
   images:   ['이미지','참고이미지','스크린샷','예시화면']
 };
 function mapGuideColumns(headers) {
+  const norm = (s) => String(s || '').replace(/\s/g, '').toLowerCase();
+  const H = headers.map(norm);
   const col = {};
   const taken = new Set();
-  for (const [field, aliases] of Object.entries(GUIDE_FIELDS)) {
+  const entries = Object.entries(GUIDE_FIELDS);
+  // 1패스: 정확 일치 우선 ('분류'가 '세부분류'를 가로채는 등 오매핑 방지)
+  for (const [field, aliases] of entries) {
     let idx = -1;
-    for (const a of aliases) {
-      idx = headers.findIndex((h, i) => !taken.has(i) && h.replace(/\s/g, '').includes(a.replace(/\s/g, '')));
+    for (const a of aliases.map(norm)) {
+      idx = H.findIndex((h, i) => !taken.has(i) && h === a);
+      if (idx >= 0) break;
+    }
+    col[field] = idx;
+    if (idx >= 0) taken.add(idx);
+  }
+  // 2패스: 남은 필드는 부분 일치로 보완
+  for (const [field, aliases] of entries) {
+    if (col[field] >= 0) continue;
+    let idx = -1;
+    for (const a of aliases.map(norm)) {
+      idx = H.findIndex((h, i) => !taken.has(i) && h.includes(a));
       if (idx >= 0) break;
     }
     col[field] = idx;
@@ -389,7 +404,7 @@ async function loadGuides() {
         } catch (e) { console.warn(`[가이드] ${src.category} 라이브 재시도 실패`, e); }
       }
 
-      report.push({ category: src.category, method, groups: count });
+      report.push({ category: src.category, method, groups: count, ...(state._guideDbg?.[src.category] || {}) });
       if (count === 0) {
         console.error(`[가이드] ${src.category} 로딩 결과 0건 — gid/게시 설정을 확인하세요.\n  URL: ${src.url}`);
       }
@@ -413,6 +428,13 @@ function hydrateGuide(table, category) {
   }
   const headers = table[hi].map(clean);
   const col = mapGuideColumns(headers);
+  // 진단: 감지된 헤더와 필드→컬럼 매핑 저장 (콘솔에서 window.__danbiGuideLoad로 확인 가능)
+  state._guideDbg = state._guideDbg || {};
+  state._guideDbg[category] = {
+    headers,
+    mapped: Object.fromEntries(Object.entries(col).map(([f, i]) => [f, i >= 0 ? headers[i] : '(없음)'])),
+    missing: Object.entries(col).filter(([, i]) => i < 0).map(([f]) => f)
+  };
   const get = (row, k) => col[k] >= 0 ? clean(row[col[k]]) : '';
   const map = new Map();
   table.slice(hi + 1).forEach((row, idx) => {
@@ -713,7 +735,9 @@ function bindChrome() {
 
   $('#pageRoot').addEventListener('click', (e) => {
     const doc = e.target.closest('[data-doc]');
-    if (doc) openDoc(doc.dataset.doc);
+    if (doc) { openDoc(doc.dataset.doc); return; }
+    const kw = e.target.closest('[data-keyword]');
+    if (kw) runGlobalSearch(kw.dataset.keyword);
   });
 
   document.addEventListener('click', (e) => {
@@ -723,7 +747,7 @@ function bindChrome() {
         $('[data-filter-trigger]', w)?.setAttribute('aria-expanded', 'false');
       });
     }
-    if (!e.target.closest('.top-search')) hideGlobalSuggestions();
+    if (!e.target.closest('.top-search') && !e.target.closest('#globalSuggest')) hideGlobalSuggestions();
   });
 
   window.addEventListener('resize', () => positionGlobalSuggestions());
@@ -1005,9 +1029,10 @@ function renderGuide() {
       <header class="doc-head">
         <h1>${esc(doc.title)}</h1>
         <p>${esc(doc.category)} · ${esc(doc.group)} 관련 문의를 빠르게 분류하고, 확인 사항·조치 방법·안내 멘트까지 한 번에 정리한 가이드입니다.</p>
-        <div class="doc-tags"><span class="doc-tag tone">${esc(doc.category)}</span><span class="doc-tag">${esc(doc.group)}</span>${subTags.map(t => `<span class="doc-tag">${esc(t)}</span>`).join('')}${doc.tags.map(t => `<span class="doc-tag ghost">#${esc(t)}</span>`).join('')}</div>
+        <div class="doc-tags"><span class="doc-tag tone">${esc(doc.category)}</span><span class="doc-tag">${esc(doc.group)}</span>${subTags.map(t => `<span class="doc-tag">${esc(t)}</span>`).join('')}</div>
       </header>
       ${secs.join('')}
+      ${doc.tags.length ? `<div class="doc-tagbar"><span class="doc-tagbar-label">${ICONS.tag || '#'} 연관 검색어</span><div class="doc-tagbar-chips">${doc.tags.map(t => `<button class="doc-kw" data-keyword="${escapeAttr(t)}">#${esc(t)}</button>`).join('')}</div></div>` : ''}
     </article>
     <aside class="toc-rail">
       <div class="toc-inner">
