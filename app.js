@@ -17,7 +17,7 @@ const state = {
   guides: { '기술상담': new Map(), '일반상담': new Map() },
   docById: new Map(),
   guideDocs: [],
-  ui: { expanded: new Set(['cat:기술상담']), activeDoc: null, device: '전체' }
+  ui: { expanded: new Set(['cat:기술상담']), activeDoc: null, device: '전체', acIndex: -1 }
 };
 
 const FILTER_LABELS = {
@@ -46,6 +46,18 @@ const normalizeSearch = (v) => String(v ?? '')
   .trim();
 const compactSearch = (v) => normalizeSearch(v).replace(/\s+/g, '');
 const searchTokens = (q) => normalizeSearch(q).split(' ').map(t => t.trim()).filter(Boolean);
+const escapeRegExp = (s) => String(s).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+const markKeyword = (text, query) => {
+  const raw = String(text ?? '');
+  const q = clean(query);
+  if (!q) return esc(raw);
+  const terms = [...new Set([q, ...searchTokens(q)].filter(t => t && t.length >= 1))]
+    .sort((a, b) => b.length - a.length)
+    .map(escapeRegExp);
+  if (!terms.length) return esc(raw);
+  const re = new RegExp(`(${terms.join('|')})`, 'gi');
+  return esc(raw).replace(re, '<mark>$1</mark>');
+};
 const slug = (s) => String(s).toLowerCase().replace(/\s+/g, '-').replace(/[^\w가-힣-]/g, '');
 const applyTheme = (theme) => {
   const next = theme === 'dark' ? 'dark' : 'light';
@@ -396,16 +408,16 @@ function renderNav() {
   const top = item('home', 'home', '홈', state.view === 'home') + item('dashboard', 'chart', '점검 운영 현황', state.view === 'detail');
   const branches = ['기술상담', '일반상담'].map(renderBranch).join('');
   $('#mainNav').innerHTML = `
-    <div class="nav-section-label">기본 메뉴</div>
     <div class="nav-top nav-panel">${top}</div>
-    <div class="nav-section-head">
-      <span class="nav-section-label guide">상담 가이드</span>
-      <span class="nav-mini-actions">
-        <button type="button" data-nav-action="expand">전체 열기</button>
-        <button type="button" data-nav-action="collapse">닫기</button>
-      </span>
-    </div>
-    <div class="nav-tree nav-panel">${branches}</div>`;
+    <div class="nav-tree nav-panel">
+      <div class="nav-tree-tools">
+        <span class="nav-mini-actions">
+          <button type="button" data-nav-action="expand">전체 열기</button>
+          <button type="button" data-nav-action="collapse">닫기</button>
+        </span>
+      </div>
+      ${branches}
+    </div>`;
 }
 function renderBranch(cat) {
   const icon = cat === '기술상담' ? 'tech' : 'general';
@@ -441,6 +453,124 @@ function renderBranch(cat) {
     <div class="nav-group-body">${body}</div></div>`;
 }
 
+
+/* ---------- Search autocomplete ---------- */
+function runGlobalSearch(value) {
+  const q = clean(value);
+  state.search = q;
+  const input = $('#globalSearch');
+  if (input) input.value = q;
+  hideGlobalSuggestions();
+
+  if (q) {
+    state.view = 'home';
+    state.ui.activeDoc = null;
+  } else if (state.view !== 'detail' && state.view !== 'guide') {
+    state.view = 'home';
+  }
+
+  applyFilters();
+  renderNav();
+  render();
+  if (state.view === 'home') window.scrollTo({ top: 0 });
+}
+function getKeywordSuggestions(q) {
+  const nq = normalizeSearch(q);
+  const source = [
+    ...(state.config?.home?.keywords || []),
+    ...state.guideDocs.flatMap(d => [d.title, d.subclass, d.group, ...d.tags]).filter(Boolean)
+  ];
+  const seen = new Set();
+  return source
+    .map(x => clean(x))
+    .filter(Boolean)
+    .filter(x => {
+      const key = normalizeSearch(x);
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return !nq || key.includes(nq) || compactSearch(x).includes(compactSearch(q));
+    })
+    .slice(0, 6);
+}
+function renderGlobalSuggestions() {
+  const input = $('#globalSearch');
+  const panel = $('#globalSuggest');
+  if (!input || !panel) return;
+  const q = clean(input.value);
+  const qCompact = compactSearch(q);
+
+  if (qCompact.length < 2) {
+    hideGlobalSuggestions();
+    return;
+  }
+
+  const docs = guideMatches(q).slice(0, 8);
+  const keywords = getKeywordSuggestions(q).filter(k => !docs.some(d => normalizeSearch(d.title) === normalizeSearch(k))).slice(0, 5);
+  const total = guideMatches(q).length;
+
+  if (!docs.length && !keywords.length) {
+    hideGlobalSuggestions();
+    return;
+  }
+
+  const docRows = docs.map(d => `
+    <button class="ac-option ac-doc ${d.category === '기술상담' ? 'tech' : 'general'}" type="button" role="option" data-ac-doc="${escapeAttr(d.id)}">
+      <span class="ac-kind">${d.category === '기술상담' ? ICONS.tech : ICONS.general}</span>
+      <span class="ac-main"><strong>${markKeyword(d.title, q)}</strong><small>${esc(d.category)} &gt; ${esc(d.group)}${d.subclass ? ` &gt; ${esc(d.subclass)}` : ''}</small></span>
+      <span class="ac-go">열기</span>
+    </button>`).join('');
+
+  const keywordRows = keywords.map(k => `
+    <button class="ac-option ac-query" type="button" role="option" data-ac-query="${escapeAttr(k)}">
+      <span class="ac-kind">${ICONS.search}</span>
+      <span class="ac-main"><strong>${markKeyword(k, q)}</strong><small>이 키워드로 전체 검색</small></span>
+    </button>`).join('');
+
+  const allSearchRow = q ? `
+    <button class="ac-option ac-all" type="button" role="option" data-ac-query="${escapeAttr(q)}">
+      <span class="ac-kind">${ICONS.list}</span>
+      <span class="ac-main"><strong>“${esc(q)}” 전체 검색 결과 보기</strong><small>기술상담 · 일반상담 전체에서 검색</small></span>
+      <span class="ac-count">${fmt(total)}건</span>
+    </button>` : '';
+
+  panel.innerHTML = `
+    <div class="ac-head">
+      <strong>${q ? `“${esc(q)}” 자동완성` : '추천 검색어'}</strong>
+      <small>${q ? '가이드 제목을 바로 열거나 전체 검색할 수 있어요.' : '자주 쓰는 키워드와 시트 상단 가이드'}</small>
+    </div>
+    ${docRows ? `<div class="ac-section"><span>가이드 제목</span>${docRows}</div>` : ''}
+    ${keywordRows ? `<div class="ac-section"><span>키워드</span>${keywordRows}</div>` : ''}
+    ${allSearchRow ? `<div class="ac-section ac-bottom">${allSearchRow}</div>` : ''}
+    ${q && !docs.length && !keywords.length ? `<div class="ac-empty">일치하는 자동완성이 없습니다. Enter를 누르면 전체 검색합니다.</div>` : ''}`;
+
+  state.ui.acIndex = -1;
+  panel.hidden = false;
+}
+function hideGlobalSuggestions() {
+  const panel = $('#globalSuggest');
+  if (panel) panel.hidden = true;
+  state.ui.acIndex = -1;
+}
+function moveSuggestion(delta) {
+  const panel = $('#globalSuggest');
+  if (!panel || panel.hidden) return false;
+  const options = $$('.ac-option', panel);
+  if (!options.length) return false;
+  state.ui.acIndex = (state.ui.acIndex + delta + options.length) % options.length;
+  options.forEach((el, i) => el.classList.toggle('active', i === state.ui.acIndex));
+  options[state.ui.acIndex]?.scrollIntoView({ block: 'nearest' });
+  return true;
+}
+function chooseActiveSuggestion() {
+  const panel = $('#globalSuggest');
+  if (!panel || panel.hidden || state.ui.acIndex < 0) return false;
+  const options = $$('.ac-option', panel);
+  const selected = options[state.ui.acIndex];
+  if (!selected) return false;
+  selected.click();
+  return true;
+}
+
 /* ---------- Bindings ---------- */
 function bindChrome() {
   $('#mainNav').addEventListener('click', (e) => {
@@ -464,6 +594,7 @@ function bindChrome() {
       state.search = '';
       const gs = $('#globalSearch');
       if (gs) gs.value = '';
+      hideGlobalSuggestions();
     }
     state.view = nextView;
     state.ui.activeDoc = null;
@@ -482,10 +613,12 @@ function bindChrome() {
         $('[data-filter-trigger]', w)?.setAttribute('aria-expanded', 'false');
       });
     }
+    if (!e.target.closest('.top-search')) hideGlobalSuggestions();
   });
 
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
+      hideGlobalSuggestions();
       $$('.filter-control.open').forEach(w => {
         w.classList.remove('open');
         $('[data-filter-trigger]', w)?.setAttribute('aria-expanded', 'false');
@@ -493,20 +626,32 @@ function bindChrome() {
     }
   });
 
-  $('#globalSearch').addEventListener('input', (e) => {
-    state.search = e.target.value.trim();
+  $('#globalSearch').addEventListener('input', () => {
+    renderGlobalSuggestions();
+  });
 
-    // 가이드 상세에서 검색을 시작하면 현재 좌측 선택 문서는 무시하고
-    // 기술상담·일반상담 전체 검색 결과 화면으로 전환한다.
-    if (state.search && state.view !== 'detail') {
-      state.view = 'home';
-      state.ui.activeDoc = null;
+  $('#globalSearch').addEventListener('focus', () => {
+    renderGlobalSuggestions();
+  });
+
+  $('#globalSearch').addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowDown') { e.preventDefault(); moveSuggestion(1); return; }
+    if (e.key === 'ArrowUp') { e.preventDefault(); moveSuggestion(-1); return; }
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      if (!chooseActiveSuggestion()) runGlobalSearch($('#globalSearch').value);
+      return;
     }
+    if (e.key === 'Escape') hideGlobalSuggestions();
+  });
 
-    applyFilters();
-    renderNav();
-    render();
-    if (state.search && state.view === 'home') window.scrollTo({ top: 0 });
+  $('#globalSearchBtn')?.addEventListener('click', () => runGlobalSearch($('#globalSearch').value));
+
+  $('#globalSuggest')?.addEventListener('click', (e) => {
+    const doc = e.target.closest('[data-ac-doc]');
+    if (doc) { hideGlobalSuggestions(); openDoc(doc.dataset.acDoc); return; }
+    const query = e.target.closest('[data-ac-query]');
+    if (query) runGlobalSearch(query.dataset.acQuery);
   });
 
   applyTheme(document.documentElement.dataset.theme || getInitialTheme());
@@ -518,7 +663,7 @@ function bindChrome() {
   });
 
   document.addEventListener('keydown', (e) => {
-    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); $('#globalSearch').focus(); }
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); $('#globalSearch').focus(); renderGlobalSuggestions(); }
   });
 
   // 복사 버튼 (위임)
@@ -616,22 +761,22 @@ function renderHome() {
       </section>`;
 
   const resultBlock = q ? `
-    <section class="card pad search-results-card">
-      <div class="card-title search-title">
+    <section class="search-portal">
+      <div class="portal-head">
         <div>
-          <h2>전체 상담가이드 검색 결과</h2>
-          <small>현재 선택된 좌측 문서와 무관하게 기술상담·일반상담 전체에서 찾습니다.</small>
+          <h2><mark>${esc(q)}</mark> 검색 결과</h2>
+          <p>좌측에서 보고 있던 문서와 관계없이 전체 상담가이드에서 찾았습니다.</p>
         </div>
-        <small class="search-count">"${esc(q)}" · ${resultCounts.total}건</small>
+        <span class="portal-count">총 ${resultCounts.total}건</span>
       </div>
-      <div class="search-scope-row" aria-label="검색 범위">
-        <span class="scope-pill active">전체 ${resultCounts.total}</span>
-        <span class="scope-pill tech">기술상담 ${resultCounts.tech}</span>
-        <span class="scope-pill general">일반상담 ${resultCounts.general}</span>
-        <span class="scope-help">제목 · 카테고리 · 태그 · 고객표현 · 확인사항 · 조치방법 · 안내멘트까지 검색</span>
+      <div class="portal-scope" aria-label="검색 범위">
+        <span>전체 ${resultCounts.total}</span>
+        <span class="tech">기술상담 ${resultCounts.tech}</span>
+        <span class="general">일반상담 ${resultCounts.general}</span>
+        <em>가이드 제목 · 카테고리 · 태그 · 고객표현 · 조치방법까지 검색</em>
       </div>
-      ${results.length ? `<div class="result-list">${results.map(resultRow).join('')}</div>${resultCounts.total > results.length ? `<p class="more-results-note">상위 ${results.length}건만 먼저 보여줍니다. 더 좁은 키워드를 추가하면 정확도가 올라갑니다.</p>` : ''}`
-        : `<p class="empty-inline">일치하는 가이드가 없습니다. 띄어쓰기 없이 검색하거나 고객 표현 그대로 검색해보세요.</p>`}
+      ${results.length ? `<div class="portal-result-list">${results.map(d => portalResultRow(d, q)).join('')}</div>${resultCounts.total > results.length ? `<p class="more-results-note">상위 ${results.length}건만 먼저 보여줍니다. 키워드를 하나 더 넣으면 더 정확해집니다.</p>` : ''}`
+        : `<p class="empty-inline portal-empty">일치하는 가이드가 없습니다. 띄어쓰기 없이 검색하거나 고객 표현 그대로 검색해보세요.</p>`}
     </section>` : `${categoryGridBlock()}${guideQuickListBlock()}`;
 
   $('#pageRoot').innerHTML = `
@@ -642,19 +787,32 @@ function renderHome() {
 
   bindHomeSearch();
 }
-function resultRow(d) {
+function pickSnippet(d, q) {
+  const chunks = [
+    ...d.expr,
+    ...d.check,
+    ...d.steps,
+    d.guide,
+    d.note,
+    d.caution,
+    ...d.history,
+    ...d.photos.map(p => `${p.title} ${p.desc} ${p.url}`),
+    d.summary
+  ].filter(Boolean);
+  const nq = normalizeSearch(q);
+  const cq = compactSearch(q);
+  return chunks.find(x => normalizeSearch(x).includes(nq) || compactSearch(x).includes(cq)) || chunks[0] || '';
+}
+function portalResultRow(d, q) {
   const type = d.category === '기술상담' ? 'tech' : 'general';
-  const snippet = d.expr[0] || d.check[0] || d.steps[0] || d.guide || '';
-  const tags = [d.category, d.group, d.subclass, ...d.tags.slice(0, 3)].filter(Boolean);
-  return `<button class="result-row ${type}" data-doc="${escapeAttr(d.id)}">
-    <span class="result-ic ${type}">${type === 'tech' ? ICONS.tech : ICONS.general}</span>
-    <span class="result-main">
-      <strong>${esc(d.title)}</strong>
-      <small>${esc(d.category)} · ${esc(d.group)}${d.subclass ? ` · ${esc(d.subclass)}` : ''}</small>
-      ${snippet ? `<em>${esc(snippet).slice(0, 92)}</em>` : ''}
-      <span class="result-tags">${tags.map(t => `<b>${esc(t)}</b>`).join('')}</span>
-    </span>
-    <span class="result-arrow">${CHEV}</span></button>`;
+  const snippet = pickSnippet(d, q);
+  const tags = [d.subclass, ...d.tags.slice(0, 4)].filter(Boolean);
+  return `<button class="portal-result ${type}" data-doc="${escapeAttr(d.id)}">
+    <span class="portal-title">${markKeyword(d.title, q)}</span>
+    <span class="portal-path">${esc(d.category)} &gt; ${esc(d.group)}${d.subclass ? ` &gt; ${esc(d.subclass)}` : ''}</span>
+    ${snippet ? `<span class="portal-snippet">${markKeyword(snippet, q)}</span>` : ''}
+    ${tags.length ? `<span class="portal-tags">${tags.map(t => `<b>${markKeyword(t, q)}</b>`).join('')}</span>` : ''}
+  </button>`;
 }
 function categoryGridBlock() {
   const cards = [];
