@@ -823,16 +823,6 @@ function renderHome() {
           <div class="keyword-row"><span class="keyword-label">추천 검색어</span>
             ${home.keywords.map(k => `<button class="chip" data-keyword="${escapeAttr(k)}">${esc(k)}</button>`).join('')}</div>
         </div>
-        <div class="hero-visual" aria-hidden="true">
-          <span class="hv-glow"></span>
-          <span class="hv-panel hv-p1"></span>
-          <span class="hv-panel hv-p2"></span>
-          <span class="hv-card">
-            <span class="hv-line w1"></span>
-            <span class="hv-line w2"></span>
-            <span class="hv-spark">${ICONS.bolt}</span>
-          </span>
-        </div>
       </section>`;
 
   const resultBlock = q ? `
@@ -864,15 +854,13 @@ function renderHome() {
 }
 function pickSnippet(d, q) {
   const chunks = [
-    ...d.expr,
-    ...d.check,
-    ...d.steps,
+    ...(d.expr || []),
+    ...(d.check || []),
+    ...(d.steps || []),
     d.guide,
-    d.note,
+    ...(d.escal || []),
     d.caution,
-    ...d.history,
-    ...d.photos.map(p => `${p.title} ${p.desc} ${p.url}`),
-    d.summary
+    ...(d.images || [])
   ].filter(Boolean);
   const nq = normalizeSearch(q);
   const cq = compactSearch(q);
