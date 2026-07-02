@@ -87,6 +87,8 @@ const ICONS = {
   check: SVG('<path d="M20 6 9 17l-5-5"/>'),
   search: SVG('<circle cx="11" cy="11" r="7"/><path d="m20 20-3.2-3.2"/>'),
   bolt: SVG('<path d="M13 2 4 14h6l-1 8 9-12h-6z"/>'),
+  expand: SVG('<path d="m7 13 5 5 5-5M7 6l5 5 5-5"/>'),
+  collapse: SVG('<path d="m7 11 5-5 5 5M7 18l5-5 5 5"/>'),
   list: SVG('<path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>'),
   camera: SVG('<path d="M4 8h3l1.5-2h7L17 8h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13" r="3"/>'),
   wifi: SVG('<path d="M5 12.5a10 10 0 0 1 14 0"/><path d="M8.5 15.8a5 5 0 0 1 7 0"/><path d="M2 9a15 15 0 0 1 20 0"/><path d="M12 19h.01"/>'),
@@ -133,6 +135,32 @@ function groupIcon(grp, cat) {
   ];
   for (const [re, ic] of rules) if (re.test(g)) return ic;
   return cat === '기술상담' ? ICONS.tech : ICONS.general;
+}
+
+/* 카테고리 그룹명 → 액센트 색상 클래스 (아이콘과 짝) */
+function groupAccent(grp, cat) {
+  const g = String(grp || '');
+  const rules = [
+    [/와이파이|wifi|네트워크|인터넷|속도|버퍼링/i, 'acc-sky'],
+    [/전원|충전|배터리|화면|밝기/i, 'acc-amber'],
+    [/원격|기능검사|점검|모니터/i, 'acc-indigo'],
+    [/기기\s*설정|기본정보|환경설정/i, 'acc-violet'],
+    [/업데이트|초기화|리셋|재설정|앱\s*작동/i, 'acc-teal'],
+    [/탈출|접근제한|잠금|보안|권한/i, 'acc-rose'],
+    [/초기화\/설정|설정/i, 'acc-blue'],
+    [/업무툴|관리자|어드민/i, 'acc-indigo'],
+    [/체험신청|체험운영|신청/i, 'acc-emerald'],
+    [/해지|환불|청약철회|취소/i, 'acc-rose'],
+    [/학습운영|수업|단계|강의/i, 'acc-violet'],
+    [/결제|할인|위약금|요금/i, 'acc-blue'],
+    [/시스템|이관|응대|서버/i, 'acc-orange'],
+    [/교재|구성품|추가구매|부품/i, 'acc-amber'],
+    [/배송|회수|반품|택배/i, 'acc-teal'],
+    [/유료학습|상품안내|상품|가격/i, 'acc-emerald'],
+    [/혜택|이벤트|리워드|쿠폰|사은품/i, 'acc-orange'],
+  ];
+  for (const [re, ac] of rules) if (re.test(g)) return ac;
+  return cat === '기술상담' ? 'acc-indigo' : 'acc-teal';
 }
 
 /* ---------- Init ---------- */
@@ -515,17 +543,17 @@ function guideMatches(query) {
 
 /* ---------- Nav (좌측 트리) ---------- */
 function renderNav() {
-  const item = (id, icon, label, active) =>
-    `<button class="nav-item ${active ? 'active' : ''}" data-view="${id}"><span class="ico">${ICONS[icon] || ICONS.default}</span><span class="nav-item-label">${label}</span></button>`;
-  const top = item('home', 'home', '홈', state.view === 'home') + item('dashboard', 'chart', '점검 운영 현황', state.view === 'detail');
+  const item = (id, icon, label, active, accent) =>
+    `<button class="nav-item ${active ? 'active' : ''}" data-view="${id}"><span class="nav-item-ic ${accent}">${ICONS[icon] || ICONS.default}</span><span class="nav-item-label">${label}</span></button>`;
+  const top = item('home', 'home', '홈', state.view === 'home', 'acc-indigo') + item('dashboard', 'chart', '점검 운영 현황', state.view === 'detail', 'acc-teal');
   const branches = ['기술상담', '일반상담'].map(renderBranch).join('');
   $('#mainNav').innerHTML = `
     <div class="nav-top nav-panel">${top}</div>
     <div class="nav-tree nav-panel">
       <div class="nav-tree-tools">
         <span class="nav-mini-actions">
-          <button type="button" data-nav-action="expand">전체 열기</button>
-          <button type="button" data-nav-action="collapse">닫기</button>
+          <button type="button" data-nav-action="expand">${ICONS.expand || ''}펼치기</button>
+          <button type="button" data-nav-action="collapse">${ICONS.collapse || ''}접기</button>
         </span>
       </div>
       ${branches}
@@ -962,7 +990,7 @@ function categoryGridBlock() {
     <div class="card-title"><h2>카테고리 바로가기</h2><small>기술·일반상담 ${cards.length}개 분류</small></div>
     <div class="cat-grid">${cards.map(c => `
       <button class="cat-card" data-doc="${escapeAttr(c.first)}">
-        <span class="cat-card-ic ${c.cat === '기술상담' ? 'tech' : 'gen'}">${groupIcon(c.grp, c.cat)}</span>
+        <span class="cat-card-ic ${groupAccent(c.grp, c.cat)}">${groupIcon(c.grp, c.cat)}</span>
         <span class="cat-card-body"><strong>${esc(c.grp)}</strong><small>${esc(c.cat)} · ${c.count}개 문서</small></span>
         <span class="result-arrow">${CHEV}</span></button>`).join('')}</div></section>`;
 }
@@ -972,7 +1000,7 @@ function guideQuickListBlock() {
   return `<section class="card pad guide-quick-card">
     <div class="card-title"><div><h2>가이드 빠른 목록</h2><small>시트 상단 기준 · 자주 봐야 할 문서를 위에 배치하면 메인에 먼저 노출됩니다.</small></div></div>
     <div class="quick-doc-grid">${docs.map(d => `<button class="quick-doc ${d.category === '기술상담' ? 'tech' : 'general'}" data-doc="${escapeAttr(d.id)}">
-      <span class="quick-doc-icon">${d.category === '기술상담' ? ICONS.tech : ICONS.general}</span>
+      <span class="quick-doc-icon ${groupAccent(d.group, d.category)}">${groupIcon(d.group, d.category)}</span>
       <span><strong>${esc(d.title)}</strong><small>${esc(d.category)} · ${esc(d.group)}</small></span>
     </button>`).join('')}</div>
   </section>`;
