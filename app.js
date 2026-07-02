@@ -17,7 +17,7 @@ const state = {
   guides: { '기술상담': new Map(), '일반상담': new Map() },
   docById: new Map(),
   guideDocs: [],
-  ui: { expanded: new Set(['cat:기술상담']), activeDoc: null, device: '전체', acIndex: -1 }
+  ui: { expanded: new Set(['cat:기술상담']), activeDoc: null, activeCat: '기술상담', device: '전체', acIndex: -1 }
 };
 
 const FILTER_LABELS = {
@@ -543,54 +543,51 @@ function guideMatches(query) {
 
 /* ---------- Nav (좌측 트리) ---------- */
 function renderNav() {
-  const item = (id, icon, label, active, accent) =>
-    `<button class="nav-item ${active ? 'active' : ''}" data-view="${id}"><span class="nav-item-ic ${accent}">${ICONS[icon] || ICONS.default}</span><span class="nav-item-label">${label}</span></button>`;
-  const top = item('home', 'home', '홈', state.view === 'home', 'acc-indigo') + item('dashboard', 'chart', '점검 운영 현황', state.view === 'detail', 'acc-teal');
-  const branches = ['기술상담', '일반상담'].map(renderBranch).join('');
+  const item = (id, icon, label, active) =>
+    `<button class="nav-item ${active ? 'active' : ''}" data-view="${id}"><span class="nav-item-ic">${ICONS[icon] || ICONS.default}</span><span class="nav-item-label">${label}</span></button>`;
+  const top = item('home', 'home', '홈', state.view === 'home') + item('dashboard', 'chart', '점검 운영 현황', state.view === 'detail');
+
+  // 기술/일반 세그먼트 스위치 — 활성 탭만 트리로 노출
+  const cat = state.ui.activeCat;
+  const seg = ['기술상담', '일반상담'].map(c => {
+    const ic = c === '기술상담' ? 'tech' : 'general';
+    return `<button class="nav-seg ${cat === c ? 'on' : ''}" data-seg="${c}"><span class="nav-seg-ic">${ICONS[ic]}</span><span>${c}</span></button>`;
+  }).join('');
+
   $('#mainNav').innerHTML = `
     <div class="nav-top nav-panel">${top}</div>
     <div class="nav-tree nav-panel">
+      <div class="nav-seg-wrap">${seg}</div>
       <div class="nav-tree-tools">
         <span class="nav-mini-actions">
           <button type="button" data-nav-action="expand">${ICONS.expand || ''}펼치기</button>
           <button type="button" data-nav-action="collapse">${ICONS.collapse || ''}접기</button>
         </span>
       </div>
-      ${branches}
+      ${renderTree(cat)}
     </div>`;
 }
-function renderBranch(cat) {
+function renderTree(cat) {
   const icon = cat === '기술상담' ? 'tech' : 'general';
-  const open = state.ui.expanded.has('cat:' + cat);
   const groups = state.guides[cat];
-  let body;
-  let branchCurrent = false;
-
   if (!groups || !groups.size) {
     const fb = (state.config.sidebarGroups?.find(g => g.label === cat)?.items) || [];
-    body = fb.length
+    const body = fb.length
       ? fb.map(l => `<div class="nav-cat2 is-loading"><span class="nav-cat2-label">${l}</span></div>`).join('')
       : `<div class="nav-empty">불러오는 중…</div>`;
-  } else {
-    body = [...groups.entries()].map(([grp, docs]) => {
-      const gk = 'grp:' + cat + '/' + grp;
-      const gopen = state.ui.expanded.has(gk);
-      const current = docs.some(d => state.ui.activeDoc === d.id);
-      if (current) branchCurrent = true;
-      const leaves = docs.map(d =>
-        `<button class="nav-doc ${state.ui.activeDoc === d.id ? 'active' : ''}" data-doc="${escapeAttr(d.id)}">${esc(d.title)}</button>`).join('');
-      return `<div class="nav-cat2wrap type-${icon} ${gopen ? 'open' : ''} ${current ? 'current' : ''}">
-        <button class="nav-cat2 type-${icon} ${current ? 'current' : ''}" data-grp="${escapeAttr(gk)}"><span class="ng-chev sm">${CHEV}</span><span class="nav-cat2-label">${esc(grp)}</span><span class="nav-cat2-count">${docs.length}</span></button>
-        <div class="nav-doc-body">${leaves}</div></div>`;
-    }).join('');
+    return `<div class="nav-group type-${icon}">${body}</div>`;
   }
-
-  return `<div class="nav-group type-${icon} ${open ? 'open' : ''} ${branchCurrent ? 'current' : ''}">
-    <button class="nav-sep-label nav-branch-row" data-branch="${escapeAttr(cat)}" aria-label="${cat} 접기/펼치기">
-      <span class="ico ico-${icon}">${ICONS[icon]}</span><span class="nav-branch-title">${cat}</span>
-      <span class="nav-branch-toggle" aria-hidden="true"><span class="ng-chev">${CHEV}</span></span>
-    </button>
-    <div class="nav-group-body">${body}</div></div>`;
+  const body = [...groups.entries()].map(([grp, docs]) => {
+    const gk = 'grp:' + cat + '/' + grp;
+    const gopen = state.ui.expanded.has(gk);
+    const current = docs.some(d => state.ui.activeDoc === d.id);
+    const leaves = docs.map(d =>
+      `<button class="nav-doc ${state.ui.activeDoc === d.id ? 'active' : ''}" data-doc="${escapeAttr(d.id)}">${esc(d.title)}</button>`).join('');
+    return `<div class="nav-cat2wrap type-${icon} ${gopen ? 'open' : ''} ${current ? 'current' : ''}">
+      <button class="nav-cat2 type-${icon} ${current ? 'current' : ''}" data-grp="${escapeAttr(gk)}"><span class="ng-chev sm">${CHEV}</span><span class="nav-cat2-label">${esc(grp)}</span><span class="nav-cat2-count">${docs.length}</span></button>
+      <div class="nav-doc-body">${leaves}</div></div>`;
+  }).join('');
+  return `<div class="nav-group type-${icon}">${body}</div>`;
 }
 
 
@@ -740,8 +737,14 @@ function bindChrome() {
       renderNav();
       return;
     }
-    const branch = e.target.closest('[data-branch]');
-    if (branch) { toggleExpand('cat:' + branch.dataset.branch); renderNav(); return; }
+    const seg = e.target.closest('[data-seg]');
+    if (seg) {
+      if (state.ui.activeCat !== seg.dataset.seg) {
+        state.ui.activeCat = seg.dataset.seg;
+        renderNav();
+      }
+      return;
+    }
     const grp = e.target.closest('[data-grp]');
     if (grp) { toggleExpand(grp.dataset.grp); renderNav(); return; }
     const doc = e.target.closest('[data-doc]');
@@ -819,6 +822,17 @@ function bindChrome() {
     if (query) runGlobalSearch(query.dataset.acQuery);
   });
 
+  $('#brandHome')?.addEventListener('click', () => {
+    resetFiltersSilently();
+    state.search = '';
+    const gs = $('#globalSearch');
+    if (gs) gs.value = '';
+    hideGlobalSuggestions();
+    state.view = 'home';
+    state.ui.activeDoc = null;
+    renderNav(); render(); window.scrollTo({ top: 0 });
+  });
+
   applyTheme(document.documentElement.dataset.theme || getInitialTheme());
   $('#themeToggle').addEventListener('click', () => {
     const html = document.documentElement;
@@ -849,15 +863,14 @@ function toggleExpand(key) {
   else state.ui.expanded.add(key);
 }
 function expandAllNav() {
-  ['기술상담', '일반상담'].forEach(cat => {
-    state.ui.expanded.add('cat:' + cat);
-    const groups = state.guides[cat];
-    if (groups) groups.forEach((_, grp) => state.ui.expanded.add('grp:' + cat + '/' + grp));
-  });
+  const cat = state.ui.activeCat;
+  const groups = state.guides[cat];
+  if (groups) groups.forEach((_, grp) => state.ui.expanded.add('grp:' + cat + '/' + grp));
 }
 function collapseAllNav() {
+  const cat = state.ui.activeCat;
   [...state.ui.expanded].forEach(key => {
-    if (key.startsWith('grp:') || key.startsWith('cat:')) state.ui.expanded.delete(key);
+    if (key.startsWith('grp:' + cat + '/')) state.ui.expanded.delete(key);
   });
 }
 function openDoc(id) {
@@ -866,6 +879,7 @@ function openDoc(id) {
   state.ui.activeDoc = id;
   state.ui.device = '전체';
   state.view = 'guide';
+  state.ui.activeCat = doc.category;
   state.ui.expanded.add('cat:' + doc.category);
   state.ui.expanded.add('grp:' + doc.category + '/' + doc.group);
   renderNav();
