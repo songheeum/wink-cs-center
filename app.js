@@ -76,9 +76,9 @@ const SVG = (i) => `<svg viewBox="0 0 24 24" width="1em" height="1em" fill="none
 const CHEV = SVG('<path d="m6 9 6 6 6-6"/>');
 const ICONS = {
   home: SVG('<path d="M3 9.5 12 3l9 6.5"/><path d="M5 9v11h14V9"/><path d="M9.5 20v-6h5v6"/>'),
-  chart: SVG('<path d="M3 3v18h18"/><rect x="7" y="12" width="2.6" height="5" rx=".6"/><rect x="11.7" y="8" width="2.6" height="9" rx=".6"/><rect x="16.4" y="14" width="2.6" height="3" rx=".6"/>'),
+  chart: SVG('<path d="M3 4v16h18"/><path d="m7 14.5 3.6-4.2 3 2.6L18.5 7"/><circle cx="18.5" cy="7" r="1.1" fill="currentColor" stroke="none"/>'),
   tech: SVG('<path d="M14.6 6.3a4 4 0 0 0-5.3 5.3l-6 6a2 2 0 1 0 2.8 2.8l6-6a4 4 0 0 0 5.3-5.3l-2.6 2.6-2.2-.5-.5-2.2z"/>'),
-  general: SVG('<path d="M21 11.5a8.4 8.4 0 0 1-8.5 8.4 8.4 8.4 0 0 1-3.7-.9L3 21l1.9-5.7A8.4 8.4 0 0 1 12.5 3 8.4 8.4 0 0 1 21 11.5z"/><path d="M9 11h.01M12 11h.01M15 11h.01"/>'),
+  general: SVG('<path d="M4.5 13a7.5 7.5 0 0 1 15 0"/><rect x="3" y="12.5" width="4" height="6" rx="1.7"/><rect x="17" y="12.5" width="4" height="6" rx="1.7"/><path d="M19.5 18.5v.7a2.6 2.6 0 0 1-2.6 2.6H13"/>'),
   sync: SVG('<path d="M21 3v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 21v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/>'),
   message: SVG('<path d="M21 11.5a8.4 8.4 0 0 1-8.5 8.4 8.4 8.4 0 0 1-3.7-.9L3 21l1.9-5.7A8.4 8.4 0 0 1 12.5 3 8.4 8.4 0 0 1 21 11.5z"/>'),
   image: SVG('<rect x="3" y="3" width="18" height="18" rx="2.5"/><circle cx="8.5" cy="8.5" r="1.6"/><path d="m21 15-4.5-4.5L5 21"/>'),
@@ -1056,7 +1056,7 @@ function renderGuide() {
       <nav class="breadcrumb">${esc(doc.category)} <span>›</span> ${esc(doc.group)}${doc.subclass ? ` <span>›</span> ${esc(doc.subclass)}` : ''}</nav>
       <header class="doc-head">
         <h1>${esc(doc.title)}</h1>
-        <p>${esc(doc.category)} · ${esc(doc.group)} 관련 문의를 빠르게 분류하고, 확인 사항·조치 방법·안내 멘트까지 한 번에 정리한 가이드입니다.</p>
+        <p>확인 사항 · 조치 방법 · 안내 멘트를 한눈에 정리한 상담 가이드입니다.</p>
         <div class="doc-tags"><span class="doc-tag tone">${esc(doc.category)}</span><span class="doc-tag">${esc(doc.group)}</span>${subTags.map(t => `<span class="doc-tag">${esc(t)}</span>`).join('')}</div>
       </header>
       ${secs.join('')}
